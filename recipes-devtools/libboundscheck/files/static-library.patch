@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Build static library instead of shared.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+--- a/Makefile	2021-09-17 13:14:58.559510146 +0200
++++ b/Makefile	2021-09-17 13:16:51.536843159 +0200
+@@ -1,4 +1,4 @@
+-PROJECT=libboundscheck.so
++PROJECT = libboundscheck.a
+ 
+ CC?=gcc
+ 
+@@ -31,8 +31,7 @@
+ LD_FLAG = -fPIC -s -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all
+ 
+ $(PROJECT): $(OBJECTS)
+-	mkdir -p lib
+-	$(CC)  -shared -o lib/$@ $(patsubst %.o,obj/%.o,$(notdir $(OBJECTS))) $(LD_FLAG)
++	ar q $(PROJECT) $(patsubst %.o,obj/%.o,$(notdir $(OBJECTS)))
+ 	@echo "finish $(PROJECT)"
+ 
+ .c.o:
+@@ -40,5 +39,5 @@
+ 	$(CC) -c $< $(CFLAG) -o obj/$(patsubst %.c,%.o,$(notdir $<))
+ 
+ clean:
+-	-rm -rf obj lib
++	-rm -rf obj
+ 	@echo "clean up"
