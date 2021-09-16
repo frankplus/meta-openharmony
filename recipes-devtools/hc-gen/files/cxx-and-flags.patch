@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Use $CXX, $CXXFLAGS and $LDFLAGS environment variables, for proper Bitbake
+integration.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+--- a/Makefile
++++ b/Makefile
+@@ -2,9 +2,9 @@ Q = @
+ BUILD_DIR := build
+ TARGET := $(BUILD_DIR)/hc-gen
+ 
+-CXX := c++
+-CXX_FLAGS := -std=gnu++14
+-CXX_LD_FLAGS := -lstdc++
++CXX ?= c++
++CXX_FLAGS := -std=gnu++14 $(CXXFLAGS)
++CXX_LD_FLAGS := -lstdc++ $(LDFLAGS)
+ 
+ SRCS := $(wildcard src/*.cpp)
+ OBJECTS := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
