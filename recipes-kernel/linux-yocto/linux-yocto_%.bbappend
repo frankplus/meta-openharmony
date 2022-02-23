@@ -5,3 +5,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-yocto:"
 
 SRC_URI:append:oniro-openharmony-linux = " file://ashmem.cfg"
+SRC_URI:append:oniro-openharmony-linux = " file://driver-add-hilog-and-hievent-buffer-management-drive.patch"
+SRC_URI:append:oniro-openharmony-linux = " file://driver-add-hilog-and-hievent-buffer-management-drive.cfg"
