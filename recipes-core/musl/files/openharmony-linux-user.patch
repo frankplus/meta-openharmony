@@ -1,0 +1,411 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch generated from OpenHarmony-v3.0-LTS version, with the following commands:
+
+    cp -r porting/linux/user/* .
+    git diff > openharmony-linux-user.patch
+
+The hunks from 0001-Make-dynamic-linker-a-relative-symlink-to-libc.patch in
+Yocto was removed here.
+
+Upstream-status: Pending
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+
+diff --git a/arch/arm/bits/fenv.h b/arch/arm/bits/fenv.h
+index d85fc86d7947..b497a9878800 100644
+--- a/arch/arm/bits/fenv.h
++++ b/arch/arm/bits/fenv.h
+@@ -9,10 +9,10 @@
+ #define FE_INEXACT    16
+ #define FE_ALL_EXCEPT 31
+ #define FE_TONEAREST  0
+-#define FE_DOWNWARD   0x800000
+-#define FE_UPWARD     0x400000
+ #define FE_TOWARDZERO 0xc00000
+ #endif
++#define FE_DOWNWARD   0x800000
++#define FE_UPWARD     0x400000
+ 
+ typedef unsigned long fexcept_t;
+ 
+diff --git a/arch/generic/bits/shm.h b/arch/generic/bits/shm.h
+index 8d19378191ba..da07a2a0cb50 100644
+--- a/arch/generic/bits/shm.h
++++ b/arch/generic/bits/shm.h
+@@ -1,4 +1,4 @@
+-#define SHMLBA 4096
++#define SHMLBA (4*4096)
+ 
+ struct shmid_ds {
+ 	struct ipc_perm shm_perm;
+diff --git a/include/alltypes.h.in b/include/alltypes.h.in
+index d9ff462e1eb4..8903736cd327 100644
+--- a/include/alltypes.h.in
++++ b/include/alltypes.h.in
+@@ -9,8 +9,8 @@ TYPEDEF _Addr ssize_t;
+ TYPEDEF _Addr intptr_t;
+ TYPEDEF _Addr regoff_t;
+ TYPEDEF _Reg register_t;
+-TYPEDEF _Int64 time_t;
+-TYPEDEF _Int64 suseconds_t;
++TYPEDEF long time_t;
++TYPEDEF long suseconds_t;
+ 
+ TYPEDEF signed char     int8_t;
+ TYPEDEF signed short    int16_t;
+diff --git a/include/ctype.h b/include/ctype.h
+index 7936536f577c..7b91d3ef6228 100644
+--- a/include/ctype.h
++++ b/include/ctype.h
+@@ -66,6 +66,11 @@ int   toascii(int);
+ #define _toupper(a) ((a)&0x5f)
+ #define isascii(a) (0 ? isascii(a) : (unsigned)(a) < 128)
+ 
++#include <stdint.h>
++
++const int32_t **__ctype_tolower_loc(void);
++const int32_t **__ctype_toupper_loc(void);
++
+ #endif
+ 
+ #ifdef __cplusplus
+diff --git a/include/pthread.h b/include/pthread.h
+index 984db6806418..73793e47ef53 100644
+--- a/include/pthread.h
++++ b/include/pthread.h
+@@ -6,6 +6,24 @@ extern "C" {
+ 
+ #include <features.h>
+ 
++/* Musl did not provide the "owner" macro directly,
++ * so users can not access the mutex-ower-ID.
++ * Thus we added this macro for getting the owner-ID
++ * of the mutex. */
++#define MUTEX_OWNER __u.__vi[1] & 0x7fffffff
++
++/* These macros provides macros for accessing inner
++ * attributes of the pthread_mutex_t struct.
++ * It is intended for solving the coompiling failure
++ * of Dopra codes which claims that .__data.* realm
++ * can not be found in pthread_mutex_t. */
++#define MUTEX_TYPE __u.__i[0]
++#define MUTEX_LOCK __u.__vi[1]
++#define MUTEX_WAITERS __u.__vi[2]
++#define MUTEX_PREV __u.__p[3]
++#define MUTEX_NEXT __u.__p[4]
++#define MUTEX_COUNT __u.__i[5]
++
+ #define __NEED_time_t
+ #define __NEED_clockid_t
+ #define __NEED_struct_timespec
+diff --git a/include/sys/socket.h b/include/sys/socket.h
+index 38f5bb17b3b8..fe3c46841693 100644
+--- a/include/sys/socket.h
++++ b/include/sys/socket.h
+@@ -19,6 +19,10 @@ extern "C" {
+ 
+ #include <bits/socket.h>
+ 
++#ifdef __MUSL__
++#include <linux/socket.h>
++#endif
++
+ struct msghdr {
+ 	void *msg_name;
+ 	socklen_t msg_namelen;
+@@ -369,11 +373,13 @@ struct sockaddr {
+ 	char sa_data[14];
+ };
+ 
++#ifndef __MUSL__
+ struct sockaddr_storage {
+ 	sa_family_t ss_family;
+ 	char __ss_padding[128-sizeof(long)-sizeof(sa_family_t)];
+ 	unsigned long __ss_align;
+ };
++#endif
+ 
+ int socket (int, int, int);
+ int socketpair (int, int, int, int [2]);
+diff --git a/include/sys/sysinfo.h b/include/sys/sysinfo.h
+index 6a3931e52010..9b095ffb500b 100644
+--- a/include/sys/sysinfo.h
++++ b/include/sys/sysinfo.h
+@@ -5,6 +5,7 @@
+ extern "C" {
+ #endif
+ 
++#ifndef _LINUX_KERNEL_H
+ #define SI_LOAD_SHIFT 16
+ 
+ struct sysinfo {
+@@ -22,6 +23,7 @@ struct sysinfo {
+ 	unsigned mem_unit;
+ 	char __reserved[256];
+ };
++#endif
+ 
+ int sysinfo (struct sysinfo *);
+ int get_nprocs_conf (void);
+diff --git a/include/unistd.h b/include/unistd.h
+index 7bcbff943d4a..c9a87b1a14b6 100644
+--- a/include/unistd.h
++++ b/include/unistd.h
+@@ -190,6 +190,7 @@ int syncfs(int);
+ int euidaccess(const char *, int);
+ int eaccess(const char *, int);
+ ssize_t copy_file_range(int, off_t *, int, off_t *, size_t, unsigned);
++pid_t gettid(void);
+ #endif
+ 
+ #if defined(_LARGEFILE64_SOURCE) || defined(_GNU_SOURCE)
+@@ -462,6 +463,19 @@ ssize_t copy_file_range(int, off_t *, int, off_t *, size_t, unsigned);
+ #define _CS_V6_ENV	1148
+ #define _CS_V7_ENV	1149
+ 
++#ifdef _GNU_SOURCE
++#ifndef TEMP_FAILURE_RETRY
++#define MUSL_TEMP_FAILURE_RETRY(expression) \
++    (__extension__ \
++        ({ long int __result; \
++            do __result = (long int)(expression); \
++            while(__result == -1L&& errno == EINTR); \
++        __result;}))
++
++#define TEMP_FAILURE_RETRY(expression) MUSL_TEMP_FAILURE_RETRY(expression)
++#endif
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/internal/pthread_impl.h b/src/internal/pthread_impl.h
+index 5742dfc55cb9..df67a3d4f6a4 100644
+--- a/src/internal/pthread_impl.h
++++ b/src/internal/pthread_impl.h
+@@ -75,12 +75,22 @@ struct __timer {
+ #define _a_sched __u.__i[3*__SU+1]
+ #define _a_policy __u.__i[3*__SU+2]
+ #define _a_prio __u.__i[3*__SU+3]
+-#define _m_type __u.__i[0]
+-#define _m_lock __u.__vi[1]
+-#define _m_waiters __u.__vi[2]
+-#define _m_prev __u.__p[3]
+-#define _m_next __u.__p[4]
+-#define _m_count __u.__i[5]
++
++/* we define the original value of _m_* in include/pthread.h
++ * as macros MUTEX_* to make the user be able to
++ * access the inner attribute of the mutex struct.
++ * Then, we modify the value of _m_* macros to MUTEX_* here,
++ * so that we can immediately be aware of the changes that
++ * the open source society has made to these original macros,
++ * because patching will fail if the value of the _m_* are
++ * changed by musl society */
++#define _m_type MUTEX_TYPE
++#define _m_lock MUTEX_LOCK
++#define _m_waiters MUTEX_WAITERS
++#define _m_prev MUTEX_PREV
++#define _m_next MUTEX_NEXT
++#define _m_count MUTEX_COUNT
++
+ #define _c_shared __u.__p[0]
+ #define _c_seq __u.__vi[2]
+ #define _c_waiters __u.__vi[3]
+diff --git a/src/internal/syscall.h b/src/internal/syscall.h
+index 975a0031d4fb..fb64c282263d 100644
+--- a/src/internal/syscall.h
++++ b/src/internal/syscall.h
+@@ -278,10 +278,6 @@ hidden long __syscall_ret(unsigned long),
+ #define SYS_utimensat SYS_utimensat_time64
+ #endif
+ 
+-#ifndef SYS_pselect6
+-#define SYS_pselect6 SYS_pselect6_time64
+-#endif
+-
+ #ifndef SYS_ppoll
+ #define SYS_ppoll SYS_ppoll_time64
+ #endif
+diff --git a/src/legacy/ulimit.c b/src/legacy/ulimit.c
+index 1f59e8e619f5..d1620e6e2812 100644
+--- a/src/legacy/ulimit.c
++++ b/src/legacy/ulimit.c
+@@ -1,6 +1,7 @@
+ #include <sys/resource.h>
+ #include <ulimit.h>
+ #include <stdarg.h>
++#include <limits.h>
+ 
+ long ulimit(int cmd, ...)
+ {
+@@ -15,5 +16,5 @@ long ulimit(int cmd, ...)
+ 		rl.rlim_cur = 512ULL * val;
+ 		if (setrlimit(RLIMIT_FSIZE, &rl)) return -1;
+ 	}
+-	return rl.rlim_cur / 512;
++	return rl.rlim_cur == RLIM_INFINITY? LONG_MAX : rl.rlim_cur / 512;
+ }
+diff --git a/src/malloc/malloc.c b/src/malloc/malloc.c
+index 96982596b94d..07848ec1e09a 100644
+--- a/src/malloc/malloc.c
++++ b/src/malloc/malloc.c
+@@ -373,6 +373,10 @@ void *realloc(void *p, size_t n)
+ 	void *new;
+ 
+ 	if (!p) return malloc(n);
++	if (!n) {
++		free(p);
++		return NULL;
++	}
+ 
+ 	if (adjust_size(&n) < 0) return 0;
+ 
+diff --git a/src/multibyte/wcsnrtombs.c b/src/multibyte/wcsnrtombs.c
+index 676932b5dcaa..95e25e708dd9 100644
+--- a/src/multibyte/wcsnrtombs.c
++++ b/src/multibyte/wcsnrtombs.c
+@@ -1,41 +1,33 @@
+ #include <wchar.h>
++#include <limits.h>
++#include <string.h>
+ 
+ size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict wcs, size_t wn, size_t n, mbstate_t *restrict st)
+ {
+-	size_t l, cnt=0, n2;
+-	char *s, buf[256];
+ 	const wchar_t *ws = *wcs;
+-	const wchar_t *tmp_ws;
+-
+-	if (!dst) s = buf, n = sizeof buf;
+-	else s = dst;
+-
+-	while ( ws && n && ( (n2=wn)>=n || n2>32 ) ) {
+-		if (n2>=n) n2=n;
+-		tmp_ws = ws;
+-		l = wcsrtombs(s, &ws, n2, 0);
+-		if (!(l+1)) {
+-			cnt = l;
+-			n = 0;
++	size_t cnt = 0;
++	if (!dst) n=0;
++	while (ws && wn) {
++		char tmp[MB_LEN_MAX];
++		size_t l = wcrtomb(n<MB_LEN_MAX ? tmp : dst, *ws, 0);
++		if (l==-1) {
++			cnt = -1;
+ 			break;
+ 		}
+-		if (s != buf) {
+-			s += l;
++		if (dst) {
++			if (n<MB_LEN_MAX) {
++				if (l>n) break;
++				memcpy(dst, tmp, l);
++			}
++			dst += l;
+ 			n -= l;
+ 		}
+-		wn = ws ? wn - (ws - tmp_ws) : 0;
+-		cnt += l;
+-	}
+-	if (ws) while (n && wn) {
+-		l = wcrtomb(s, *ws, 0);
+-		if ((l+1)<=1) {
+-			if (!l) ws = 0;
+-			else cnt = l;
++		if (!*ws) {
++			ws = 0;
+ 			break;
+ 		}
+-		ws++; wn--;
+-		/* safe - this loop runs fewer than sizeof(buf) times */
+-		s+=l; n-=l;
++		ws++;
++		wn--;
+ 		cnt += l;
+ 	}
+ 	if (dst) *wcs = ws;
+diff --git a/src/network/inet_legacy.c b/src/network/inet_legacy.c
+index 621b47b05086..6d91b6e179f6 100644
+--- a/src/network/inet_legacy.c
++++ b/src/network/inet_legacy.c
+@@ -12,12 +12,12 @@ struct in_addr inet_makeaddr(in_addr_t n, in_addr_t h)
+ 	if (n < 256) h |= n<<24;
+ 	else if (n < 65536) h |= n<<16;
+ 	else h |= n<<8;
+-	return (struct in_addr){ h };
++	return (struct in_addr){ htonl(h) };
+ }
+ 
+ in_addr_t inet_lnaof(struct in_addr in)
+ {
+-	uint32_t h = in.s_addr;
++	uint32_t h = ntohl(in.s_addr);
+ 	if (h>>24 < 128) return h & 0xffffff;
+ 	if (h>>24 < 192) return h & 0xffff;
+ 	return h & 0xff;
+@@ -25,7 +25,7 @@ in_addr_t inet_lnaof(struct in_addr in)
+ 
+ in_addr_t inet_netof(struct in_addr in)
+ {
+-	uint32_t h = in.s_addr;
++	uint32_t h = ntohl(in.s_addr);
+ 	if (h>>24 < 128) return h >> 24;
+ 	if (h>>24 < 192) return h >> 16;
+ 	return h >> 8;
+diff --git a/src/passwd/getspnam_r.c b/src/passwd/getspnam_r.c
+index 541e85314d56..e738d656cfb7 100644
+--- a/src/passwd/getspnam_r.c
++++ b/src/passwd/getspnam_r.c
+@@ -15,8 +15,15 @@
+ static long xatol(char **s)
+ {
+ 	long x;
++	int sign;
+ 	if (**s == ':' || **s == '\n') return -1;
++
++	sign = (int)(unsigned char)**s;
++	if (sign == '-' || sign == '+') ++*s;
++
+ 	for (x=0; **s-'0'<10U; ++*s) x=10*x+(**s-'0');
++
++	if (sign == '-') return -x;
+ 	return x;
+ }
+ 
+diff --git a/src/thread/arm/syscall_cp.s b/src/thread/arm/syscall_cp.s
+index e607dd426afc..03a83dc952b9 100644
+--- a/src/thread/arm/syscall_cp.s
++++ b/src/thread/arm/syscall_cp.s
+@@ -7,11 +7,16 @@
+ .hidden __cp_cancel
+ .hidden __cancel
+ .global __syscall_cp_asm
+-.hidden __syscall_cp_asm
+ .type __syscall_cp_asm,%function
++.cfi_startproc
+ __syscall_cp_asm:
+ 	mov ip,sp
+ 	stmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 16
++	.cfi_rel_offset r4, 0
++	.cfi_rel_offset r5, 4
++	.cfi_rel_offset r6, 8
++	.cfi_rel_offset r7, 12
+ __cp_begin:
+ 	ldr r0,[r0]
+ 	cmp r0,#0
+@@ -23,7 +28,10 @@ __cp_begin:
+ 	svc 0
+ __cp_end:
+ 	ldmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 0
+ 	bx lr
+ __cp_cancel:
+ 	ldmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 0
+ 	b __cancel
++.cfi_endproc	
