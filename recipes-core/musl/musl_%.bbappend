@@ -8,6 +8,8 @@ LIC_FILES_CHKSUM:oniro-openharmony-linux = "file://COPYRIGHT;md5=f95ee848a08ad25
 FILESEXTRAPATHS:prepend:oniro-openharmony-linux := "${THISDIR}/files:"
 SRC_URI:append:oniro-openharmony-linux = " file://openharmony-common.patch"
 SRC_URI:append:oniro-openharmony-linux = " file://openharmony-linux-user.patch"
+# This conflicts with libcap, so we have to go with libcap instead
+#SRC_URI:append:oniro-openharmony-linux = " file://openharmony-linux-user-capability_h.patch"
 
 # As musl links with -nostdlib, we need to add linking with
 # libclang_rt.builtins.a manually as needed
