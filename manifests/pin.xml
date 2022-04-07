@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-License-Identifier: Apache-2.0
+SPDX-FileCopyrightText: Huawei Inc.
+-->
+<manifest>
+  <include name="manifests/branch.xml" />
+
+  <extend-project name="oniro" revision="ab7d94c98db300b0b2010d6eb53b053d082640e0" />
+
+  <extend-project name="bitbake" revision="c212b0f3b542efa19f15782421196b7f4b64b0b9" />
+  <extend-project name="openembedded-core" revision="d2ba3b8850d461bc7b773240cdf15b22b31a3f9e" />
+  <extend-project name="meta-openembedded" revision="6fbe7f748706229f43a2e06b08b6e1e729942314" />
+  <extend-project name="meta-clang" revision="12a5f8be1201fa1fcb62aa004542279d5c9acae0" />
+
+</manifest>
