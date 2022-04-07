@@ -1,0 +1,236 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.0 codebase.
+
+This integrates with the oniro-openharmony-toolchain or oniro-openharmony-bundle
+being installed into //oniro, configuring the codebase to use the toolchain
+provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/build/config/BUILDCONFIG.gn b/build/config/BUILDCONFIG.gn
+index 98bb98b8a4a3..b8b047c3b5af 100755
+--- a/build/config/BUILDCONFIG.gn
++++ b/build/config/BUILDCONFIG.gn
+@@ -137,11 +137,13 @@ declare_args() {
+ 
+   # Allows the path to a custom target toolchain to be injected as a single
+   # argument, and set as the default toolchain.
+-  custom_toolchain = ""
++  custom_toolchain = "//oniro/sysroots/target:target_clang"
+ 
+   # This should not normally be set as a build argument.  It's here so that
+   # every toolchain can pass through the "global" value via toolchain_args().
+-  host_toolchain = ""
++  host_toolchain = "//oniro/sysroots/host:host_toolchain"
++
++  is_oniro_toolchain = true
+ 
+   # target platform
+   target_platform = "phone"
+diff --git a/build/config/clang/clang.gni b/build/config/clang/clang.gni
+index 5a124ffd3e9a..07680d98c2d5 100755
+--- a/build/config/clang/clang.gni
++++ b/build/config/clang/clang.gni
+@@ -4,7 +4,7 @@
+ 
+ import("//build/toolchain/toolchain.gni")
+ 
+-default_clang_base_path = "//prebuilts/clang/ohos/${host_platform_dir}/llvm"
++default_clang_base_path = "//oniro/sysroots/host/usr"
+ 
+ declare_args() {
+   # Indicates if the build should use the Chrome-specific plugins for enforcing
+diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
+index ec42ec55627f..523b08665f40 100755
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -515,6 +515,11 @@ config("compiler") {
+       # Gcc does not support ##__VA_ARGS__ when in standards-conforming mode,
+       # but we use this feature in several places in Chromium.
+       standard_prefix = "gnu"
++
++      # For what it is worth, we end up building with -std=c* instead of
++      #-std=gnu* in some components relying on GNU extensions, we need to
++      # define _GNU_SOURCE manually here as well.
++      defines += [ "_GNU_SOURCE" ]
+     }
+ 
+     #   cflags_c += [ "-std=${standard_prefix}11" ]
+@@ -682,7 +692,7 @@ config("compiler_cpu_abi") {
+   ldflags = []
+   defines = []
+ 
+-  if (is_posix && !(is_mac || is_ios)) {
++  if (is_posix && !(is_mac || is_ios || !is_oniro_toolchain)) {
+     # CPU architecture. We may or may not be doing a cross compile now, so for
+     # simplicity we always explicitly set the architecture.
+     if (current_cpu == "x64") {
+diff --git a/build/config/ohos/BUILD.gn b/build/config/ohos/BUILD.gn
+index aa5ac7cc6629..3db8725133c7 100755
+--- a/build/config/ohos/BUILD.gn
++++ b/build/config/ohos/BUILD.gn
+@@ -41,6 +41,7 @@ config("compiler") {
+     "-Wl,--exclude-libs=libvpx_assembly_arm.a",
+   ]
+ 
++  if (!is_oniro_toolchain) {
+   cflags += [ "--target=$abi_target" ]
+   include_dirs = [
+     "${musl_sysroot}/usr/include/${abi_target}",
+@@ -52,6 +53,7 @@ config("compiler") {
+   # Assign any flags set for the C compiler to asmflags so that they are sent
+   # to the assembler.
+   asmflags = cflags
++  }
+ }
+ 
+ # This is included by reference in the //build/config/compiler:runtime_library
+@@ -71,7 +73,11 @@ config("runtime_library") {
+     "_LIBCPP_HAS_MUSL_LIBC",
+     "__BUILD_LINUX_WITH_CLANG",
+   ]
+-  ldflags = [ "-nostdlib" ]
++  if (!is_oniro_toolchain) {
++    ldflags = [ "-nostdlib" ]
++  } else {
++    ldflags = []
++  }
+ 
+   libs = []
+ 
+@@ -80,6 +86,7 @@ config("runtime_library") {
+     libs += [ "unwind" ]
+   }
+ 
++  if (!is_oniro_toolchain) {
+   ldflags += [
+     "-L" +
+         rebase_path("${clang_base_path}/lib/${abi_target}/c++", root_build_dir),
+@@ -88,9 +95,10 @@ config("runtime_library") {
+                        root_build_dir),
+   ]
+   ldflags += [ "-Wl,--dynamic-linker,/system/bin/ld-musl-${musl_arch}.so.1" ]
++  libs += [ rebase_path(libclang_rt_file) ]
++  }
+ 
+   libs += [
+-    rebase_path(libclang_rt_file),
+     "c",
+     "c++",
+     "c++abi",
+diff --git a/build/config/ohos/config.gni b/build/config/ohos/config.gni
+index 072bce1da9ff..924f034bbbf6 100644
+--- a/build/config/ohos/config.gni
++++ b/build/config/ohos/config.gni
+@@ -37,5 +37,7 @@ if (is_ohos) {
+     assert(false, "Architecture not supported")
+   }
+ 
++  if (!is_oniro_toolchain) {
+   libclang_rt_file = "${clang_base_path}/lib/clang/10.0.1/lib/${abi_target}/libclang_rt.builtins.a"
++  }
+ }
+diff --git a/build/config/ohos/musl.gni b/build/config/ohos/musl.gni
+index 2468ca8d5cfe..337095d910f3 100644
+--- a/build/config/ohos/musl.gni
++++ b/build/config/ohos/musl.gni
+@@ -13,7 +13,11 @@
+ 
+ if (use_musl){
+   musl_target_abi_name = "soft"
++  if (!is_oniro_toolchain) {
+   musl_target = "//third_party/musl:musl_libs"
+   musl_sysroot = get_label_info(musl_target, "target_out_dir")
++  } else {
++  musl_sysroot = "//oniro/sysroots/target"
++  }
+   import("//third_party/musl/musl_config.gni")
+ }
+\ No newline at end of file
+diff --git a/build/loader/preloader/platforms.template b/build/loader/preloader/platforms.template
+index 5cad64dd26b0..3fad225c16e0 100644
+--- a/build/loader/preloader/platforms.template
++++ b/build/loader/preloader/platforms.template
+@@ -4,13 +4,13 @@
+       {
+         "target_os": "ohos",
+         "target_cpu": "arm64",
+-        "toolchain": "//build/toolchain/ohos:ohos_clang_arm64",
++        "toolchain": "//oniro/sysroots/target:target_clang",
+         "parts_config": "./parts.json"
+       },
+       {
+         "target_os": "ohos",
+         "target_cpu": "arm",
+-        "toolchain": "//build/toolchain/ohos:ohos_clang_arm",
++        "toolchain": "//oniro/sysroots/target:target_clang",
+         "parts_config": "./parts.json"
+       }
+     ]
+diff --git a/build/ohos/ace/ace.gni b/build/ohos/ace/ace.gni
+index 60b1082bac9e..b13a3d4561e2 100644
+--- a/build/ohos/ace/ace.gni
++++ b/build/ohos/ace/ace.gni
+@@ -26,7 +26,7 @@ template("gen_js_obj") {
+   action("gen_js_obj_" + name) {
+     visibility = [ ":*" ]
+ 
+-    objcopy_tool = "${clang_base_path}/bin/llvm-objcopy"
++    objcopy_tool = "//oniro/sysroots/host/usr/bin/llvm-objcopy"
+     platform = "${current_os}_${current_cpu}"
+     if (platform == "mingw_x86_64") {
+       script =
+diff --git a/build/ohos/ndk/ndk.gni b/build/ohos/ndk/ndk.gni
+index ce4d5564dd07..aa9d75badfb1 100755
+--- a/build/ohos/ndk/ndk.gni
++++ b/build/ohos/ndk/ndk.gni
+@@ -128,7 +128,7 @@ template("ohos_ndk_library") {
+     # Don't enable cross compile if build_ohos_ndk is false.
+     # Cross compiling in this case may cause build failure in some scenario,
+     # such as build for ASAN.
+-    ndk_toolchains = [ "//build/toolchain/ohos:ohos_clang_${target_cpu}" ]
++    ndk_toolchains = [ "//oniro/sysroots/target:target_clang" ]
+   }
+ 
+   _accumulated_deps = []
+@@ -140,6 +140,8 @@ template("ohos_ndk_library") {
+       _ndk_shlib_directory = "aarch64-linux-ohos"
+     } else if (_toolchain == "//build/toolchain/ohos:ohos_clang_x86_64") {
+       _ndk_shlib_directory = "x86_64-linux-ohos"
++    } else if (_toolchain == "//oniro/sysroots/target:target_clang") {
++      _ndk_shlib_directory = target_cpu + "-linux-ohos"
+     }
+ 
+     assert(defined(_ndk_shlib_directory))
+diff --git a/build/templates/cxx/cxx.gni b/build/templates/cxx/cxx.gni
+index db2a816e61fc..e43c699b0c52 100755
+--- a/build/templates/cxx/cxx.gni
++++ b/build/templates/cxx/cxx.gni
+@@ -155,6 +155,11 @@ template("ohos_executable") {
+     }
+     if (!defined(libs)) {
+       libs = []
++      if (is_oniro_toolchain && is_clang) {
++        libs += ["c++", "c++abi"]
++      } else if (is_oniro_toolchain && !is_clang) {
++        libs += ["stdc++"]
++      }
+     }
+     if (!defined(include_dirs)) {
+       include_dirs = []
+@@ -462,6 +462,11 @@ template("ohos_shared_library") {
+     }
+     if (!defined(libs)) {
+       libs = []
++      if (is_oniro_toolchain && is_clang) {
++        libs += ["c++", "c++abi"]
++      } else if (is_oniro_toolchain && !is_clang) {
++        libs += ["stdc++"]
++      }
+     }
+     if (!defined(include_dirs)) {
+       include_dirs = []

@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import("//build/ohos.gni")
+import("//oniro/third_party.gni")
+
+ohos_prebuilt_executable("ld-musl-arm.so") {
+  source = "//oniro/sysroots/target/lib/ld-musl-arm.so.1"
+  subsystem_name = "common"
+  part_name = "common"
+  install_enable = install_oniro_third_party
+}
+
+ohos_prebuilt_shared_library("libc.so") {
+  source = "//oniro/sysroots/target/usr/lib/libc.so"
+  subsystem_name = "common"
+  part_name = "common"
+  install_enable = install_oniro_third_party
+  install_images = [ "system", "updater" ]
+}
+
+# The following targets and configs wraps existing targets and configs
+# to the above, so we don't need to modify other BUILD.gn files.
+
+group("musl_libs") {
+  deps = [ ":libc.so" ]
+}
+
+group("soft_shared_libs") {
+  deps = [ ":libc.so" ]
+}
+
+group("musl_headers") {
+}

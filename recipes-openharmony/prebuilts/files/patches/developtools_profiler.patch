@@ -1,0 +1,100 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //developtools/profiler git repository of OpenHarmony 3.0 codebase.
+
+This integrates with the oniro-ohos-bundle being installed into
+//oniro, configuring the codebase to use the toolchain and third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/developtools/profiler/build/gcov.sh b/developtools/profiler/build/gcov.sh
+index 5ad6b336cd78..f2c45d2ec1cf 100755
+--- a/developtools/profiler/build/gcov.sh
++++ b/developtools/profiler/build/gcov.sh
+@@ -14,8 +14,4 @@
+ set -e
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+-CLANG_DIR=$TOP/prebuilts/clang/host/linux-x86/clang-r353983c
+-if [ ! -e "$CLANG_DIR" ]; then
+-    CLANG_DIR=$TOP/prebuilts/clang/ohos/linux-x86_64/llvm
+-fi
+-$CLANG_DIR/bin/llvm-cov gcov $@
++$TOP/oniro/sysroots/host/usr/bin/llvm-cov gcov $@
+diff --git a/developtools/profiler/build/lcov.sh b/developtools/profiler/build/lcov.sh
+index 39d2668242d0..d63599347558 100755
+--- a/developtools/profiler/build/lcov.sh
++++ b/developtools/profiler/build/lcov.sh
+@@ -14,9 +14,9 @@
+ set -e
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+-HOST_OUT=$TOP/hos/out/hos-arm/clang_x64
++HOST_OUT=$TOP/hos/out/hos-arm/host_toolchain
+ if [ ! -e "$HOST_OUT" ]; then
+-    HOST_OUT=$TOP/out/ohos-arm-release/clang_x64
++    HOST_OUT=$TOP/out/ohos-arm-release/host_toolchain
+ fi
+ 
+ 
+diff --git a/developtools/profiler/build/protoc.sh b/developtools/profiler/build/protoc.sh
+index 275fa09eefd8..f866a1d20f7a 100755
+--- a/developtools/profiler/build/protoc.sh
++++ b/developtools/profiler/build/protoc.sh
+@@ -17,10 +17,10 @@ set -e
+ THIS_DIR=$(dirname ${BASH_SOURCE[0]})
+ PROJECT_TOP=$(realpath $THIS_DIR/../../..)
+ 
+-OHOS_X64_OUT=$PROJECT_TOP/$2/clang_x64
++OHOS_X64_OUT=$PROJECT_TOP/$2/host_toolchain
+ LIBCXX_X64_OUT=$PROJECT_TOP/$1/ndk/libcxx/linux_x86_64
+-SUBSYS_X64_OUT=$PROJECT_TOP/$2/clang_x64/developtools/developtools
+-PROTOC=$PROJECT_TOP/$2/clang_x64/developtools/developtools/protoc
++SUBSYS_X64_OUT=$PROJECT_TOP/$2/host_toolchain/developtools/developtools
++PROTOC=$PROJECT_TOP/$2/host_toolchain/developtools/developtools/protoc
+ 
+ PARAMS=$*
+ PARAMS_FILTER="$1 $2"
+diff --git a/developtools/profiler/build/run.sh b/developtools/profiler/build/run.sh
+index cd27dd1b6db2..a46292e4c36a 100755
+--- a/developtools/profiler/build/run.sh
++++ b/developtools/profiler/build/run.sh
+@@ -15,7 +15,7 @@ set -e
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+ SUBSYS=developtools
+-HOST_OUT=$TOP/hos/out/hos-arm/clang_x64
++HOST_OUT=$TOP/hos/out/hos-arm/host_toolchain
+ LIB_PATH=$LIB_PATH:$HOST_OUT/devtools/devtools
+ LIB_PATH=$LIB_PATH:$HOST_OUT/$SUBSYS/$SUBSYS
+ LIB_PATH=$LIB_PATH:$HOST_OUT/common/common
+diff --git a/developtools/profiler/device/format-code.sh b/developtools/profiler/device/format-code.sh
+index 6842278a8e42..055339b1aefb 100644
+--- a/developtools/profiler/device/format-code.sh
++++ b/developtools/profiler/device/format-code.sh
+@@ -18,7 +18,7 @@ set -e
+ 
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+-CLANG_DIR=$TOP/prebuilts/clang/ohos/linux-x86_64/llvm/bin
++CLANG_DIR=$TOP/oniro/sysroots/host/usr/bin
+ GN_DIR=$TOP/prebuilts/build-tools/linux-x86/bin
+ 
+ export PATH=$CLANG_DIR:$GN_DIR:$PATH
+diff --git a/developtools/profiler/protos/protos.gni b/developtools/profiler/protos/protos.gni
+index a3522f5860a7..a9c5eeeea02e 100644
+--- a/developtools/profiler/protos/protos.gni
++++ b/developtools/profiler/protos/protos.gni
+@@ -14,7 +14,7 @@
+ import("../build/config.gni")
+ 
+ subsys_name = OHOS_PROFILER_SUBSYS_NAME
+-subsys_x64_out = "clang_x64/$subsys_name/$subsys_name"
++subsys_x64_out = "host_toolchain/$subsys_name/$subsys_name"
+ libc_dir_proto = rebase_path("$asdk_libs_dir", "//")
+ root_output_dir_proto = rebase_path("$root_out_dir", "//")
+ # print("grpc_cpp_plugin = ", grpc_cpp_plugin)

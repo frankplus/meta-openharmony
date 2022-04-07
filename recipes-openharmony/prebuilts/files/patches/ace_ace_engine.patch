@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/ace/ace_engine git repository of OpenHarmony 3.0 codebase.
+
+This integrates with the oniro-ohos-bundle being installed into
+//oniro, configuring the codebase to use the toolchain and third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/foundation/ace/ace_engine/ace_config.gni b/foundation/ace/ace_engine/ace_config.gni
+index e66e31156635..ad6cadde3bfc 100644
+--- a/foundation/ace/ace_engine/ace_config.gni
++++ b/foundation/ace/ace_engine/ace_config.gni
+@@ -18,6 +18,9 @@ ace_flutter_engine_root = "//third_party/flutter"
+ ace_test_output_root = "ace_engine_standard"
+ 
+ objcopy_aarch64 = "//prebuilts/clang/ohos/linux-x86_64/llvm/bin/llvm-objcopy"
++if (host_toolchain == "//oniro/sysroots/host:host_toolchain" || host_toolchain == "//oniro:host_toolchain") {
++  objcopy_aarch64 = "//oniro/sysroots/host/usr/bin/llvm-objcopy"
++}
+ objcopy_x86_64 = ""
+ ark_tools_root = "//prebuilts/ace-toolkit/ace-loader/panda"
+ node_js_path = "//prebuilts/ace-toolkit/nodejs/node-v12.18.4-linux-x64/bin/"

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import("//build/ohos.gni")
+import("//oniro/third_party.gni")
+
+ohos_prebuilt_shared_library("libcrypto") {
+  source = "//oniro/sysroots/target/usr/lib/libcrypto.so.3"
+  subsystem_name = "common"
+  part_name = "common"
+  install_enable = install_oniro_third_party
+  install_images = [ "system", "updater" ]
+}
+
+ohos_prebuilt_shared_library("libssl") {
+  source = "//oniro/sysroots/target/usr/lib/libssl.so.3"
+  subsystem_name = "common"
+  part_name = "common"
+  install_enable = install_oniro_third_party
+  install_images = [ "system", "updater" ]
+}
+
+# The following targets and configs wraps existing targets and configs
+# to the above, so we don't need to modify other BUILD.gn files.
+group("crypto_source") {
+  deps = [ ":libcrypto" ]
+}
+
+group("libcrypto_static") {
+  deps = [ ":libcrypto" ]
+}
+
+group("ssl_source") {
+  deps = [ ":libssl" ]
+}
+
+config("ssl_config_public") {
+}

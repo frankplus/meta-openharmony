@@ -69,6 +69,19 @@ You can run these commands to do this:
 	repo sync --no-clone-bundle
 
 
+## OpenHarmony prebuilts
+
+The meta-openharmony layer enables building of prebuilts for use with the
+OpenHarmony build system. A toolchain-only image, making it possible to use the
+Oniro Clang version instead of the default Clang version included, and a bundle
+image which contains both the Oniro Clang compiler and Oniro versions of various
+third-party components, replacing the corresponding default third-party
+versions.
+
+See
+[recipes-openharmony/prebuilts/README.md](recipes-openharmony/prebuilts/README.md)
+for more information.
+
 ## Repo manifests
 
 The meta-openharmony repository includes a number of different repo manifest

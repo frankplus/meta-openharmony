@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+declare_args() {
+  # Whether unstripped binaries, i.e. compiled with debug symbols, should be
+  # considered runtime_deps rather than stripped ones.
+  ohos_unstripped_runtime_outputs = true
+}

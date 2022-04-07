@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import("third_party.gni")
+
+group("third_party") {
+  if (install_oniro_third_party) {
+    deps = [
+      "//third_party/openssl:libcrypto",
+      "//third_party/openssl:libssl",
+    ]
+  }
+}
+
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("host_toolchain") {
+  toolchain_args = {
+    current_cpu = "x64"
+    current_os = "linux"
+    is_clang = false
+  }
+
+  cc = "gcc -Uunix"
+  cxx = "g++ -Uunix"
+  ar = "ar"
+  ld = cxx  # GN expects a compiler, not a linker.
+  nm = "nm"
+  readelf = "readelf"
+
+  extra_cppflags = "-Wno-pedantic"
+  extra_cppflags += " -Wno-error=unused-but-set-variable"
+  extra_cppflags += " -Wno-error=format-truncation"
+  extra_cppflags += " -Wno-error=stringop-overflow"
+  extra_cppflags += " -Wno-error=stringop-truncation"
+  extra_cxxflags = "-Wno-error=shadow"
+}

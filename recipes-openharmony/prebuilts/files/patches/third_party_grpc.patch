@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/grpc git repository of OpenHarmony 3.0 codebase.
+
+Building with -Werror with both clang and gcc requires some differences in which
+warnings are disabled. Some warnings in clang is not known by gcc, so we are not
+allowed to disable them, and the missing-prototypes warning ins only supported
+for C++ by gcc.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/third_party/grpc/BUILD.gn b/third_party/grpc/BUILD.gn
+index 488986bcab42..e580e97bcac3 100755
+--- a/third_party/grpc/BUILD.gn
++++ b/third_party/grpc/BUILD.gn
+@@ -43,13 +43,17 @@ config("private_grpc_config") {
+     "-Wno-implicit-fallthrough",
+     "-Wno-unused-variable",
+     "-Wno-ignored-qualifiers",
+-    "-Wno-atomic-implicit-seq-cst",
+     "-Wno-undef",
+-    "-Wno-missing-prototypes",
+-    "-Wno-missing-variable-declarations",
+     "-Wno-sign-compare",
+-    "-Wno-shadow-uncaptured-local",
+   ]
++  cflags_c = [ "-Wno-missing-prototypes" ]
++  if (is_clang) {
++    cflags += [
++      "-Wno-shadow-uncaptured-local",
++      "-Wno-missing-variable-declarations",
++      "-Wno-atomic-implicit-seq-cst",
++    ]
++  }
+ }
+ 
+ ohos_shared_library("gpr") {

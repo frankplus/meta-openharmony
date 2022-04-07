@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.0 codebase.
+
+This integrates with the oniro-openharmony-bundle being installed into
+//oniro, configuring the codebase to use third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/build/common/BUILD.gn b/build/common/BUILD.gn
+index ddf1ad2cd182..242db293cd1c 100755
+--- a/build/common/BUILD.gn
++++ b/build/common/BUILD.gn
+@@ -32,4 +32,6 @@ group("common_packages") {
+       "asan:libclang_rt.asan.so",
+     ]
+   }
++
++  deps += [ "//oniro:third_party" ]
+ }

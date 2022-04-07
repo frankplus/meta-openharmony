@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import("//build/config/sanitizers/sanitizers.gni")
+
+declare_args() {
+  if (target_cpu == "arm") {
+    musl_arch = "arm"
+  } else if (target_cpu == "arm64") {
+    musl_arch = "aarch64"
+  }
+}

@@ -1,0 +1,114 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/icu git repository of OpenHarmony 3.0 codebase.
+
+Building with -Werror with both clang and gcc requires some differences in which
+warnings are disabled. Some warnings in clang is not known by gcc, and some
+additional warnings are triggered by gcc, which we then need to disable as well.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/third_party/icu/icu4c/BUILD.gn b/third_party/icu/icu4c/BUILD.gn
+index 892733e53e2c..dbb9b4cddb3f 100755
+--- a/third_party/icu/icu4c/BUILD.gn
++++ b/third_party/icu/icu4c/BUILD.gn
+@@ -509,10 +509,12 @@ ohos_shared_library("shared_icuuc") {
+     "-Wwrite-strings",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
+     "-std=c++11",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+   ldflags = [
+     "-shared",
+     "-lm",
+@@ -552,11 +554,13 @@ ohos_shared_library("shared_icui18n") {
+     "-Wpointer-arith",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
+     "-Wwrite-strings",
+     "-std=c++11",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+   ldflags = [
+     "-shared",
+     "-ldl",
+@@ -599,11 +603,13 @@ ohos_static_library("static_icuuc") {
+     "-std=c++11",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
+     "-fvisibility-inlines-hidden",
+     "-Wno-unused-function",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+ 
+   cflags = [
+     "-fvisibility=hidden",
+@@ -649,12 +655,14 @@ ohos_static_library("static_icui18n") {
+     "-Wwrite-strings",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
+     "-std=c++11",
+     "-fvisibility-inlines-hidden",
+     "-fno-exceptions",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+ 
+   cflags = [
+     "-fvisibility=hidden",
+diff --git a/third_party/icu/icu4c/source/BUILD.gn b/third_party/icu/icu4c/source/BUILD.gn
+index c93a43ef248e..de8af91f4a75 100644
+--- a/third_party/icu/icu4c/source/BUILD.gn
++++ b/third_party/icu/icu4c/source/BUILD.gn
+@@ -247,11 +247,15 @@ ohos_shared_library("shared_icuuc_host") {
+     "-Wwrite-strings",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
++    "-Wno-error=stringop-overflow",
++    "-Wno-error=stringop-truncation",
+     "-Wignored-attributes",
+     "-std=c++11",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+   ldflags = [
+     "-shared",
+     "-lm",
+@@ -384,10 +386,14 @@ ohos_shared_library("shared_icuio") {
+     "-Wwrite-strings",
+     "-Wno-error=unused-parameter",
+     "-Wno-error=unused-const-variable",
+-    "-Wno-error=unneeded-internal-declaration",
++    "-Wno-error=stringop-overflow",
++    "-Wno-error=stringop-truncation",
+     "-std=c++11",
+     "-Wno-ignored-attributes",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-error=unneeded-internal-declaration" ]
++  }
+   ldflags = [
+     "-shared",
+     "-lm",

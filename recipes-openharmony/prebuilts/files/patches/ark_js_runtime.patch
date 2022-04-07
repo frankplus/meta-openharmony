@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //ark/js_runtime git repository of OpenHarmony 3.0 codebase.
+
+* Building with host gcc (at least version 9.3.0) and LTO does not work, so we
+  need to disable LTO for these cases.
+
+* The -Wno-gnu-statement-expression argument is not supported with gcc (9.3.0),
+  so we need to disable that.
+
+* Also, gcc fails out with attributes warning, so we disable that for now.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/ark/js_runtime/BUILD.gn b/ark/js_runtime/BUILD.gn
+index dbae38a04082..13d26c451641 100644
+--- a/ark/js_runtime/BUILD.gn
++++ b/ark/js_runtime/BUILD.gn
+@@ -131,7 +131,11 @@ ohos_static_library("libark_js_intl_static") {
+ }
+ 
+ config("ark_jsruntime_common_config") {
+-  defines = [ "PANDA_ENABLE_LTO" ]
++  if (is_clang) {
++    defines = [ "PANDA_ENABLE_LTO" ]
++  } else {
++    defines = []
++  }
+ 
+   if (is_standard_system) {
+     defines += [ "IS_STANDARD_SYSTEM" ]
+@@ -168,14 +172,23 @@ config("ark_jsruntime_common_config") {
+   cflags_cc = [
+     "-pedantic",
+     "-Wno-invalid-offsetof",
+-    "-Wno-gnu-statement-expression",
+     "-pipe",
+     "-Wdate-time",
+     "-Wformat=2",
+-    "-flto",
+   ]
+-
+-  ldflags = [ "-flto" ]
++  if (is_clang) {
++    cflags_cc += [
++      "-Wno-gnu-statement-expression",
++      "-flto",
++    ]
++    ldflags = [ "-flto" ]
++  } else {
++    cflags_cc += [
++      "-Wno-error=attributes",
++      "-fno-lto",
++    ]
++    ldflags = [ "-fno-lto" ]
++  }
+ 
+   if (is_debug) {
+     cflags_cc += [

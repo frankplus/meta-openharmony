@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+group("musl_install") {
+  deps = [
+    "//third_party/musl:ld-musl-arm.so",
+    "//third_party/musl:libc.so",
+  ]
+}

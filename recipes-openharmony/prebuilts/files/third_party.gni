@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+declare_args() {
+  install_oniro_third_party = true
+}

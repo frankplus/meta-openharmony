@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //drivers/peripheral git repository of OpenHarmony 3.0 codebase.
+
+Using //oniro/sysroots/target:target_clang toolchain, we now get a
+working input-event-codes.h from the kernel headers, so we can drop
+the dependency on the out-of-tree (FreeBSD!) header version.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/drivers/peripheral/input/interfaces/include/input_type.h b/drivers/peripheral/input/interfaces/include/input_type.h
+index 137e89d5c7a8..acfceab73c5a 100644
+--- a/drivers/peripheral/input/interfaces/include/input_type.h
++++ b/drivers/peripheral/input/interfaces/include/input_type.h
+@@ -42,9 +42,7 @@
+ #include <stdbool.h>
+ #include <sys/time.h>
+ 
+-#ifndef _UAPI_INPUT_H
+-#include <input-event-codes.h>
+-#endif
++#include <linux/input-event-codes.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {

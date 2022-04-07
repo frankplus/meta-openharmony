@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+#
+# This file contains GN toolchain definition for SDK/host clang toolchain
+#
+# It uses a simple template format, where variables are substituted by
+# bitbake during SDK build.  Variables to be substituted must be
+# written as @VARIABLE@, and the recipe must be extended for each
+# variable to be substituted.
+
+import("//build/toolchain/gcc_toolchain.gni")
+import("//oniro/toolchain.gni")
+
+gcc_toolchain("host_toolchain") {
+  toolchain_args = {
+    current_cpu = "@SDK_GN_CPU@"
+    current_os = "linux"
+    is_clang = true
+  }
+
+  target_triplet = "@SDK_SYS@"
+  toolchain_prefix = rebase_path("//oniro/sysroots/host@bindir_nativesdk@/", root_build_dir)
+  # Absolute path to sysroot
+  sysroot = rebase_path("//oniro/sysroots/host")
+  cc_args = " -target $target_triplet"
+  # Use relative path for --sysroot as it is normally shorter
+  cc_args += " --sysroot=" + rebase_path("//oniro/sysroots/host", root_build_dir)
+  # Build executables to use the dynamic linker from the SDK
+  ld_args = " -Wl,--dynamic-linker,$sysroot@base_libdir_nativesdk@/@SDK_DYNAMIC_LINKER@"
+  # Set RPATH so executables use libraries from the SDK
+  ld_args += " -Wl,-rpath=$sysroot@base_libdir_nativesdk@ -Wl,-rpath=$sysroot@libdir_nativesdk@"
+
+  # Workaround for incomplete bitbake native sysroot
+  #cc_args += "-I/usr/include"
+  #ld_args += "-L/lib -L/usr/lib"
+
+  cc      = toolchain_prefix + "clang " + cc_args
+  cxx     = toolchain_prefix + "clang++ " + cc_args
+  ar      = toolchain_prefix + "llvm-ar"
+  ld      = cxx + ld_args # GN expects a compiler, not a linker
+  nm      = toolchain_prefix + "llvm-nm"
+  readelf = toolchain_prefix + "readelf"
+  strip   = toolchain_prefix + "llvm-strip"
+
+  # Make some warnings that was promoted to errors back into
+  # warnings. Current OpenHarmony codebase was written for older
+  # clang, which did not have these warnings.
+  # As OpenHarmony code is improved to work with newer clang, revisit
+  # all of these and remove them ASAP.
+  extra_cppflags = " -Wno-error=deprecated-declarations"
+  extra_cppflags += " -Wno-error=thread-safety-analysis"
+  extra_cppflags += " -Wno-error=unused-but-set-variable"
+}

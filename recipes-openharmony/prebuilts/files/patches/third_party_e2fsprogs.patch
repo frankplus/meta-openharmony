@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/e2fsprogs git repository of OpenHarmony 3.0 codebase.
+
+This integrates with the oniro-ohos-bundle being installed into
+//oniro, configuring the codebase to use the toolchain and third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/third_party/e2fsprogs/misc/BUILD.gn b/third_party/e2fsprogs/misc/BUILD.gn
+index bcfcd45d00f5..c46def3acbc5 100644
+--- a/third_party/e2fsprogs/misc/BUILD.gn
++++ b/third_party/e2fsprogs/misc/BUILD.gn
+@@ -71,7 +71,9 @@ ohos_executable("mke2fs") {
+     "//third_party/e2fsprogs/misc:libext2_misc",
+   ]
+
++  if (!is_oniro_toolchain) {
+   ldflags = [ "-stdlib=libc++_static" ]
++  }
+   install_enable = true
+   part_name = "e2fsprogs"
+   install_images = [

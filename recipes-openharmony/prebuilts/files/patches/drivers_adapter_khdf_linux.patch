@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //drivers/adapter/khdf/linux git repository of OpenHarmony 3.0 codebase.
+
+Clang 14 brings in a lot of new checks/warnings, and the current
+codebase violates the declaration-after-statement check, so we need to
+reduce that from an error to a warning in order to be able to compile
+the code.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [code should be fixed instead]
+
+diff --git a/drivers/adapter/khdf/linux/model/audio/Makefile b/drivers/adapter/khdf/linux/model/audio/Makefile
+index f6eeeb8a39e8..e34868d9dde3 100755
+--- a/drivers/adapter/khdf/linux/model/audio/Makefile
++++ b/drivers/adapter/khdf/linux/model/audio/Makefile
+@@ -89,3 +89,5 @@ ccflags-y += -lm -lc  -lgcc -std=gnu99 -Werror \
+              -Iinclude/$(KHDF_AUDIO_CODEC_DIR)/hi3516dv300/include \
+              -Iinclude/$(KHDF_AUDIO_PERIPHERAL_ROOT_DIR)/audio/interfaces/include \
+              -Iinclude/$(KHDF_AUDIO_CODEC_DIR)/include
++
++ccflags-y += -Wno-error=declaration-after-statement
