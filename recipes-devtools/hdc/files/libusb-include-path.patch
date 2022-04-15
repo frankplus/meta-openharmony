@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix libusb.h include path.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/src/common/common.h b/src/common/common.h
+index 862359e..5e77a6d 100644
+--- a/src/common/common.h
++++ b/src/common/common.h
+@@ -47,7 +47,7 @@ using std::vector;
+ #ifdef HDC_HOST
+ 
+ #ifdef HARMONY_PROJECT
+-#include <libusb/libusb.h>
++#include <libusb.h>
+ #else  // NOT HARMONY_PROJECT
+ #include <libusb-1.0/libusb.h>
+ #endif // END HARMONY_PROJECT
