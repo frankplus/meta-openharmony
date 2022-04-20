@@ -68,6 +68,13 @@ You can run these commands to do this:
 	repo init -u https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony.git -b kirkstone
 	repo sync --no-clone-bundle
 
+## QEMU example image
+
+The meta-openharmony provides an example image recipe which can be used for
+quickly building and running OpenHarmony code in QEMU ARM simulator.
+
+See [recipes-openharmony/images/README.md](recipes-openharmony/images/README.md)
+for more information.
 
 ## OpenHarmony prebuilts
 
