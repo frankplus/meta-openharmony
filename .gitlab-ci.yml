@@ -1,0 +1,321 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Note: While main CI operations are done on Eclipse Foundation infrastructure,
+# a few extra operations are run on Huawei OSTC infrastructure, providing:
+#
+# - hosting Docker images on registry.ostc-eu.org
+# - automatically updated mirror of source files in China
+#
+# The Docker images will move to Eclipse Foundation infrastructure when Docker
+# registry becomes available on gitlab.eclipse.org.
+#
+# The mirror in China will need to be investigated further. Do we actually need
+# it? Can it be supported by Eclipse Foundation infrastructure?
+#
+
+# switch between branch pipelines and merge request pipelines
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+include:
+ - local: '.gitlab-ci/container.yml'
+
+variables:
+  # output upload and download progress every 10 seconds
+  TRANSFER_METER_FREQUENCY: "10s"
+  # Use no compression for artifacts
+  ARTIFACT_COMPRESSION_LEVEL: "fastest"
+  # Use no compression for caches
+  CACHE_COMPRESSION_LEVEL: "fastest"
+  # The bitbake-builder Docker image registry path.
+  #
+  # As we don't have Docker registry support on gitlab.eclipse.org, use this
+  # setup for now. When updating the bitbake-builder image, you therefore need
+  # to push to git.ostc-eu.org first, and wait for the bitbake-builder image to
+  # be pushed to the registry before starting a pipeline on gitlab.eclipse.org.
+  BITBAKE_BUILDER: "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony/bitbake-builder"
+
+stages:
+  - container
+  - maintenance
+  - fetch
+  - build
+  - test
+
+# Common job definition for bitbake driven jobs, such as fetch and build
+.bitbake:
+  image:
+    name: $BITBAKE_BUILDER:$BITBAKE_CONTAINER_VERSION
+  variables:
+    MANIFEST_FILE: manifests/ci.xml
+    BB_ENV_PASSTHROUGH_ADDITIONS: DISTRO MACHINE
+    SOURCE_MIRROR_URL_CH: http://114.116.235.68/source-mirror
+  before_script:
+    # The repo tool seems to insist on having a branch checked out or
+    # something like that... Without this we get errors like
+    #     fatal: couldn't find remote ref refs/heads/master
+    - git checkout -b master
+    # Create/maintain a mirror of all manifest repositories in runner
+    # persistent storage, and use that as reference when initializing the
+    # build repo, effectively reducing the time spent fetching git repos to
+    # almost nothing.
+    #
+    # If for some reason, the repo mirror becomes corrupted, a pipeline with
+    # $REBUILD_REPO_MIRROR set to a non-empty value will remove the entire
+    # mirror, and rebuild it from scratch.
+    #
+    # Note the use of fd 9 to hold a lock while accessing the $REPO_MIRROR
+    # path, so we can handle parallel jobs.  First we open the lock file on fd
+    # 9, then we lock it, and close/unlock it after repo sync.
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+        REPO_MIRROR="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/repo-mirror" ;
+        REPO_MIRROR_ARG="--reference=$REPO_MIRROR" ;
+        mkdir -p $(dirname $REPO_MIRROR) ;
+        exec 9>$REPO_MIRROR.lock ; flock 9 ;
+        if [ -n "$REBUILD_REPO_MIRROR" ] ; then
+          rm -rf "$REPO_MIRROR" ;
+        fi ;
+        if [ ! -e "$REPO_MIRROR" ] ; then
+          echo "Creating new repo mirror @ $REPO_MIRROR" ;
+          mkdir -p "$REPO_MIRROR" ;
+          pushd "$REPO_MIRROR" ;
+          repo init -u "$CI_PROJECT_DIR" -m "$MANIFEST_FILE" --mirror ;
+        else
+          echo "Reusing repo mirror @ $REPO_MIRROR" ;
+          pushd "$REPO_MIRROR" ;
+          repo init -u "$CI_PROJECT_DIR" -m "$MANIFEST_FILE" ;
+        fi ;
+        repo sync --no-clone-bundle ;
+        popd ;
+      fi
+    # Create the build environment in a repo subdir, which links back to this
+    # directory with a meta-openharmony symlink
+    - mkdir repo && cd repo
+    - repo init -u "$CI_PROJECT_DIR" -m "$MANIFEST_FILE" $REPO_MIRROR_ARG
+    - repo sync --no-clone-bundle
+    - ln -s "$CI_PROJECT_DIR" meta-openharmony
+    # Release repo mirror lock if held
+    - if [ -n "$REPO_MIRROR_ARG" ] ; then exec 9>&- ; fi
+    # Set mtime for all checked out files to commit time, allowing bitbake
+    # parser cache to be re-used
+    - repo forall -c git restore-mtime -q
+    # Initialize bitbake build configuration
+    - TEMPLATECONF=../meta-openharmony/conf source oe-core/oe-init-build-env meta-openharmony/build
+    # Try to reduce disk usage while building
+    - echo 'INHERIT += "rm_work"' >> conf/auto.conf
+    # Setup to use mirror of downloads
+    - if [ -n "$SOURCE_MIRROR_URL" ] ; then
+        echo 'INHERIT += "own-mirrors"' ;
+        echo "SOURCE_MIRROR_URL = \"$SOURCE_MIRROR_URL\"" ;
+      else
+        if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+          SOURCE_MIRROR_PATH="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/source" ;
+        else
+          SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
+        fi ;
+        mkdir -p "$SOURCE_MIRROR_PATH" ;
+        echo 'INHERIT += "own-mirrors"' ;
+        echo "SOURCE_MIRROR_URL = \"file://$SOURCE_MIRROR_PATH\"" ;
+      fi >> conf/auto.conf
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+        SSTATE_MIRROR_PATH="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/sstate" ;
+        mkdir -p "$SSTATE_MIRROR_PATH" ;
+        echo "SSTATE_MIRRORS = \"file://.* file://$SSTATE_MIRROR_PATH/PATH\""
+          >> conf/auto.conf ;
+      fi
+    - if [ -n "$CI_ONIRO_NUM_CPUS" ] ; then
+        echo "BB_NUMBER_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
+        echo "BB_NUMBER_PARSE_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
+      fi >> conf/auto.conf
+  script:
+    - bitbake "${RECIPE}"
+  after_script:
+    # Update sstate-cache mirror
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" -a -d build/sstate-cache ] ; then
+        SSTATE_MIRROR_PATH="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/sstate" ;
+        cp -urn build/sstate-cache/* "$SSTATE_MIRROR_PATH/" ;
+      fi
+  cache:
+    key: bitbake-cache
+    paths:
+      - build/mirror
+      - build/cache
+      - build/tmp*/cache
+    policy: pull
+
+# Pre-fetch all download files to mirror maintained in GitLab CI cache, and
+# provide artifacts for updating an external mirror.
+#
+# To overcome (reasonable) limits to artifacts size, we skip the huge
+# OpenHarmony tarballs, which must be uploaded to external mirrors manually if
+# needed.
+fetch:
+  stage: fetch
+  extends: .bitbake
+  needs:
+    - job: bitbake-builder
+      artifacts: false
+      optional: true
+  script:
+    # Configure build to create mirror tarballs of VCS repositories
+    - echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/auto.conf
+    # Run fetch tasks for all builds
+    - export DISTRO MACHINE
+    - for DISTRO in oniro-openharmony-linux ; do
+      for MACHINE in qemuarma7 ; do
+      for RECIPE in oniro-openharmony-bundle openharmony-standard-image ; do
+        echo Fetching DISTRO=$DISTRO MACHINE=$MACHINE RECIPE=$RECIPE ;
+        bitbake $RECIPE --runall=fetch ;
+      done ; done ; done
+    - mkdir -pv mirror-updates-ch
+    # Copy all regular files from downloads dir (except *.done files) to
+    # mirror dirs.  Note, file is first copied to a temporary file (in same
+    # filesystem), and then atomically moved, so no concurrent CI job will see
+    # partial mirror files.
+    - rm downloads/*.done
+    - rm -f downloads/npm2/*.done
+    - rm -f downloads/npm2/*.resolved
+    - for f in downloads/* downloads/npm2/* ; do if test -f "$f" -a ! -L "$f" ; then
+        fname=$(basename "$f") ;
+        if [ -n "$SOURCE_MIRROR_PATH" -a ! -e "$SOURCE_MIRROR_PATH/$fname" ] ; then
+          cp "$f" "$SOURCE_MIRROR_PATH/$fname~tmp" ;
+          mv "$SOURCE_MIRROR_PATH/$fname~tmp" "$SOURCE_MIRROR_PATH/$fname" ;
+        fi ;
+        if ! curl --output /dev/null --silent --head --fail "$SOURCE_MIRROR_URL_CH/$fname" ; then
+          ln -v "$f" mirror-updates-ch/ ;
+        fi ;
+      fi ; done
+  cache:
+    policy: pull-push
+    when: always
+  artifacts:
+    paths:
+      - build/mirror-updates-ch/
+    exclude:
+      - build/mirror-updates-ch/code-*.tar.gz
+    expire_in: 1 day
+
+# Update source mirror in China
+mirror_ch:
+  stage: fetch
+  needs:
+    - job: fetch
+      artifacts: true
+  rules:
+    - if: $CI_SERVER_HOST == "git.ostc-eu.org"
+  # We don't want to block MRs due to issues with mirror server
+  allow_failure: true
+  tags:
+    - huawei-cloud-ch
+  image:
+    name: ubuntu:20.04
+  script:
+    - for f in build/mirror-updates-ch/* ; do
+        if test ! -e /var/www/source-mirror/$(basename "$f") ; then
+          cp -v "$f" /var/www/source-mirror/ ;
+        fi ;
+      done
+
+# Build OpenHarmony images using normal CI runners
+build:
+  stage: build
+  needs:
+    - job: fetch
+      artifacts: false
+  rules:
+    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+      # Don't use CI resources on normals builds when doing China builds
+      when: never
+    - when: on_success
+  extends: .bitbake
+  parallel:
+    matrix:
+      - DISTRO: [oniro-openharmony-linux]
+        MACHINE: [qemuarma7]
+        RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image]
+  artifacts:
+    paths:
+      - build/tmp-*/deploy/images/${MACHINE}
+      - build/tmp-*/deploy/sdk
+    expire_in: 1 month
+
+# Build OpenHarmony images using CI runner in China.
+#
+# Note, you might want to allow the mirror_ch job to complete before running
+# this job, or you could see this job failing on problems fetching new
+# downloads blocked by firewall rules.  Take care.
+build_ch:
+  extends: build
+  needs:
+    - job: mirror_ch
+      artifacts: false
+  rules:
+    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+  tags:
+    - region.china
+    - cpu.4
+    - mem.16
+    - large-disk
+  variables:
+    MANIFEST_FILE: manifests/gitee/ci.xml
+    SOURCE_MIRROR_URL: $SOURCE_MIRROR_URL_CH
+
+# Job for triggering a prune of the sstate-cache mirror in runner persistent
+# storage.  This should be done periodically, but as I believe it removes a
+# bit too much, not too often.  And a complete rebuild is done also, to refill
+# the cache.
+#
+# To run it, use "CI/CD" -> "Pipelines" -> "Run pipeline", and then define
+# PRUNE_SSTATE_CACHE variable (any value will do).
+prune_sstate_cache:
+  stage: maintenance
+  rules:
+    - if: $PRUNE_SSTATE_CACHE != null && $CLEAR_PERSISTENT_STORAGE == null
+  extends: .bitbake
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+        SSTATE_MIRROR_PATH="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/sstate" ;
+        SSTATE_MIRROR_ARCHS=$(
+          find "$SSTATE_MIRROR_PATH" \( -name \*.tgz -o -name \*.tar.zst \) -exec basename {} \; |
+          awk -F ":" '{print $3}' | grep . | sort -u |
+          tr '\n' ',' | sed 's/,$//');
+        ./repo/oe-core/scripts/sstate-cache-management.sh
+          --cache-dir="$SSTATE_MIRROR_PATH"
+          --extra-archs="$SSTATE_MIRROR_ARCHS"
+          --remove-duplicated -y ;
+      fi
+
+# Manual job for completely clearing source and sstate-cache mirror
+# directories in CI runner persistent storage.  This should normally not be
+# necessary, and is therefore not added as a proper manual job.  To run it,
+# use "CI/CD" -> "Pipelines" -> "Run pipeline", and then define
+# CLEAR_PERSISTENT_STORAGE variable (any value will do).
+clear_persistent_storage:
+  stage: maintenance
+  rules:
+    - if: $CLEAR_PERSISTENT_STORAGE != null
+  image:
+    name: ubuntu:20.04
+  script:
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+        rm -rf "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony" ;
+      fi

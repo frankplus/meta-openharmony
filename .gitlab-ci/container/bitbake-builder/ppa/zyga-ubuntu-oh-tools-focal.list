@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2020 Huawei Inc.
+deb https://ppa.launchpadcontent.net/zyga/oh-tools/ubuntu focal main
+#deb-src https://ppa.launchpadcontent.net/zyga/oh-tools/ubuntu focal main
