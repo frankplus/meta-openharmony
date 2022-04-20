@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Remove path prefix so bison executable can be found even if not in the
+standard binary location.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+--- a/parser.sh
++++ b/parser.sh
+@@ -1 +1 @@
+-/usr/bin/bison $*
++bison $*

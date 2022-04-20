@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Disable copy of FlexLexer.h. It's done by bitbake from the Yocto native
+sysroot. This avoids the installation of libfl-dev on the host system.
+
+Also comment out the useless PATH modification.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+--- a/services/script/bison.sh
++++ b/services/script/bison.sh
+@@ -18,6 +18,6 @@ if [ ! -d ./yacc ]; then
+    mkdir -p ./yacc
+ fi
+ 
+-export PATH=/usr/share/bison:$PATH
++#export PATH=/usr/share/bison:$PATH
+ 
+-cp /usr/include/FlexLexer.h ./yacc
++#cp /usr/include/FlexLexer.h ./yacc

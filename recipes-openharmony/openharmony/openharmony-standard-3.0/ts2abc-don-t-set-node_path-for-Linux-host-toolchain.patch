@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+The path to node exectuable is set by the node_path arg and must point
+to the Yocto native sysroot. Since node_path is declared as a gn
+argument it can be set though GN_ARGS and thus it must not be
+overwritten for the Linux host toolchain configurtion.
+
+This patch remove node_path config from ts2abc_config.gni which is now
+set in GN_ARGS by the openharmony-standard-system-components recipe to
+node_path="${RECIPE_SYSROOT_NATIVE}/usr/bin".
+
+Apply to repo ark/ts2abc
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/ts2panda/ts2abc_config.gni b/ts2panda/ts2abc_config.gni
+index a86ae80..cd05aa0 100755
+--- a/ts2panda/ts2abc_config.gni
++++ b/ts2panda/ts2abc_config.gni
+@@ -51,7 +51,6 @@ if (host_toolchain == buildtool_mac) {
+   ts2abc_build_path =
+       get_label_info("//ark/ts2abc/ts2panda:ts2abc_build($buildtool_linux)",
+                      "root_out_dir") + "/obj/ark/ts2abc/ts2panda/build"
+-  node_path = "${nodejs_dir}/node-v12.18.4-linux-x64/bin/"
+ }
+ 
+ # Generate js plugin.

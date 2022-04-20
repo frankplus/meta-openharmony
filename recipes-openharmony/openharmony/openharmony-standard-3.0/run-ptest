@@ -1,0 +1,25 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Create directories required by hilogd and hilog
+mkdir -p /dev/unix/socket
+mkdir -p /data/log/hilog
+
+# Add /system/bin to PATH
+export PATH="/system/bin:${PATH}"
+
+hilogd &
+HILOGD_PID=$!
+
+./HiLogNDKTest
+TEST_RESULT=$?
+
+kill "${HILOGD_PID}"
+
+if test "$TEST_RESULT" -eq 0; then
+    echo "PASS: HiLogNDKTest"
+else
+    echo "FAIL: HiLogNDKTest"
+fi

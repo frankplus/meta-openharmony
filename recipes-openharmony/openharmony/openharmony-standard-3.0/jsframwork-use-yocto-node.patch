@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Don't copy prebuilt node binaries to the out folder and use sysroot
+Yocto node executable by removing the relative path to access it.
+
+Apply to repo third_party/jsframework
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/js_framework_build.sh b/js_framework_build.sh
+index 2b5a6b8..561eb1f 100755
+--- a/js_framework_build.sh
++++ b/js_framework_build.sh
+@@ -44,18 +44,18 @@ cp -r $8 $9
+ if [ -d "$prebuilts_path" ]; then
+   echo "prebuilts exists"
+   # address problme of parallzing compile
+-  rm -rf "$9/node-v12.18.4-linux-x64"
+-  rm -rf "$9/node-v12.18.4-darwin-x64"
+-  cp -r $2 $9
++#  rm -rf "$9/node-v12.18.4-linux-x64"
++#  rm -rf "$9/node-v12.18.4-darwin-x64"
++#  cp -r $2 $9
+   cd $9
+   if [ "${11}" == 'true' ];then
+     ./node-v12.18.4-darwin-x64/bin/node build.js
+     # run unit test
+     ./node-v12.18.4-darwin-x64/bin/node node_modules/.bin/mocha -r ts-node/register test/lib.ts test/ut/**/*.ts test/ut/*.ts
+   else
+-    ./node-v12.18.4-linux-x64/bin/node build.js
++    node build.js
+     # run unit test
+-    ./node-v12.18.4-linux-x64/bin/node node_modules/.bin/mocha -r ts-node/register test/lib.ts test/ut/**/*.ts test/ut/*.ts
++#    ./node-v12.18.4-linux-x64/bin/node node_modules/.bin/mocha -r ts-node/register test/lib.ts test/ut/**/*.ts test/ut/*.ts
+   fi
+ else
+   npm run build

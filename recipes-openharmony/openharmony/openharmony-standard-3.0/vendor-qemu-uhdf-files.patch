@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Replace hardcoded path with product company and name variables.
+
+Apply to drivers/peripheral
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/camera/hal/adapter/platform/v4l2/BUILD.gn b/camera/hal/adapter/platform/v4l2/BUILD.gn
+index a6d86af7..a8d3f749 100755
+--- a/camera/hal/adapter/platform/v4l2/BUILD.gn
++++ b/camera/hal/adapter/platform/v4l2/BUILD.gn
+@@ -6,7 +6,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
+ action("build_camera_host_config") {
+   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
+   sources = [ rebase_path(
+-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/camera_host_config.hcs") ]
++          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/camera_host_config.hcs") ]
+   outputs = [ "$target_gen_dir/config/hdi_impl/camera_host_config.hcb" ]
+   args = [
+     "-o",
+@@ -27,7 +27,7 @@ ohos_prebuilt_etc("camera_host_config.hcb") {
+ action("build_stream_supported_config") {
+   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
+   sources = [ rebase_path(
+-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/stream_supported_config.hcs") ]
++          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/stream_supported_config.hcs") ]
+   outputs = [ "$target_gen_dir/config/hdi_impl/stream_supported_config.hcb" ]
+   args = [
+     "-o",
+@@ -56,7 +56,7 @@ ohos_prebuilt_etc("config.c") {
+             "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/config.c"),
+         "-t",
+         rebase_path(
+-            "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/config.hcs"),
++            "//vendor/${product_company}/${product_name}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/config.hcs"),
+       ],
+       "")
+ }
+@@ -72,7 +72,7 @@ ohos_prebuilt_etc("params.c") {
+             "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/params.c"),
+         "-t",
+         rebase_path(
+-            "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/params.hcs"),
++            "//vendor/${product_company}/${product_name}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/params.hcs"),
+       ],
+       "")
+ }
+@@ -80,7 +80,7 @@ ohos_prebuilt_etc("params.c") {
+ action("build_ipp_algo_config") {
+   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
+   sources = [ rebase_path(
+-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs") ]
++          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs") ]
+   outputs = [ "$target_gen_dir/pipeline_core/ipp_algo_config.hcb" ]
+   args = [
+     "-o",
