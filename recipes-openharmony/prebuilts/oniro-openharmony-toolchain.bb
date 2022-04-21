@@ -45,3 +45,7 @@ POPULATE_SDK_POST_TARGET_COMMAND += "create_sysroot_symlinks; "
 
 DEPENDS += "musl"
 TOOLCHAIN_TARGET_TASK += "musl-dev"
+# OpenHarmony patched musl to include sys/capability.h header file, but we will
+# be using the one from libcap instead
+DEPENDS += "libcap"
+TOOLCHAIN_TARGET_TASK += "libcap-dev"
