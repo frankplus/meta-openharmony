@@ -47,6 +47,8 @@ SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;pat
 #SRC_URI += "file://ts2abc_host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 #SRC_URI += "file://hc-gen-compiler.patch;patchdir=${S}/drivers/framework"
 
+SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
+
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
 # TODO: Get this merged into OpenHarmony upstream or split into separate git
 # repository

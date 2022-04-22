@@ -60,7 +60,7 @@ SRC_URI += "${GITEE_URL}/update_updater.git;protocol=https;branch=OpenHarmony-3.
 SRC_URI += "${GITEE_URL}/update_updateservice.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=593ca7b5e2b1288b808ef49790214c393a330f41;destsuffix=${OH_SRCDIR}/base/update/updateservice"
 SRC_URI += "${GITEE_URL}/build.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=fae45dcbe24118d596578fd1936007b9d299a443;destsuffix=${OH_SRCDIR}/build"
 SRC_URI += "${GITEE_URL}/developtools_bytrace_standard.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=b83852080c7d68e13b013deda64b3dab69554080;destsuffix=${OH_SRCDIR}/developtools/bytrace_standard"
-SRC_URI += "${GITEE_URL}/developtools_hdc_standard.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=8a154c52d793790c19260c38acb87124684141f3;destsuffix=${OH_SRCDIR}/developtools/hdc_standard"
+SRC_URI += "${GITEE_URL}/developtools_hdc_standard.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=5304e6ff48d783362d577b8cf1fb1b34e3e451d4;destsuffix=${OH_SRCDIR}/developtools/hdc_standard"
 SRC_URI += "${GITEE_URL}/developtools_profiler.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=2d75f87399240e900bdfc5b57f7abe6a72c4f6d1;destsuffix=${OH_SRCDIR}/developtools/profiler;lfs=0"
 SRC_URI += "${GITEE_URL}/device_qemu.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=00bf590c9d04ee5af641ccff7e8a02eb6ff727e0;destsuffix=${OH_SRCDIR}/device/qemu"
 SRC_URI += "${GITEE_URL}/drivers_adapter.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=9f6cd92cfa61cae193328e53577899f51d5b5fca;destsuffix=${OH_SRCDIR}/drivers/adapter"
