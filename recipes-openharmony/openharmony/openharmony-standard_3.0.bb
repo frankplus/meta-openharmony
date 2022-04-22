@@ -275,6 +275,7 @@ generate_parts_json() {
         "communication:ipc",
         "communication:ipc_js",
         "developtools:bytrace_standard",
+        "developtools:hdc_standard",
         "distributeddatamgr:distributeddatamgr",
         "distributeddatamgr:native_appdatamgr",
         "distributedhardware:device_manager_base",
