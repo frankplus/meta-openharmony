@@ -69,6 +69,8 @@ stages:
     BB_ENV_PASSTHROUGH_ADDITIONS: DISTRO MACHINE
     SOURCE_MIRROR_URL_CH: http://114.116.235.68/source-mirror
   before_script:
+    # Tell git this repository is safe even if cloned with a different uid
+    - git config --global --add safe.directory $CI_PROJECT_DIR
     # The repo tool seems to insist on having a branch checked out or
     # something like that... Without this we get errors like
     #     fatal: couldn't find remote ref refs/heads/master
