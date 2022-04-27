@@ -62,3 +62,11 @@ DISTRO ?= "oniro-openharmony-linux"
 #
 INHERIT += "rm_work"
 RM_WORK_EXCLUDE += "qemu-helper-native"
+
+#
+# Use source mirror in China
+#
+# Uncomment this if you are building in China, and/or have trouble fetching sources.
+#
+#INHERIT += "own-mirrors"
+#SOURCE_MIRROR_URL = "http://114.116.235.68/source-mirror"
