@@ -160,15 +160,30 @@ do_install () {
     ln -sfT ..${libdir} ${D}/system/lib
     ln -sfT ..${bindir} ${D}/system/bin
 
+    # system ability configurations
+    mkdir -p ${D}${libdir}/openharmony/profile
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/profile/* ${D}${libdir}/openharmony/profile
+    ln -sfT ..${libdir}/openharmony/profile ${D}/system/profile
+
+    # OpenHarmony etc (configuration) files
+    mkdir -p ${D}${sysconfdir}/openharmony
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
+    ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
+
+    # OpenHarmony font files
+    mkdir -p ${D}${datadir}/fonts/openharmony
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/fonts/* ${D}${datadir}/fonts/openharmony
+    ln -sfT ..${datadir}/fonts/openharmony ${D}/system/fonts
+
     # Avoid file-conflict on /usr/bin/udevadm with //third_party/eudev and udev
     # recipe
     rm ${D}${bindir}/udevadm
 }
 
-PACKAGES =+ "${PN}-libs ${PN}-exes hilog-ptest"
+PACKAGES =+ "${PN}-libs ${PN}-exes ${PN}-configs ${PN}-fonts hilog-ptest"
 
 RDEPENDS:${PN}-libs += "libcxx musl libcrypto libssl libatomic"
-RDEPENDS:${PN}-exes += "musl libcxx libcrypto ${PN}-libs"
+RDEPENDS:${PN}-exes += "musl libcxx libcrypto ${PN}-libs ${PN}-configs ${PN}-fonts"
 RDEPENDS:hilog-ptest += "${PN}-libs libcxx musl"
 
 # ptest class adds ${PN}-ptest package which depends on ${PN} package which in
@@ -180,8 +195,10 @@ PACKAGES:remove = "${PN}-ptest"
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-FILES:${PN}-libs = "${libdir} /system/lib"
+FILES:${PN}-libs = "${libdir} /system/lib /system/profile"
 FILES:${PN}-exes = "${bindir} /system/bin"
+FILES:${PN}-configs = "${sysconfdir} /system/etc"
+FILES:${PN}-fonts = "${datadir}/fonts /system/fonts"
 
 FILES:hilog-ptest =+ "${PTEST_PATH}"
 
