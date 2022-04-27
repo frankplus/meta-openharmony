@@ -70,3 +70,8 @@ RM_WORK_EXCLUDE += "qemu-helper-native"
 #
 #INHERIT += "own-mirrors"
 #SOURCE_MIRROR_URL = "http://114.116.235.68/source-mirror"
+
+#
+# Use out-of-China mirror of OpenHarmony git repositories.
+#
+MIRRORS:prepend = "git://gitee.com/openharmony/ git://github.com/openharmony/ \n "
