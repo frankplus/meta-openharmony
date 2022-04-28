@@ -7,13 +7,16 @@
 mkdir -p /dev/unix/socket
 mkdir -p /data/log/hilog
 
-# Add /system/bin to PATH
-export PATH="/system/bin:${PATH}"
+# Add path to hilog test suite $PATH
+PTEST_PATH=$(dirname $(readlink -f $0))
+export PATH="${PTEST_PATH}/moduletest/hiviewdfx/hilog:${PATH}"
 
 hilogd &
 HILOGD_PID=$!
+# Wait a bit so there is a better chance that hilogd is ready for the test
+sleep 1
 
-./HiLogNDKTest
+HiLogNDKTest
 TEST_RESULT=$?
 
 kill "${HILOGD_PID}"

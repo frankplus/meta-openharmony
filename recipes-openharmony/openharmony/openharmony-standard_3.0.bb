@@ -79,7 +79,6 @@ SRC_URI += "file://run-ptest"
 
 inherit python3native gn_base ptest
 
-PTEST_PATH = "${libdir}/hilog/ptest"
 B = "${S}/out/ohos-arm-release"
 
 COMPATIBLE_MACHINE = "qemuarm"
@@ -182,15 +181,11 @@ do_install () {
     rm ${D}${bindir}/udevadm
 }
 
-PACKAGES =+ "${PN}-libs ${PN}-exes ${PN}-configs ${PN}-fonts hilog-ptest"
+PACKAGES =+ "${PN}-libs ${PN}-exes ${PN}-configs ${PN}-fonts"
 
-RDEPENDS:${PN}-libs += "libcxx musl libcrypto libssl libatomic"
+RDEPENDS:${PN}-libs += "musl libcxx libcrypto libssl libatomic"
 RDEPENDS:${PN}-exes += "musl libcxx libcrypto ${PN}-libs ${PN}-configs ${PN}-fonts"
-RDEPENDS:hilog-ptest += "${PN}-libs libcxx musl"
-
-# ptest class adds ${PN}-ptest package which depends on ${PN} package which in
-# case of this umbrella-recipe is not provided
-PACKAGES:remove = "${PN}-ptest"
+RDEPENDS:${PN}-ptest = "${PN}-exes"
 
 # OpenHarmony libraries are not versioned properly.
 # Move the unversioned .so files to the primary package.
@@ -201,8 +196,6 @@ FILES:${PN}-libs = "${libdir} /system/lib /system/profile"
 FILES:${PN}-exes = "${bindir} /system/bin"
 FILES:${PN}-configs = "${sysconfdir} /system/etc"
 FILES:${PN}-fonts = "${datadir}/fonts /system/fonts"
-
-FILES:hilog-ptest =+ "${PTEST_PATH}"
 
 generate_build_config_json_file() {
 
@@ -222,8 +215,10 @@ EOF
 }
 
 do_install_ptest () {
-    install -d ${D}${PTEST_PATH}
-    install ${B}/tests/moduletest/hiviewdfx/hilog/HiLogNDKTest ${D}${PTEST_PATH}
+    for f in $(cd "${B}/tests" && find . -type f)
+    do
+        install -D -m 755 "${B}/tests/$f" "${D}${PTEST_PATH}/$f"
+    done
 }
 
 generate_platforms_build_file() {
