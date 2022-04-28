@@ -23,12 +23,17 @@
 #
 #MACHINE ?= "qemuarma7"
 #
-# This sets the default machine to aries if no other machine is selected:
+# This sets the default machine to qemuarma7 if no other machine is selected:
 MACHINE ??= "qemuarma7"
 
-# SDK architecture
 #
-SDKMACHINE ?= "x86_64"
+# SDK target architecture
+#
+# This variable specifies the architecture to build SDK items for and means
+# you can build the SDK packages for architectures other than the machine you are
+# running the build on (i.e. building i686 packages on an x86_64 host).
+# Supported values are i686 and x86_64
+#SDKMACHINE ?= "i686"
 
 #
 # Default policy config
