@@ -4,8 +4,6 @@
 
 SUMMARY = "A console-only image with OpenHarmony first party components"
 
-IMAGE_FEATURES += "splash"
-
 LICENSE = "Apache-2.0"
 
 inherit core-image
