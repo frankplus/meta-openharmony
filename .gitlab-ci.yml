@@ -183,7 +183,7 @@ fetch:
     - export DISTRO MACHINE
     - for DISTRO in oniro-openharmony-linux ; do
       for MACHINE in qemuarma7 ; do
-      for RECIPE in oniro-openharmony-bundle openharmony-standard-image ; do
+      for RECIPE in oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests ; do
         echo Fetching DISTRO=$DISTRO MACHINE=$MACHINE RECIPE=$RECIPE ;
         bitbake $RECIPE --runall=fetch ;
       done ; done ; done
@@ -244,7 +244,7 @@ build:
       artifacts: false
   rules:
     - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
-      # Don't use CI resources on normals builds when doing China builds
+      # Don't use CI resources on normal builds when doing China builds
       when: never
     - when: on_success
   extends: .bitbake
@@ -258,6 +258,25 @@ build:
       - build/tmp-*/deploy/images/${MACHINE}
       - build/tmp-*/deploy/sdk
     expire_in: 1 month
+
+# Build OpenHarmony images using normal CI runners
+test:
+  stage: test
+  allow_failure: true
+  needs:
+    - job: build
+      artifacts: false
+  rules:
+    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+      # Don't use CI resources on normal tests when doing China builds
+      when: never
+    - when: on_success
+  extends: .bitbake
+  parallel:
+    matrix:
+      - DISTRO: [oniro-openharmony-linux]
+        MACHINE: [qemuarma7]
+        RECIPE: [openharmony-standard-image-tests]
 
 # Build OpenHarmony images using CI runner in China.
 #
