@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Enable the default disabled hilog moduletest test suite. It seems like at least
+one of the test cases randomly fail, depending on the host computer used to run
+the test. Most likely some kind of timing problem or race condition. So upstream
+has a valid reason for having it commented out.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/base/hiviewdfx/hilog/BUILD.gn b/base/hiviewdfx/hilog/BUILD.gn
+index 19a70e0..41fcac0 100644
+--- a/base/hiviewdfx/hilog/BUILD.gn
++++ b/base/hiviewdfx/hilog/BUILD.gn
+@@ -18,8 +18,8 @@ group("hilog_target") {
+ }
+ 
+ group("hilog_test_target") {
+-  #testonly = true
++  testonly = true
+   deps = [
+-    #"libhilog/test:unittest",
++    "test:HiLogNDKTest",
+   ]
+ }
+diff --git a/base/hiviewdfx/hilog/ohos.build b/base/hiviewdfx/hilog/ohos.build
+index f17894e..56488e4 100644
+--- a/base/hiviewdfx/hilog/ohos.build
++++ b/base/hiviewdfx/hilog/ohos.build
+@@ -7,6 +7,9 @@
+     "hilog": {
+       "module_list": [
+         "//base/hiviewdfx/hilog:hilog_target"
++      ],
++      "test_list": [
++        "//base/hiviewdfx/hilog:hilog_test_target"
+       ]
+     },
+     "hilog_native": {

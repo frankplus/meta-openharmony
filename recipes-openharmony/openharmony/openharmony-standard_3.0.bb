@@ -19,7 +19,7 @@ DEPENDS += "ruby-native"
 require ${PN}-sources-${PV}.inc
 
 # TODO: we probably want these
-#SRC_URI += "file://hilog-Add-tests.patch"
+SRC_URI += "file://hilog-Add-tests.patch"
 
 FILESPATH =. "${FILE_DIRNAME}/openharmony-standard-${PV}:"
 
