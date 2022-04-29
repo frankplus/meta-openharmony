@@ -330,6 +330,20 @@ RDEPENDS:${PN}-libutilsecurec += "musl libcxx"
 RDEPENDS:${PN}-libutils += "musl libcxx ${PN}"
 RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 
+inherit systemd
+SYSTEMD_AUTO_ENABLE = "enable"
+
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "hilogd.service"
+SRC_URI += "file://hilogd.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/init/hilogd.cfg
+    install -d ${D}${sysconfdir}/sysctl.d
+    echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
+}
+
 INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
 
