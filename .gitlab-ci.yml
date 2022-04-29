@@ -147,6 +147,7 @@ stages:
         echo "BB_NUMBER_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
         echo "BB_NUMBER_PARSE_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
       fi >> conf/auto.conf
+    - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
   script:
     - bitbake "${RECIPE}"
   after_script:
@@ -277,6 +278,11 @@ test:
       - DISTRO: [oniro-openharmony-linux]
         MACHINE: [qemuarma7]
         RECIPE: [openharmony-standard-image-tests]
+  artifacts:
+    paths:
+      - build/tmp-*/work/*/*/*/testimage
+    expire_in: 1 month
+    when: always
 
 # Build OpenHarmony images using CI runner in China.
 #
