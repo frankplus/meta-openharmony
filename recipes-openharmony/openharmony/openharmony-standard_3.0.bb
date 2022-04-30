@@ -186,7 +186,7 @@ PACKAGES =+ "${PN}-configs ${PN}-fonts"
 RDEPENDS:${PN} += "${PN}-configs ${PN}-fonts"
 
 RDEPENDS:${PN} += "musl libcxx libcrypto libssl libatomic"
-RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl"
+RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl ${PN}-libutils"
 
 # OpenHarmony libraries are not versioned properly.
 # Move the unversioned .so files to the primary package.
@@ -322,6 +322,13 @@ EOF
 copy_subsystem_config_json_file() {
     cp "${S}/build/subsystem_config.json" "${OHOS_BUILD_CONFIGS_DIR}/"
 }
+
+PACKAGES =+ "${PN}-libutilsecurec ${PN}-libutils"
+FILES:${PN}-libutilsecurec = "${libdir}/libutilsecurec*${SOLIBS}"
+FILES:${PN}-libutils = "${libdir}/libutils*${SOLIBS}"
+RDEPENDS:${PN}-libutilsecurec += "musl libcxx"
+RDEPENDS:${PN}-libutils += "musl libcxx ${PN}"
+RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 
 INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
