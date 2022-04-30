@@ -8,7 +8,7 @@ systemctl start hilogd.service
 
 # Add path to hilog test suite $PATH
 PTEST_PATH=$(dirname $(readlink -f $0))
-export PATH="${PTEST_PATH}/moduletest/hiviewdfx/hilog:${PATH}"
+export PATH="${PTEST_PATH}:${PATH}"
 
 HiLogNDKTest
 TEST_RESULT=$?

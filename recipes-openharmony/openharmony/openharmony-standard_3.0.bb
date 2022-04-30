@@ -75,8 +75,6 @@ SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config
 SRC_URI += "file://display-Mock-interface-for-standard-system.patch"
 SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/default/standard_system"
 
-SRC_URI += "file://run-ptest"
-
 inherit python3native gn_base ptest
 
 B = "${S}/out/ohos-arm-release"
@@ -327,15 +325,17 @@ PACKAGES =+ "${PN}-libutilsecurec ${PN}-libutils"
 FILES:${PN}-libutilsecurec = "${libdir}/libutilsecurec*${SOLIBS}"
 FILES:${PN}-libutils = "${libdir}/libutils*${SOLIBS}"
 RDEPENDS:${PN}-libutilsecurec += "musl libcxx"
-RDEPENDS:${PN}-libutils += "musl libcxx ${PN}"
+RDEPENDS:${PN}-libutils += "musl libcxx ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN} = "hilogd.service"
+PACKAGES =+ "${PN}-hilog ${PN}-hilog-ptest"
+SYSTEMD_PACKAGES = "${PN}-hilog"
+SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
 SRC_URI += "file://hilogd.service"
+SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://hilog.run-ptest', '', d)}"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
@@ -343,6 +343,22 @@ do_install:append() {
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
 }
+do_install_ptest:append() {
+    install -D ${WORKDIR}/hilog.run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog/* ${D}${libdir}/${BPN}-hilog/ptest/
+    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog
+}
+FILES:${PN}-hilog = "\
+    ${bindir}/hilog* \
+    ${libdir}/libhilog* \
+    ${sysconfdir}/openharmony/hilog*.conf \
+    ${systemd_unitdir}/hilogd.service \
+"
+FILES:${PN}-hilog-ptest = "${libdir}/${BPN}-hilog/ptest"
+RDEPENDS:${PN}-hilog += "musl libcxx ${PN}-libutilsecurec"
+RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog musl libcxx"
+RDEPENDS:${PN} += "${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest ${PN}-hilog"
 
 INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"

@@ -2,6 +2,7 @@
 Description=OpenHarmony hilog daemon
 
 [Service]
+Type=exec
 ExecStartPre=mkdir -p /dev/unix/socket
 ExecStartPre=mkdir -p /data/log/hilog
 ExecStart=/usr/bin/hilogd
