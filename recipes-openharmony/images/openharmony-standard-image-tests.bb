@@ -25,5 +25,4 @@ EXTRA_IMAGE_FEATURES += "debug-tweaks"
 IMAGE_INSTALL += "sshd ptest-runner"
 
 # install OpenHarmony components and ptests
-IMAGE_INSTALL += "openharmony-standard-exes"
 IMAGE_INSTALL += "openharmony-standard-ptest"

@@ -181,21 +181,25 @@ do_install () {
     rm ${D}${bindir}/udevadm
 }
 
-PACKAGES =+ "${PN}-libs ${PN}-exes ${PN}-configs ${PN}-fonts"
+PACKAGES =+ "${PN}-configs ${PN}-fonts"
 
-RDEPENDS:${PN}-libs += "musl libcxx libcrypto libssl libatomic"
-RDEPENDS:${PN}-exes += "musl libcxx libcrypto ${PN}-libs ${PN}-configs ${PN}-fonts"
-RDEPENDS:${PN}-ptest = "${PN}-exes"
+RDEPENDS:${PN} += "${PN}-configs ${PN}-fonts"
+
+RDEPENDS:${PN} += "musl libcxx libcrypto libssl libatomic"
+RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl"
 
 # OpenHarmony libraries are not versioned properly.
 # Move the unversioned .so files to the primary package.
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-FILES:${PN}-libs = "${libdir} /system/lib /system/profile"
-FILES:${PN}-exes = "${bindir} /system/bin"
-FILES:${PN}-configs = "${sysconfdir} /system/etc"
-FILES:${PN}-fonts = "${datadir}/fonts /system/fonts"
+FILES:${PN} += "${libdir}/media ${libdir}/module ${libdir}/ark ${libdir}/openharmony ${libdir}/*${SOLIBS}"
+FILES:${PN}-configs = "${sysconfdir}"
+FILES:${PN}-fonts = "${datadir}/fonts"
+
+FILES:${PN} += "/system/bin /system/lib /system/profile"
+FILES:${PN}-configs += "/system/etc"
+FILES:${PN}-fonts += "/system/fonts"
 
 generate_build_config_json_file() {
 
@@ -323,6 +327,9 @@ INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
 
 # We have the following problem:
-# ERROR: openharmony-standard-3.0-r0 do_package_qa: QA Issue: /usr/lib/module/multimedia/libcamera_napi.z.so contained in package openharmony-standard-libs requires libwms_client.z.so, but no providers found in RDEPENDS:openharmony-standard-libs? [file-rdeps]
+# ERROR: openharmony-standard-3.0-r0 do_package_qa: QA Issue: /usr/lib/module/multimedia/libcamera_napi.z.so contained in package openharmony-standard requires libwms_client.z.so, but no providers found in RDEPENDS:openharmony-standard? [file-rdeps]
 # and seems to be a bug in OpenHarmony 3.0
-INSANE_SKIP:${PN}-libs = "file-rdeps"
+INSANE_SKIP:${PN} = "file-rdeps"
+
+# To avoid excessive diskspace blowup, we are stripping our executables
+INSANE_SKIP:${PN} += "already-stripped"
