@@ -65,6 +65,12 @@ SRC_URI += "file://foundation_graphic_standard-hdi-display-layer.patch;patchdir=
 SRC_URI += "file://third_party_weston-hdi-display-layer.patch;patchdir=${S}/third_party/weston"
 SRC_URI += "file://features.json;subdir=${OHOS_BUILD_CONFIGS_DIR}"
 
+# Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
+SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
+SRC_URI += "file://foundation_distributedschedule_samgr-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/samgr"
+
+SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
+
 # Workaround for problem with nodejs 17:
 # error:0308010C:digital envelope routines::unsupported
 export NODE_OPTIONS = "--openssl-legacy-provider"
@@ -199,7 +205,8 @@ RDEPENDS:${PN} += "${PN}-configs ${PN}-fonts"
 
 RDEPENDS:${PN} += "musl libcxx libcrypto libssl libatomic"
 RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl"
-RDEPENDS:${PN}-ptest += "${PN}-libutils ${PN}-libsyspara ${PN}-libbegetutil"
+RDEPENDS:${PN}-ptest += "${PN}-libutils ${PN}-libsyspara ${PN}-libbegetutil ${PN}-libeventhandler ${PN}-accesstoken"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-mbedtls ${PN}-thirdparty-sqlite"
 
 # OpenHarmony libraries are not versioned properly.
 # Move the unversioned .so files to the primary package.
@@ -282,6 +289,7 @@ OPENHARMONY_PARTS += "communication:dsoftbus_standard"
 OPENHARMONY_PARTS += "communication:ipc"
 OPENHARMONY_PARTS += "communication:ipc_js"
 OPENHARMONY_PARTS += "communication:netmanager_base"
+OPENHARMONY_PARTS += "communication:wifi_standard"
 OPENHARMONY_PARTS += "developtools:bytrace_standard"
 OPENHARMONY_PARTS += "developtools:hdc_standard"
 OPENHARMONY_PARTS += "deviceprofile:device_profile_core"
@@ -415,7 +423,8 @@ RDEPENDS:${PN} += "${PN}-libparam-client"
 
 PACKAGES =+ "${PN}-libparam-watcheragent"
 FILES:${PN}-libparam-watcheragent = "${libdir}/libparam_watcheragent*${SOLIBS}"
-RDEPENDS:${PN}-libparam-watcheragent += "musl libcxx ${PN}-libagent-log ${PN}-libparam-client ${PN}-libutils ${PN}"
+RDEPENDS:${PN}-libparam-watcheragent += "musl libcxx"
+RDEPENDS:${PN}-libparam-watcheragent += "${PN}-libagent-log ${PN}-libparam-client ${PN}-libutils ${PN}-samgr ${PN}-ipc"
 RDEPENDS:${PN} += "${PN}-libparam-watcheragent"
 
 PACKAGES =+ "${PN}-libsyspara"
@@ -438,6 +447,26 @@ FILES:${PN}-libbegetutil = "${libdir}/libbegetutil*${SOLIBS}"
 RDEPENDS:${PN}-libbegetutil += "musl libcxx ${PN}-libparam-client"
 RDEPENDS:${PN} += "${PN}-libbegetutil"
 
+PACKAGES =+ "${PN}-libeventhandler"
+FILES:${PN}-libeventhandler = "${libdir}/libeventhandler*${SOLIBS}"
+RDEPENDS:${PN}-libeventhandler += "musl libcxx ${PN}-hilog ${PN}-hichecker ${PN}-hitrace"
+RDEPENDS:${PN} += "${PN}-libeventhandler"
+
+PACKAGES =+ "${PN}-thirdparty-mbedtls"
+FILES:${PN}-thirdparty-mbedtls = "${libdir}/libmbedtls*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-mbedtls += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-mbedtls"
+
+PACKAGES =+ "${PN}-thirdparty-sqlite"
+FILES:${PN}-thirdparty-sqlite = "${libdir}/libsqlite*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-sqlite += "musl libcxx libcrypto ${PN}-libutils"
+RDEPENDS:${PN} += "${PN}-thirdparty-sqlite"
+
+PACKAGES =+ "${PN}-thirdparty-libxml2"
+FILES:${PN}-thirdparty-libxml2 = "${libdir}/libxml2*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libxml2 += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libxml2"
+
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
@@ -449,7 +478,7 @@ SRC_URI += "file://hilogd.service"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
-    rm -f ${D}${sysconfdir}/init/hilogd.cfg
+    rm -f ${D}${sysconfdir}/openharmony/init/hilogd.cfg
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
 }
@@ -474,11 +503,306 @@ RDEPENDS:${PN}-hilog       += "musl libcxx"
 RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
 RDEPENDS:${PN}-hilog       += "${PN}-libsec-shared ${PN}-libutilsecurec ${PN}-libbegetutil ${PN}-libsyspara"
 
+# //base/startup/appspawn_standard component
+PACKAGES =+ "${PN}-appspawn ${PN}-appspawn-ptest"
+SYSTEMD_PACKAGES += "${PN}-appspawn"
+SYSTEMD_SERVICE:${PN}-appspawn = "appspawn.service"
+SRC_URI += "file://appspawn.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/appspawn.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/appspawn.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appspawn/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appspawn/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/appspawn/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/appspawn/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/*/appspawn
+    echo "appspawn.service" > ${D}${libdir}/${BPN}-appspawn/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN = "appspawn"
+FILES:${PN}-appspawn = "\
+    ${bindir}/appspawn* \
+    ${libdir}/libappspawn* \
+    ${systemd_unitdir}/appspawn.service \
+"
+FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
+RDEPENDS:${PN} += "${PN}-appspawn"
+RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest ${PN}-appspawn"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
+RDEPENDS:${PN}-appspawn       += "musl libcxx"
+RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
+RDEPENDS:${PN}-appspawn       += "${PN}-libutils ${PN}-hilog ${PN}-libbegetutil ${PN}-libsyspara"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog ${PN}-libbegetutil ${PN}-libsyspara"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-appspawn       += "${PN}"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}"
+
+# //foundation/appexecfwk/standard component
+PACKAGES =+ "${PN}-appexecfwk ${PN}-appexecfwk-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appexecfwk/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appexecfwk/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/unittest
+    mv ${D}${PTEST_PATH}/systemtest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/systemtest
+}
+OPENHARMONY_PTEST_IS_BROKEN = "appexecfwk"
+FILES:${PN}-appexecfwk = "\
+    ${libdir}/libappexecfwk*${SOLIBS} \
+"
+FILES:${PN}-appexecfwk-ptest = "${libdir}/${BPN}-appexecfwk/ptest"
+RDEPENDS:${PN} += "${PN}-appexecfwk"
+RDEPENDS:${PN}-ptest += "${PN}-appexecfwk-ptest ${PN}-appexecfwk"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-appexecfwk"
+RDEPENDS:${PN}-appexecfwk       += "musl libcxx"
+RDEPENDS:${PN}-appexecfwk-ptest += "musl libcxx"
+RDEPENDS:${PN}-appexecfwk       += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-libeventhandler ${PN}-hichecker ${PN}-hitrace"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-appexecfwk += "${PN}"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}"
+
+PACKAGES =+ "${PN}-samgr ${PN}-samgr-ptest"
+SYSTEMD_PACKAGES += "${PN}-samgr"
+SYSTEMD_SERVICE:${PN}-samgr = "samgr.service"
+SRC_URI += "file://samgr.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/samgr.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/samgr_standard.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-samgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-samgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/samgr_standard/samgr ${D}${libdir}/${BPN}-samgr/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/samgr_standard
+    echo "samgr.service" > ${D}${libdir}/${BPN}-samgr/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN = "samgr"
+FILES:${PN}-samgr = "\
+    ${bindir}/samgr \
+    ${libdir}/libsamgr*${SOLIBS} \
+    ${libdir}/liblsamgr*${SOLIBS} \
+    ${systemd_unitdir}/samgr.service \
+"
+FILES:${PN}-samgr-ptest = "${libdir}/${BPN}-samgr/ptest"
+RDEPENDS:${PN} += "${PN}-samgr"
+RDEPENDS:${PN}-ptest += "${PN}-samgr-ptest ${PN}-samgr"
+RDEPENDS:${PN}-samgr-ptest += "${PN}-samgr"
+RDEPENDS:${PN}-samgr       += "musl libcxx"
+RDEPENDS:${PN}-samgr-ptest += "musl libcxx"
+RDEPENDS:${PN}-samgr       += "${PN}-libutils ${PN}-libbegetutil ${PN}-accesstoken ${PN}-libeventhandler ${PN}-hilog ${PN}-ipc"
+RDEPENDS:${PN}-samgr-ptest += "${PN}-libutils ${PN}-libbegetutil ${PN}-accesstoken ${PN}-libeventhandler ${PN}-hilog ${PN}-ipc"
+RDEPENDS:${PN}-samgr       += "${PN}-thirdparty-libxml2"
+RDEPENDS:${PN}-samgr-ptest += "${PN}-thirdparty-libxml2"
+
+PACKAGES =+ "${PN}-safwk ${PN}-safwk-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-safwk/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-safwk/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/safwk/safwk ${D}${libdir}/${BPN}-safwk/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/safwk
+}
+OPENHARMONY_PTEST_IS_BROKEN = "safwk"
+FILES:${PN}-safwk = "\
+    ${libdir}/libsystem_ability_fwk*${SOLIBS} \
+"
+FILES:${PN}-safwk-ptest = "${libdir}/${BPN}-safwk/ptest"
+RDEPENDS:${PN} += "${PN}-safwk"
+RDEPENDS:${PN}-ptest += "${PN}-safwk-ptest ${PN}-safwk"
+RDEPENDS:${PN}-safwk-ptest += "${PN}-safwk"
+RDEPENDS:${PN}-safwk       += "musl libcxx"
+RDEPENDS:${PN}-safwk-ptest += "musl libcxx"
+RDEPENDS:${PN}-safwk       += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+RDEPENDS:${PN}-safwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+
+PACKAGES =+ "${PN}-ipc ${PN}-ipc-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-ipc/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-ipc/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/ipc ${D}${libdir}/${BPN}-ipc/ptest/unittest
+    mv ${D}${PTEST_PATH}/moduletest/ipc ${D}${libdir}/${BPN}-ipc/ptest/moduletest
+}
+OPENHARMONY_PTEST_IS_BROKEN = "ipc"
+FILES:${PN}-ipc = "\
+    ${libdir}/libipc*${SOLIBS} \
+    ${libdir}/librpc*${SOLIBS} \
+    ${libdir}/libdbinder*${SOLIBS} \
+"
+FILES:${PN}-ipc-ptest = "${libdir}/${BPN}-ipc/ptest"
+RDEPENDS:${PN} += "${PN}-ipc"
+RDEPENDS:${PN}-ptest += "${PN}-ipc-ptest ${PN}-ipc"
+RDEPENDS:${PN}-ipc-ptest += "${PN}-ipc"
+RDEPENDS:${PN}-ipc       += "musl libcxx"
+RDEPENDS:${PN}-ipc-ptest += "musl libcxx"
+RDEPENDS:${PN}-ipc       += "${PN}-libutils ${PN}-hilog ${PN}-dsoftbus ${PN}-hitrace"
+RDEPENDS:${PN}-ipc-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr"
+
+PACKAGES =+ "${PN}-devicemanager ${PN}-devicemanager-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-devicemanager/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-devicemanager/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/device_manager_base/component_loader_test ${D}${libdir}/${BPN}-devicemanager/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/device_manager_base
+}
+OPENHARMONY_PTEST_IS_BROKEN = "devicemanager"
+FILES:${PN}-devicemanager = "\
+    ${libdir}/libdevicemanager*${SOLIBS} \
+    ${libdir}/module/distributedhardware/libdevicemanager*${SOLIBS} \
+"
+FILES:${PN}-devicemanager-ptest = "${libdir}/${BPN}-devicemanager/ptest"
+RDEPENDS:${PN} += "${PN}-devicemanager"
+RDEPENDS:${PN}-ptest += "${PN}-devicemanager-ptest ${PN}-devicemanager"
+RDEPENDS:${PN}-devicemanager-ptest += "${PN}-devicemanager"
+RDEPENDS:${PN}-devicemanager       += "musl libcxx"
+RDEPENDS:${PN}-devicemanager-ptest += "musl libcxx"
+RDEPENDS:${PN}-devicemanager       += "${PN}-libsyspara ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-libeventhandler ${PN}-safwk ${PN}-libsyspara-watchagent ${PN}-hilog ${PN}-accesstoken ${PN}-dsoftbus"
+RDEPENDS:${PN}-devicemanager-ptest += "${PN}-libsyspara ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-libeventhandler ${PN}-safwk ${PN}-libsyspara-watchagent ${PN}-hilog ${PN}-accesstoken ${PN}-dsoftbus"
+RDEPENDS:${PN}-devicemanager       += "${PN}-thirdparty-mbedtls"
+RDEPENDS:${PN}-devicemanager-ptest += "${PN}-thirdparty-mbedtls"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-devicemanager       += "${PN}"
+RDEPENDS:${PN}-devicemanager-ptest += "${PN}"
+
+PACKAGES =+ "${PN}-accesstoken ${PN}-accesstoken-ptest"
+SYSTEMD_PACKAGES += "${PN}-accesstoken"
+SYSTEMD_SERVICE:${PN}-accesstoken = "accesstoken.service tokensync.service"
+SRC_URI += "file://accesstoken.service file://tokensync.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/accesstoken.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/access_token.cfg
+    install -m 644 ${WORKDIR}/tokensync.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/token_sync.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-accesstoken/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-accesstoken/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/access_token/access_token ${D}${libdir}/${BPN}-accesstoken/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/access_token
+    echo "accesstoken.service" >  ${D}${libdir}/${BPN}-accesstoken/ptest/systemd-units
+    echo "tokensync.service"   >> ${D}${libdir}/${BPN}-accesstoken/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN = "accesstoken"
+FILES:${PN}-accesstoken = "\
+    ${libdir}/libaccesstoken*${SOLIBS} \
+    ${libdir}/libtoken*sync*${SOLIBS} \
+    ${libdir}/openharmony/profile/accesstoken_service.xml \
+    ${libdir}/openharmony/profile/token_sync_service.xml \
+    ${systemd_unitdir}/accesstoken.service \
+    ${systemd_unitdir}/tokensync.service \
+"
+FILES:${PN}-accesstoken-ptest = "${libdir}/${BPN}-accesstoken/ptest"
+RDEPENDS:${PN} += "${PN}-accesstoken"
+RDEPENDS:${PN}-ptest += "${PN}-accesstoken-ptest ${PN}-accesstoken"
+RDEPENDS:${PN}-accesstoken-ptest += "${PN}-accesstoken"
+RDEPENDS:${PN}-accesstoken       += "musl libcxx"
+RDEPENDS:${PN}-accesstoken-ptest += "musl libcxx"
+RDEPENDS:${PN}-accesstoken       += "${PN}-libutils ${PN}-libsyspara ${PN}-libeventhandler ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-safwk ${PN}-devicemanager ${PN}-dsoftbus"
+RDEPENDS:${PN}-accesstoken-ptest += "${PN}-libutils ${PN}-libsyspara ${PN}-libeventhandler ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-safwk ${PN}-devicemanager"
+RDEPENDS:${PN}-accesstoken       += "${PN}-thirdparty-mbedtls ${PN}-thirdparty-sqlite"
+RDEPENDS:${PN}-accesstoken-ptest += "${PN}-thirdparty-mbedtls ${PN}-thirdparty-sqlite"
+
+PACKAGES =+ "${PN}-dsoftbus ${PN}-dsoftbus-ptest"
+SYSTEMD_PACKAGES += "${PN}-dsoftbus"
+SYSTEMD_SERVICE:${PN}-dsoftbus = "dsoftbus.service"
+SRC_URI += "file://dsoftbus.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/dsoftbus.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/softbus_server.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-dsoftbus/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-dsoftbus/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/dsoftbus_standard ${D}${libdir}/${BPN}-dsoftbus/ptest/unittest
+    echo "dsoftbus.service" > ${D}${libdir}/${BPN}-dsoftbus/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN = "dsoftbus"
+FILES:${PN}-dsoftbus = "\
+    ${libdir}/libsoftbus*${SOLIBS} \
+    ${sysconfdir}/openharmony/communication/softbus \
+    ${libdir}/openharmony/profile/softbus_server.xml \
+    ${systemd_unitdir}/dsoftbus.service \
+"
+FILES:${PN}-dsoftbus-ptest = "${libdir}/${BPN}-dsoftbus/ptest"
+RDEPENDS:${PN} += "${PN}-dsoftbus"
+RDEPENDS:${PN}-ptest += "${PN}-dsoftbus-ptest ${PN}-dsoftbus"
+RDEPENDS:${PN}-dsoftbus-ptest += "${PN}-dsoftbus"
+RDEPENDS:${PN}-dsoftbus       += "musl libcxx"
+RDEPENDS:${PN}-dsoftbus-ptest += "musl libcxx"
+RDEPENDS:${PN}-dsoftbus       += "${PN}-samgr ${PN}-libsyspara ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk"
+RDEPENDS:${PN}-dsoftbus-ptest += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-dsoftbus       += "${PN}-thirdparty-mbedtls"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-dsoftbus       += "${PN}"
+RDEPENDS:${PN}-dsoftbus-ptest += "${PN}"
+
+PACKAGES =+ "${PN}-hichecker ${PN}-hichecker-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hichecker/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hichecker/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hichecker/native ${D}${libdir}/${BPN}-hichecker/ptest/unittest
+}
+FILES:${PN}-hichecker = "\
+    ${libdir}/libhichecker*${SOLIBS} \
+"
+FILES:${PN}-hichecker-ptest = "${libdir}/${BPN}-hichecker/ptest"
+RDEPENDS:${PN} += "${PN}-hichecker"
+RDEPENDS:${PN}-ptest += "${PN}-hichecker-ptest ${PN}-hichecker"
+RDEPENDS:${PN}-hichecker-ptest += "${PN}-hichecker"
+RDEPENDS:${PN}-hichecker       += "musl libcxx"
+RDEPENDS:${PN}-hichecker-ptest += "musl libcxx"
+RDEPENDS:${PN}-hichecker       += "${PN}-hilog"
+#RDEPENDS:${PN}-hichecker-ptest += "${PN}-libutils ${PN}-hilog"
+#RDEPENDS:${PN}-hichecker       += "${PN}-thirdparty-mbedtls"
+## TODO: remove when needed parts are split out
+RDEPENDS:${PN}-hichecker       += "${PN}"
+#RDEPENDS:${PN}-hichecker-ptest += "${PN}"
+
+PACKAGES =+ "${PN}-hitrace ${PN}-hitrace-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hitrace/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hitrace/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hiviewdfx/hitrace ${D}${libdir}/${BPN}-hitrace/ptest/unittest
+}
+FILES:${PN}-hitrace = "\
+    ${libdir}/libhitrace*${SOLIBS} \
+    ${libdir}/module/libhitrace*${SOLIBS} \
+"
+FILES:${PN}-hitrace-ptest = "${libdir}/${BPN}-hitrace/ptest"
+RDEPENDS:${PN} += "${PN}-hitrace"
+RDEPENDS:${PN}-ptest += "${PN}-hitrace-ptest ${PN}-hitrace"
+RDEPENDS:${PN}-hitrace-ptest += "${PN}-hitrace"
+RDEPENDS:${PN}-hitrace       += "musl libcxx"
+RDEPENDS:${PN}-hitrace-ptest += "musl libcxx"
+RDEPENDS:${PN}-hitrace       += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-hitrace-ptest += "${PN}-libutils ${PN}-hilog"
+#RDEPENDS:${PN}-hitrace       += "${PN}-thirdparty-mbedtls"
+## TODO: remove when needed parts are split out
+RDEPENDS:${PN}-hitrace       += "${PN}"
+#RDEPENDS:${PN}-hitrace-ptest += "${PN}"
+
+# Disable all ptest suites that are know to not work for now. When the x-bit is
+# not set, the ptest is visible (using `ptest-runner -l`), but no test cases
+# will be run when executing it.
+# TODO: Fix all components and tests and remove all of this
+OPENHARMONY_PTEST_IS_BROKEN = "accesstoken appexecfwk appspawn devicemanager dsoftbus ipc safwk samgr"
+do_install_ptest:append() {
+    for component in ${OPENHARMONY_PTEST_IS_BROKEN} ; do
+        chmod -x ${D}${libdir}/${BPN}-$component/ptest/run-ptest
+    done
+}
+
 EXCLUDE_FROM_SHLIBS = "1"
 
-# We have the following problem:
-# ERROR: openharmony-standard-3.0-r0 do_package_qa: QA Issue: /usr/lib/module/multimedia/libcamera_napi.z.so contained in package openharmony-standard requires libwms_client.z.so, but no providers found in RDEPENDS:openharmony-standard? [file-rdeps]
-# and seems to be a bug in OpenHarmony 3.0
+# FIXME: this is a dirty workaround for a bunch of missing *.z.so files, either
+# from parts we need to install, or some problems with "inner kits" not being
+# installed to our image. These are most likely real problems that we need to
+# fix, as the components needing these will most likely fail in all kinds of
+# wonderful ways.
 INSANE_SKIP:${PN} = "file-rdeps"
 
 # To avoid excessive diskspace blowup, we are stripping our executables

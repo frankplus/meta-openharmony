@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenHarmony TokenSyncManager
+Requires=samgr.service
+
+[Service]
+Type=exec
+# should run as system:system
+ExecStart=/usr/bin/sa_main /system/profile/token_sync_service.xml
+
+[Install]
+WantedBy=multi-user.target

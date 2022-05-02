@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+This changes the dir to find the samgr profiles. Although not strictly needed
+yet, it brings us closer to getting rid of the /system/profile symlink.
+
+Apply to foundation/distributedschedule/samgr repository
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/services/samgr/native/source/system_ability_manager.cpp b/services/samgr/native/source/system_ability_manager.cpp
+index 918372bd9e4b..5ce8e630522e 100755
+--- a/services/samgr/native/source/system_ability_manager.cpp
++++ b/services/samgr/native/source/system_ability_manager.cpp
+@@ -36,7 +36,7 @@ using namespace std;
+ 
+ namespace OHOS {
+ namespace {
+-const string PREFIX = "/system/profile/";
++const string PREFIX = "/usr/lib/openharmony/profile/";
+ constexpr int32_t MAX_NAME_SIZE = 200;
+ constexpr int32_t SPLIT_NAME_VECTOR_SIZE = 2;
+ 

@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenHarmony DSoftBus services
+Requires=samgr.service
+
+[Service]
+Type=exec
+# should run as system:system
+ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
+
+[Install]
+WantedBy=multi-user.target

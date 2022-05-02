@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+With having /system/profile a symlink to /usr/lib/openharmony/profile and
+similar for /system/usr, safwk are not working, as it is using realpath(3) on
+the files before comparing against dir prefix. To avoid that, we simply change
+dir prefix to the resolved path.
+
+Apply to foundation/distributedschedule/safwk repository
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/services/safwk/src/local_ability_manager.cpp b/services/safwk/src/local_ability_manager.cpp
+index 79e1cb8acac5..e4c56c3004a5 100644
+--- a/services/safwk/src/local_ability_manager.cpp
++++ b/services/safwk/src/local_ability_manager.cpp
+@@ -48,8 +48,8 @@ const u16string BOOT_START_PHASE = u"BootStartPhase";
+ const u16string CORE_START_PHASE = u"CoreStartPhase";
+ constexpr int32_t MAX_SA_STARTUP_TIME = 100;
+ 
+-const string PROFILES_DIR = "/system/profile/";
+-const string DEFAULT_DIR = "/system/usr/";
++const string PROFILES_DIR = "/usr/lib/openharmony/profile/";
++const string DEFAULT_DIR = "/usr/lib/openharmony/usr/";
+ const string PREFIX = PROFILES_DIR;
+ const string SUFFIX = "_trust.xml";
+ 
