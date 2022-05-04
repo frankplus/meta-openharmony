@@ -10,3 +10,6 @@ inherit core-image
 
 # install OpenHarmony components and ptests
 IMAGE_INSTALL += "openharmony-standard"
+
+# Let's be friendly enough to provide a fully working interactive shell
+IMAGE_INSTALL += "bash"
