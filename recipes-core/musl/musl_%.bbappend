@@ -15,3 +15,11 @@ SRC_URI:append:oniro-openharmony-linux = " file://openharmony-linux-user.patch"
 # libclang_rt.builtins.a manually as needed
 LDFLAGS_CLANG_COMPILER_RT = "-L${RECIPE_SYSROOT}/lib/clang/*/lib/${OPENHARMONY_LLVM_BINARY_TARGET_ARCH}/${OPENHARMONY_LLVM_BINARY_TARGET_ABI} -lclang_rt.builtins"
 LDFLAGS:append:toolchain-clang = " ${@bb.utils.contains('COMPILER_RT', '-rtlib=compiler-rt', d.getVar('LDFLAGS_CLANG_COMPILER_RT'), '', d)}"
+
+# Enable this to (try to) build the malloc/free hooks and support needed for
+# OpenHarmony //developtools/profiler component. It doesn't build for now as the
+# code uses stdatomic.h header, which is not available as musl is being built
+# with `-nostdinc` argument.
+# Possible fix is to rewrite the hooks implementation to use the musl internal
+# atomic.h functions instead.
+#CFLAGS:append:oniro-openharmony-linux = "-DHOOK_ENABLE"
