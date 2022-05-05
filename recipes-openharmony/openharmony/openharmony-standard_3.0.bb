@@ -83,9 +83,9 @@ COMPATIBLE_MACHINE = "qemuarm"
 
 OHOS_DEVICE_CPU_ARCH = "arm"
 OHOS_DEVICE_NAME = "qemuarm"
-OHOS_DEVICE_COMPANY = "qemu"
+OHOS_DEVICE_COMPANY = "oniro"
 OHOS_PRODUCT_NAME = "yocto-ohos-${OHOS_DEVICE_NAME}"
-OHOS_PRODUCT_COMPANY = "qemu"
+OHOS_PRODUCT_COMPANY = "oniro"
 # For some reason platform type has to be phone
 OHOS_PRODUCT_PLATFORM_TYPE = "phone"
 
