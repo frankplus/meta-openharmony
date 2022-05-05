@@ -50,27 +50,7 @@ SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;pat
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
-# TODO: Get this merged into OpenHarmony upstream or split into separate git
-# repository
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/usb_pnp_device.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/usb_ecm_acm.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/hdf.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/device_info.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/stream_supported_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/camera_host_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/params.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/driver/mpp_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/hdi_impl/stream_supported_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/hdi_impl/camera_host_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/pipeline_core/config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/pipeline_core/ipp_algo_config.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/camera/hal/mpp/hispark_taurus/pipeline_core/params.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/usb_cdcacm.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/hdf_ecm_acm.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/usb_cdcecm.hcs;subdir=${S}"
-SRC_URI += "file://vendor/${OHOS_DEVICE_COMPANY}/${OHOS_PRODUCT_NAME}/hdf_config/uhdf/hdf_ecm.hcs;subdir=${S}"
+SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
 
 SRC_URI += "file://display-Mock-interface-for-standard-system.patch"
 SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/default/standard_system"
