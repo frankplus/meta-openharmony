@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build/lite git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-toolchain or oniro-openharmony-bundle
+being installed into //oniro, configuring the codebase to use the toolchain
+provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/build/lite/hb_internal/preloader/preloader.py b/build/lite/hb_internal/preloader/preloader.py
+index 42e7ec243114..34adeb1ebf6f 100755
+--- a/build/lite/hb_internal/preloader/preloader.py
++++ b/build/lite/hb_internal/preloader/preloader.py
+@@ -487,8 +487,7 @@ class Preloader():
+         if os_level == 'mini' or os_level == 'small':
+             toolchain_label = ""
+         else:
+-            toolchain_label = '//build/toolchain/{0}:{0}_clang_{1}'.format(
+-                target_os, target_cpu)
++            toolchain_label = '//oniro/sysroots/target:target_clang'
+ 
+         # add toolchain label
+         build_vars['product_toolchain_label'] = toolchain_label

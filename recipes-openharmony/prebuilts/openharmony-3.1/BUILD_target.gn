@@ -1,0 +1,79 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+#
+# This file contains GN toolchain definition for SDK/host clang toolchain
+#
+# It uses a simple template format, where variables are substituted by
+# bitbake during SDK build.  Variables to be substituted must be
+# written as @VARIABLE@, and the recipe must be extended for each
+# variable to be substituted.
+
+import("//build/toolchain/gcc_toolchain.gni")
+import("//oniro/toolchain.gni")
+
+gcc_toolchain("target_clang") {
+  toolchain_args = {
+    current_cpu = "@TARGET_GN_CPU@"
+    current_os = "ohos"
+    is_clang = true
+  }
+
+  target_triplet = "@TARGET_SYS@"
+  toolchain_prefix = rebase_path("//oniro/sysroots/host@bindir@/", root_build_dir) + target_triplet + "/" + target_triplet + "-"
+  cc_args = " -target $target_triplet"
+  cc_args += " @TUNE_CCARGS@"
+  # Use relative path for --sysroot as it is normally shorter
+  cc_args += " --sysroot=" + rebase_path("//oniro/sysroots/host", root_build_dir)
+
+  cc      = toolchain_prefix + "clang " + cc_args
+  cxx     = toolchain_prefix + "clang++ " + cc_args
+  ar      = toolchain_prefix + "llvm-ar"
+  ld      = cxx # GN expects a compiler, not a linker
+  nm      = toolchain_prefix + "llvm-nm"
+  readelf = toolchain_prefix + "readelf"
+  strip   = toolchain_prefix + "llvm-strip"
+
+  # Output linker map files for binary size analysis.
+  enable_linker_map = true
+
+  use_unstripped_as_runtime_outputs = ohos_unstripped_runtime_outputs
+
+  # Don't use .cr.so for loadable_modules since they are always loaded via
+  # absolute path.
+  loadable_module_extension = ".so"
+
+  # Make some warnings that was promoted to errors back into
+  # warnings. Current OpenHarmony codebase was written for older
+  # clang, which did not have these warnings.
+  # As OpenHarmony code is improved to work with newer clang, revisit
+  # all of these and remove them ASAP.
+  extra_cppflags = " -Wno-implicit-fallthrough"
+  extra_cppflags += " -Wno-error=bitwise-instead-of-logical"
+  extra_cppflags += " -Wno-error=deprecated-pragma"
+  extra_cppflags += " -Wno-error=free-nonheap-object"
+  extra_cppflags += " -Wno-error=gnu-folding-constant"
+  extra_cppflags += " -Wno-error=non-c-typedef-for-linkage"
+  extra_cppflags += " -Wno-error=null-pointer-subtraction"
+  extra_cppflags += " -Wno-error=pedantic"
+  extra_cppflags += " -Wno-error=pointer-to-int-cast"
+  extra_cppflags += " -Wno-error=null-conversion"
+  extra_cppflags += " -Wno-error=reserved-identifier"
+  extra_cppflags += " -Wno-error=string-concatenation"
+  extra_cppflags += " -Wno-error=suggest-destructor-override"
+  extra_cppflags += " -Wno-error=suggest-override"
+  extra_cppflags += " -Wno-error=tautological-value-range-compare"
+  extra_cppflags += " -Wno-error=thread-safety-analysis"
+  extra_cppflags += " -Wno-error=unused-but-set-parameter"
+  extra_cppflags += " -Wno-error=unused-but-set-variable"
+  extra_cppflags += " -Wno-error=shadow"
+
+  # Using OpenSSL 3.0 with OpenSSL 1.1.1 API causes a lot of
+  # deprecation warnings, which we therefore does not want to error
+  # out on.  Either downgrade to latest 1.1.1 LTS version, or upgrade
+  # the OpenHarmony code to use OpenSSL 3.0 API to be able to get rid
+  # of this.
+  extra_cppflags += " -Wno-error=deprecated-declarations"
+  extra_cppflags += " -Wno-error=incompatible-pointer-types-discards-qualifiers"
+}

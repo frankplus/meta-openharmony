@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //ark/runtime_core git repository of OpenHarmony 3.1 codebase.
+
+* The explicit inclusion of array header is needed when using
+  std::array with upstream libc++ from LLVM 14.
+
+* As of glibc 2.34, __malloc_hook and friends have been removed, and we are
+  currently using glibc 2.34 in the //oniro/sysroots/host toolchain, so we need
+  to compile this out. Going forward, the hooks should probably be removed
+  entirely, and if the functionality is needed, a different implementation is
+  needed, and preferably one that works with musl libc as well.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/ark/runtime_core/BUILD.gn b/ark/runtime_core/BUILD.gn
+index f30ca7fdd967..e7b0d6a812d7 100644
+--- a/ark/runtime_core/BUILD.gn
++++ b/ark/runtime_core/BUILD.gn
+@@ -105,10 +105,12 @@ config("ark_config") {
+     "-fno-exceptions",
+     "-Wno-invalid-offsetof",
+ 
+-    "-Wno-gnu-statement-expression",
+     "-Wno-unused-parameter",
+     "-Wno-unused-result",
+   ]
++  if (is_clang) {
++    cflags_cc += [ "-Wno-gnu-statement-expression" ]
++  }
+ 
+   if (!is_mac && use_pbqp) {
+     cflags_cc += [
+diff --git a/ark/runtime_core/libpandabase/os/unix/futex/mutex.h b/ark/runtime_core/libpandabase/os/unix/futex/mutex.h
+index b2870ce87e5c..09359f362ed1 100644
+--- a/ark/runtime_core/libpandabase/os/unix/futex/mutex.h
++++ b/ark/runtime_core/libpandabase/os/unix/futex/mutex.h
+@@ -23,6 +23,7 @@
+ #include <atomic>
+ #include <limits>
+ #include <iostream>
++#include <array>
+ 
+ #include <unistd.h>
+ #include <linux/futex.h>
+diff --git a/ark/runtime_core/runtime/BUILD.gn b/ark/runtime_core/runtime/BUILD.gn
+index 31165dddb995..9219ae1ace2d 100644
+--- a/ark/runtime_core/runtime/BUILD.gn
++++ b/ark/runtime_core/runtime/BUILD.gn
+@@ -36,6 +36,10 @@ config("arkruntime_config") {
+     "$ark_root/dprof/libdprof",
+   ]
+ 
++  if (is_oniro_toolchain) {
++    defines = [ "_LIBC_HAS_NO_MALLOC_HOOKS" ]
++  }
++
+   cflags_cc = [
+     "-Wno-invalid-offsetof",
+     "-Wno-unused-parameter",
+diff --git a/ark/runtime_core/runtime/mem/mem_hooks.cpp b/ark/runtime_core/runtime/mem/mem_hooks.cpp
+index 0a0700045a57..d4038e956f17 100644
+--- a/ark/runtime_core/runtime/mem/mem_hooks.cpp
++++ b/ark/runtime_core/runtime/mem/mem_hooks.cpp
+@@ -29,7 +29,7 @@ void (*volatile PandaHooks::old_free_hook)(void *, const void *) = nullptr;
+ /* static */
+ void PandaHooks::SaveMemHooks()
+ {
+-#ifndef __MUSL__
++#if ! (defined(__MUSL__) || defined(_LIBC_HAS_NO_MALLOC_HOOKS))
+     old_malloc_hook = __malloc_hook;
+     old_memalign_hook = __memalign_hook;
+     old_free_hook = __free_hook;
+@@ -39,7 +39,7 @@ void PandaHooks::SaveMemHooks()
+ /* static */
+ void PandaHooks::SetMemHooks()
+ {
+-#ifndef __MUSL__
++#if ! (defined(__MUSL__) || defined(_LIBC_HAS_NO_MALLOC_HOOKS))
+     __malloc_hook = MallocHook;
+     __memalign_hook = MemalignHook;
+     __free_hook = FreeHook;
+@@ -107,7 +107,7 @@ void PandaHooks::Enable()
+ /* static */
+ void PandaHooks::Disable()
+ {
+-#ifndef __MUSL__
++#if ! (defined(__MUSL__) || defined(_LIBC_HAS_NO_MALLOC_HOOKS))
+     __malloc_hook = old_malloc_hook;
+     __memalign_hook = old_memalign_hook;
+     __free_hook = old_free_hook;

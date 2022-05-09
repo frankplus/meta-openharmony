@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/user_iam/pin_auth git repository of OpenHarmony 3.1 codebase.
+
+This adds a missing type cast.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/base/user_iam/pin_auth/frameworks/src/inputer_data_impl.cpp b/base/user_iam/pin_auth/frameworks/src/inputer_data_impl.cpp
+index 27e6bfd51ba8..9254f4ec7e29 100644
+--- a/base/user_iam/pin_auth/frameworks/src/inputer_data_impl.cpp
++++ b/base/user_iam/pin_auth/frameworks/src/inputer_data_impl.cpp
+@@ -51,7 +51,7 @@ void InputerDataImpl::getScrypt(std::vector<uint8_t> data, std::vector<uint8_t>
+         PINAUTH_HILOGE(MODULE_FRAMEWORKS, "InputerDataImpl::getScrypt EVP_PKEY_derive_init error");
+         return;
+     }
+-    if (EVP_PKEY_CTX_set1_pbe_pass(pctx, data.data(), data.size()) <= 0) {
++    if (EVP_PKEY_CTX_set1_pbe_pass(pctx, (const char *)data.data(), data.size()) <= 0) {
+         PINAUTH_HILOGE(MODULE_FRAMEWORKS, "InputerDataImpl::getScrypt EVP_PKEY_CTX_set1_pbe_pass error");
+         EVP_PKEY_CTX_free(pctx);
+         return;

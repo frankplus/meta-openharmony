@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-bundle being installed into
+//oniro, configuring the codebase to use third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/build/common/BUILD.gn b/build/common/BUILD.gn
+index bf98fc448834..1f0810ddaf73 100755
+--- a/build/common/BUILD.gn
++++ b/build/common/BUILD.gn
+@@ -40,6 +40,9 @@ group("common_packages") {
+     ]
+   }
+ 
++  # Prebuilt third-party components from Oniro
++  deps += [ "//oniro:third_party" ]
++
+   # global subsystem's configuration
+   deps += [
+     "//third_party/icu/icu4c:ohos_icudat",

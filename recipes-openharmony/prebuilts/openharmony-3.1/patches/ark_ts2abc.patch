@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //ark/ts2abc git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-ohos-bundle being installed into
+//oniro, configuring the codebase to use the toolchain and third party
+components provided in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/ark/ts2abc/ts2panda/ts2abc_config.gni b/ark/ts2abc/ts2panda/ts2abc_config.gni
+index 9a1db6561630..896f9739503e 100755
+--- a/ark/ts2abc/ts2panda/ts2abc_config.gni
++++ b/ark/ts2abc/ts2panda/ts2abc_config.gni
+@@ -15,7 +15,7 @@ import("//build/ohos.gni")
+ import("//build/test.gni")
+ 
+ declare_args() {
+-  buildtool_linux = "//build/toolchain/linux:clang_x64"
++  buildtool_linux = "$host_toolchain"
+   buildtool_mac = "//build/toolchain/mac:clang_x64"
+   buildtool_win = "//build/toolchain/mingw:mingw_x86_64"
+ 

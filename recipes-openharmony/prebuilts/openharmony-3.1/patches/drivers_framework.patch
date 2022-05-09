@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //drivers/framework git repository of OpenHarmony 3.1 codebase.
+
+Using //oniro/sysroots/target:target_clang toolchain, we now get a
+working input-event-codes.h from the kernel headers, so we can drop
+the dependency on the out-of-tree (FreeBSD!) header version.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/drivers/framework/model/input/driver/event_hub.h b/drivers/framework/model/input/driver/event_hub.h
+index 97dec781d33f..bd7a0f20a559 100644
+--- a/drivers/framework/model/input/driver/event_hub.h
++++ b/drivers/framework/model/input/driver/event_hub.h
+@@ -9,7 +9,7 @@
+ #ifndef EVENT_HUB_H
+ #define EVENT_HUB_H
+ 
+-#include "input-event-codes.h"
++#include <uapi/linux/input-event-codes.h>
+ #include "hdf_input_device_manager.h"
+ #include "osal_time.h"
+ 
+diff --git a/drivers/framework/model/input/driver/hdf_input_device_manager.h b/drivers/framework/model/input/driver/hdf_input_device_manager.h
+index 98d247d88b91..f3d520755aa9 100644
+--- a/drivers/framework/model/input/driver/hdf_input_device_manager.h
++++ b/drivers/framework/model/input/driver/hdf_input_device_manager.h
+@@ -9,7 +9,7 @@
+ #ifndef HDF_INPUT_DEVICE_MANAGER_H
+ #define HDF_INPUT_DEVICE_MANAGER_H
+ 
+-#include "input-event-codes.h"
++#include <uapi/linux/input-event-codes.h>
+ #include "osal_mutex.h"
+ #include "hdf_types.h"
+ #include "hdf_device_desc.h"
+diff --git a/drivers/framework/test/unittest/pm/hdf_pm_driver_test.c b/drivers/framework/test/unittest/pm/hdf_pm_driver_test.c
+index 3f5dcf0034fb..41f84aa02869 100644
+--- a/drivers/framework/test/unittest/pm/hdf_pm_driver_test.c
++++ b/drivers/framework/test/unittest/pm/hdf_pm_driver_test.c
+@@ -221,7 +221,7 @@ void HdfPmSetListeners(void)
+     pmTestType[PM_TEST_DRIVER].listener.powerListener.Suspend = HdfPmTestSuspend;
+ }
+ 
+-void HdfPmClearTestCnt()
++void HdfPmClearTestCnt(void)
+ {
+     uint32_t index;
+ 
+diff --git a/drivers/framework/core/host/src/hdf_driver_loader.c b/drivers/framework/core/host/src/hdf_driver_loader.c
+index 6497fab81da3..66495ef184e0 100644
+--- a/drivers/framework/core/host/src/hdf_driver_loader.c
++++ b/drivers/framework/core/host/src/hdf_driver_loader.c
+@@ -13,7 +13,7 @@
+ 
+ #define HDF_LOG_TAG driver_loader
+ 
+-int32_t HdfDriverEntryConstruct()
++int32_t HdfDriverEntryConstruct(void)
+ {
+     int i;
+     struct HdfDriverEntry *driverEntry = NULL;
+diff --git a/drivers/framework/tools/hdi-gen/Makefile b/drivers/framework/tools/hdi-gen/Makefile
+index 033c257575dc..99e0d0ca7a0a 100644
+--- a/drivers/framework/tools/hdi-gen/Makefile
++++ b/drivers/framework/tools/hdi-gen/Makefile
+@@ -27,9 +28,9 @@ endif
+ 
+ all:
+ 	$(Q) echo start build $(TARGET) ...
+-	$(Q) $(MAKE) -f $(MAKE_FILE_NAME)
++	$(Q) $(MAKE) CXX=${BUILD_CXX} -f $(MAKE_FILE_NAME)
+ 
+ clean:
+ 	$(Q) $(MAKE) -f $(MAKE_FILE_NAME) clean

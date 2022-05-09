@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/usb/usb_manager git repository of OpenHarmony 3.1 codebase.
+
+Use NAPI_*_BOOL() macros to fix implicit cast of nullptr to boolean value
+not supported by Clang 14.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/base/usb/usb_manager/interfaces/kits/js/napi/src/usb_info.cpp b/base/usb/usb_manager/interfaces/kits/js/napi/src/usb_info.cpp
+index be7232239e3d..d303806fc7cd 100644
+--- a/base/usb/usb_manager/interfaces/kits/js/napi/src/usb_info.cpp
++++ b/base/usb/usb_manager/interfaces/kits/js/napi/src/usb_info.cpp
+@@ -1178,17 +1178,17 @@ static bool GetBulkTransferParams(napi_env env, napi_callback_info info, USBBulk
+     napi_value argv[PARAM_COUNT_4] = {0};
+ 
+     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= PARAM_COUNT_3), "BulkTransfer failed to get cb info");
++    NAPI_ASSERT_BOOL(env, (status == napi_ok) && (argc >= PARAM_COUNT_3), "BulkTransfer failed to get cb info");
+ 
+     napi_valuetype type;
+     USBDevicePipe pipe;
+     napi_typeof(env, argv[INDEX_0], &type);
+-    NAPI_ASSERT(env, type == napi_object, "BulkTransfer wrong argument type index 0, object expected");
++    NAPI_ASSERT_BOOL(env, type == napi_object, "BulkTransfer wrong argument type index 0, object expected");
+     ParseUsbDevicePipe(env, argv[INDEX_0], pipe);
+ 
+     USBEndpoint ep;
+     napi_typeof(env, argv[INDEX_1], &type);
+-    NAPI_ASSERT(env, type == napi_object, "BulkTransfer wrong argument type index 1. Object expected.");
++    NAPI_ASSERT_BOOL(env, type == napi_object, "BulkTransfer wrong argument type index 1. Object expected.");
+     ParseEndpointObj(env, argv[INDEX_1], ep);
+ 
+     int32_t timeOut = 0;

@@ -1,0 +1,113 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //developtools/hiperf git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-toolchain being installed into
+//oniro, configuring the codebase to use the toolchain in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/developtools/hiperf/BUILD.gn b/developtools/hiperf/BUILD.gn
+index 3c2c1897dab6..1625f14eca5f 100644
+--- a/developtools/hiperf/BUILD.gn
++++ b/developtools/hiperf/BUILD.gn
+@@ -292,7 +292,7 @@ host_protoc_path =
+     root_out_dir + host_out_path + "/" + protoc_subsystem_out_path + "/protoc"
+ 
+ action("hiperf_host_build_proto") {
+-  deps = [ "//third_party/protobuf:protoc(//build/toolchain/linux:clang_x64)" ]
++  deps = [ "//third_party/protobuf:protoc($host_toolchain)" ]
+   args = []
+   outputs = proto_file_codegen
+   sources = []
+@@ -357,7 +357,7 @@ ohos_executable("hiperf_host") {
+   deps = [ ":hiperf_platform_common" ]
+ 
+   if (use_musl) {
+-    static_link = true
++    static_link = false
+   }
+ 
+   subsystem_name = "developtools"
+@@ -423,11 +423,9 @@ group("hiperf_target_all") {
+     deps = [ ":hiperf_target" ]
+   } else {
+     deps = [
+-      ":hiperf_host(//build/toolchain/linux:clang_x64)",  # host linux
+-      ":hiperf_host(//build/toolchain/mingw:mingw_x86_64)",  # host mingw
+-      ":hiperf_host_lib(//build/toolchain/linux:clang_x64)",  # host linux
+-      ":hiperf_host_lib(//build/toolchain/mingw:mingw_x86_64)",  # host mingw
+-      ":hiperf_host_lib_demo(//build/toolchain/linux:clang_x64)",  # host linux
++      ":hiperf_host($host_toolchain)",  # host linux
++      ":hiperf_host_lib($host_toolchain)",  # host linux
++      ":hiperf_host_lib_demo($host_toolchain)",  # host linux
+       ":hiperf_host_python",
+       ":hiperf_target",
+       "interfaces/innerkits/native:hiperf_client",  # c++ api
+diff --git a/proto/build_proto.sh b/proto/build_proto.sh
+index 407b54a226b6..776971048498 100755
+--- a/developtools/hiperf/proto/build_proto.sh
++++ b/developtools/hiperf/proto/build_proto.sh
+@@ -23,6 +23,9 @@ BUILD_TOP=$MYDIR/../../../
+ echo MYDIR $MYDIR
+ echo BUILD_TOP $BUILD_TOP
+ 
++# Set path to libprotobuf.z.so library
++export LD_LIBRARY_PATH=$(dirname $1)
++
+ protoc_cmdline=$*
+ echo protoc_cmdline $protoc_cmdline
+ 
+diff --git a/developtools/hiperf/include/elf_parser.h b/developtools/hiperf/include/elf_parser.h
+index a63b1248f34d..50c389583b94 100755
+--- a/developtools/hiperf/include/elf_parser.h
++++ b/developtools/hiperf/include/elf_parser.h
+@@ -25,12 +25,7 @@
+ #include <unordered_map>
+ #include <vector>
+ 
+-#if !is_ohos
+-// this is not good enough
+-#include <../musl/include/elf.h>
+-#else
+ #include <elf.h>
+-#endif
+ 
+ #include <fcntl.h>
+ #include <stdint.h>
+diff --git a/developtools/hiperf/src/hiperf_libreport.cpp b/developtools/hiperf/src/hiperf_libreport.cpp
+index 6236d70dd4c6..2feee7796f14 100644
+--- a/developtools/hiperf/src/hiperf_libreport.cpp
++++ b/developtools/hiperf/src/hiperf_libreport.cpp
+@@ -14,11 +14,6 @@
+  */
+ #include "hiperf_libreport.h"
+ 
+-#if !is_ohos
+-// this is not good enough
+-#include <../musl/include/elf.h>
+-#endif
+-
+ #include "debug_logger.h"
+ #include "elf_parser.h"
+ #include "perf_file_reader.h"
+diff --git a/developtools/hiperf/test/unittest/common/native/include/elf_parser_test.h b/developtools/hiperf/test/unittest/common/native/include/elf_parser_test.h
+index 4ea121bc1018..32493f2ed4bb 100755
+--- a/developtools/hiperf/test/unittest/common/native/include/elf_parser_test.h
++++ b/developtools/hiperf/test/unittest/common/native/include/elf_parser_test.h
+@@ -16,12 +16,7 @@
+ #ifndef HIPERF_ELF_PARSER_TEST_H
+ #define HIPERF_ELF_PARSER_TEST_H
+ 
+-#if !is_ohos
+-// this is not good enough
+-#include <../musl/include/elf.h>
+-#else
+ #include <elf.h>
+-#endif
+ #include <gmock/gmock.h>
+ #include <gtest/gtest.h>
+ #include <hilog/log.h>

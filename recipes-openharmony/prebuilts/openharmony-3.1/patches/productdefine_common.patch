@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //productdefine/common git repository of OpenHarmony 3.1 codebase.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/productdefine/common/products/Hi3516DV300.json b/productdefine/common/products/Hi3516DV300.json
+index 5467f61ead47..44b5944ceaa5 100755
+--- a/productdefine/common/products/Hi3516DV300.json
++++ b/productdefine/common/products/Hi3516DV300.json
+@@ -87,7 +87,6 @@
+     "updater:update_service":{},
+     "developtools:bytrace_standard":{},
+     "developtools:hdc_standard":{},
+-    "developtools:profiler":{},
+     "developtools:hiperf":{},
+     "sensors:miscdevice":{},
+     "graphic:graphic_standard":{},

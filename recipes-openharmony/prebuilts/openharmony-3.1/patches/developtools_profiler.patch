@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //developtools/profiler git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-toolchain being installed into
+//oniro, configuring the codebase to use the toolchain in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/developtools/profiler/build/gcov.sh b/developtools/profiler/build/gcov.sh
+index 5ad6b336cd78..f2c45d2ec1cf 100755
+--- a/developtools/profiler/build/gcov.sh
++++ b/developtools/profiler/build/gcov.sh
+@@ -14,8 +14,4 @@
+ set -e
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+-CLANG_DIR=$TOP/prebuilts/clang/host/linux-x86/clang-r353983c
+-if [ ! -e "$CLANG_DIR" ]; then
+-    CLANG_DIR=$TOP/prebuilts/clang/ohos/linux-x86_64/llvm
+-fi
+-$CLANG_DIR/bin/llvm-cov gcov $@
++$TOP/oniro/sysroots/host/usr/bin/llvm-cov gcov $@
+diff --git a/developtools/profiler/device/format-code.sh b/developtools/profiler/device/format-code.sh
+index 5296125d98fb..cd4981a2e07c 100755
+--- a/developtools/profiler/device/format-code.sh
++++ b/developtools/profiler/device/format-code.sh
+@@ -18,7 +18,7 @@ set -e
+ 
+ DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
+ TOP=$(realpath $DIR/../../..)
+-CLANG_DIR=$TOP/prebuilts/clang/ohos/linux-x86_64/llvm/bin
++CLANG_DIR=$TOP/oniro/sysroots/host/usr/bin
+ GN_DIR=$TOP/prebuilts/build-tools/linux-x86/bin
+ 
+ export PATH=$CLANG_DIR:$GN_DIR:$PATH
+diff --git a/developtools/profiler/device/plugins/ftrace_plugin/src/flow_controller.cpp b/developtools/profiler/device/plugins/ftrace_plugin/src/flow_controller.cpp
+index 077078228317..4e7600ace0ee 100755
+--- a/developtools/profiler/device/plugins/ftrace_plugin/src/flow_controller.cpp
++++ b/developtools/profiler/device/plugins/ftrace_plugin/src/flow_controller.cpp
+@@ -325,7 +325,7 @@ int FlowController::StopCapture(void)
+ bool FlowController::ParsePerCpuStatus(int stage)
+ {
+     auto tracePacket = std::make_unique<TracePluginResult>();
+-    CHECK_NOTNULL(tracePacket, nullptr, "create TracePluginResult FAILED!");
++    CHECK_NOTNULL(tracePacket, false, "create TracePluginResult FAILED!");
+ 
+     auto cpuStatsMsg = tracePacket->add_ftrace_cpu_stats();
+     if (stage == TRACE_START) {
+@@ -362,7 +362,7 @@ bool FlowController::ParsePerCpuStatus(int stage)
+ bool FlowController::ReportClockTimes()
+ {
+     auto traceResult = std::make_unique<TracePluginResult>();
+-    CHECK_NOTNULL(traceResult, nullptr, "create TracePluginResult FAILED!");
++    CHECK_NOTNULL(traceResult, false, "create TracePluginResult FAILED!");
+ 
+     std::map<clockid_t, ClockDetailMsg::ClockId> clocksMap = {
+         {CLOCK_REALTIME, ClockDetailMsg::REALTIME},
+@@ -376,7 +376,7 @@ bool FlowController::ReportClockTimes()
+         struct timespec ts = {};
+         clock_gettime(entry.first, &ts);
+         auto clockMsg = traceResult->add_clocks_detail();
+-        CHECK_NOTNULL(clockMsg, nullptr, "add clock_detail failed for %d!", entry.first);
++        CHECK_NOTNULL(clockMsg, false, "add clock_detail failed for %d!", entry.first);
+         clockMsg->set_id(entry.second);
+         auto timeMsg = clockMsg->mutable_time();
+         timeMsg->set_tv_sec(ts.tv_sec);
+@@ -394,7 +394,7 @@ bool FlowController::ReportClockTimes()
+ bool FlowController::ParseKernelSymbols()
+ {
+     auto traceResult = std::make_unique<TracePluginResult>();
+-    CHECK_NOTNULL(traceResult, nullptr, "create TracePluginResult FAILED!");
++    CHECK_NOTNULL(traceResult, false, "create TracePluginResult FAILED!");
+ 
+     ksymsParser_->Accept([&traceResult](const KernelSymbol& symbol) {
+         auto symbolDetail = traceResult->add_symbols_detail();
+@@ -408,12 +408,12 @@ bool FlowController::ParseKernelSymbols()
+ bool FlowController::ParseFtraceEvent(int cpuid, uint8_t page[])
+ {
+     auto tracePacket = std::make_unique<TracePluginResult>();
+-    CHECK_NOTNULL(tracePacket, nullptr, "create TracePluginResult FAILED!");
++    CHECK_NOTNULL(tracePacket, false, "create TracePluginResult FAILED!");
+ 
+     auto cpudetail = tracePacket->add_ftrace_cpu_detail();
+     cpudetail->set_cpu(static_cast<uint32_t>(cpuid));
+ 
+-    CHECK_TRUE(ftraceParser_->ParsePage(*cpudetail, page, PAGE_SIZE), nullptr, "parse page failed!");
++    CHECK_TRUE(ftraceParser_->ParsePage(*cpudetail, page, PAGE_SIZE), false, "parse page failed!");
+ 
+     return tansporter_->Submit(std::move(tracePacket));
+ }

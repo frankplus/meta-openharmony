@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/ace/ace_engine git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-toolchain being installed into
+//oniro, configuring the codebase to use the toolchain in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/foundation/ace/ace_engine/ace_config.gni b/foundation/ace/ace_engine/ace_config.gni
+index fb5324f1635e..cbf2ded3fa4c 100644
+--- a/foundation/ace/ace_engine/ace_config.gni
++++ b/foundation/ace/ace_engine/ace_config.gni
+@@ -70,6 +70,9 @@ objcopy_clang = "$clang_base_path/bin/llvm-objcopy"
+ 
+ if (is_standard_system) {
+   objcopy_default = "//prebuilts/clang/ohos/linux-x86_64/llvm/bin/llvm-objcopy"
++  if (is_oniro_toolchain) {
++    objcopy_default = "//oniro/sysroots/host/usr/bin/llvm-objcopy"
++  }
+   node_js_path =
+       "//prebuilts/build-tools/common/nodejs/node-v12.18.4-linux-x64/bin/"
+ } else if (is_cross_platform_build && defined(aosp_objcopy)) {

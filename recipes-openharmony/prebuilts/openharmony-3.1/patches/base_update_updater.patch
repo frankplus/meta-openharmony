@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/update/updater git repository of OpenHarmony 3.1 codebase.
+
+flashd: Build Linux target only using host toolchain.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/base/update/updater/services/flashd/BUILD.gn b/base/update/updater/services/flashd/BUILD.gn
+index c505c593e365..53cb6ac66be4 100755
+--- a/base/update/updater/services/flashd/BUILD.gn
++++ b/base/update/updater/services/flashd/BUILD.gn
+@@ -220,17 +220,12 @@ group("flashhost_target_standard") {
+ }
+ 
+ group("flashhost_target_standard_linux") {
+-  deps = [ ":ohflash(//build/toolchain/linux:clang_x64)" ]
+-}
+-
+-group("flashhost_target_standard_mingw") {
+-  deps = [ ":ohflash(//build/toolchain/mingw:mingw_x86_64)" ]
++  deps = [ ":ohflash($host_toolchain)" ]
+ }
+ 
+ group("flashhost_target_standard_all") {
+   deps = [
+     ":flashhost_target_standard_linux",
+-    ":flashhost_target_standard_mingw",
+   ]
+ }
+ 

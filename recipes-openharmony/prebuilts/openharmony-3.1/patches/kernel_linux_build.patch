@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //kernel/linux/build git repository of OpenHarmony 3.1 codebase.
+
+This integrates with the oniro-openharmony-toolchain being installed into
+//oniro, configuring the codebase to use the toolchain in //oniro.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/kernel/linux/build/kernel.mk b/kernel/linux/build/kernel.mk
+index 56fcde79ef55..84789e66b759 100644
+--- a/kernel/linux/build/kernel.mk
++++ b/kernel/linux/build/kernel.mk
+@@ -27,7 +27,7 @@ KERNEL_SRC_PATH := $(OHOS_BUILD_HOME)/kernel/linux/${KERNEL_VERSION}
+ KERNEL_PATCH_PATH := $(OHOS_BUILD_HOME)/kernel/linux/patches/${KERNEL_VERSION}
+ KERNEL_CONFIG_PATH := $(OHOS_BUILD_HOME)/kernel/linux/config/${KERNEL_VERSION}
+ PREBUILTS_GCC_DIR := $(OHOS_BUILD_HOME)/prebuilts/gcc
+-CLANG_HOST_TOOLCHAIN := $(OHOS_BUILD_HOME)/prebuilts/clang/ohos/linux-x86_64/llvm/bin
++CLANG_HOST_TOOLCHAIN := $(OHOS_BUILD_HOME)/oniro/sysroots/host/usr/bin
+ KERNEL_HOSTCC := $(CLANG_HOST_TOOLCHAIN)/clang
+ KERNEL_PREBUILT_MAKE := make
+ 

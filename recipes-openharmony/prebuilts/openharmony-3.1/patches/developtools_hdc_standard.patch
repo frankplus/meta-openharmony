@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //developtools/hdc_standard git repository of OpenHarmony 3.1 codebase.
+
+Only build for linux host using host toolchain.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/developtools/hdc_standard/BUILD.gn b/developtools/hdc_standard/BUILD.gn
+index b2c1cfbeea4a..8b4eeaa1fc1f 100644
+--- a/developtools/hdc_standard/BUILD.gn
++++ b/developtools/hdc_standard/BUILD.gn
+@@ -194,25 +194,13 @@ group("hdc_target_standard") {
+ }
+ 
+ group("hdc_target_standard_linux") {
+-  deps = [ ":hdc_std(//build/toolchain/linux:clang_x64)" ]
+-}
+-
+-group("hdc_target_standard_mingw") {
+-  deps = [ ":hdc_std(//build/toolchain/mingw:mingw_x86_64)" ]
++  deps = [ ":hdc_std($host_toolchain)" ]
+ }
+ 
+ group("hdc_target_standard_all") {
+   deps = [
+     ":hdc_target_standard",
+     ":hdc_target_standard_linux",
+-    ":hdc_target_standard_mingw",
+-  ]
+-}
+-
+-group("hdc_target_standard_windows") {
+-  deps = [
+-    ":hdc_target_standard",
+-    ":hdc_target_standard_mingw",
+   ]
+ }
+ 

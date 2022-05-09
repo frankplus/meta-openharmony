@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/ace/napi git repository of OpenHarmony 3.1 codebase.
+
+This adds new macros NAPI_CALL_BOOL() and NAPI_ASSERT_BOOL() returning
+boolean false instead of nullptr as done by NAPI_CALL() and NAPI_ASSERT(),
+as Clang 14 doesn't implicitly cast nullptr as boolean value.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/foundation/ace/napi/interfaces/innerkits/napi/native_common.h b/foundation/ace/napi/interfaces/innerkits/napi/native_common.h
+index 673301787a08..79b0518c90aa 100644
+--- a/foundation/ace/napi/interfaces/innerkits/napi/native_common.h
++++ b/foundation/ace/napi/interfaces/innerkits/napi/native_common.h
+@@ -41,6 +41,8 @@
+ 
+ #define NAPI_ASSERT(env, assertion, message) NAPI_ASSERT_BASE(env, assertion, message, nullptr)
+ 
++#define NAPI_ASSERT_BOOL(env, assertion, message) NAPI_ASSERT_BASE(env, assertion, message, false)
++
+ #define NAPI_ASSERT_RETURN_VOID(env, assertion, message) NAPI_ASSERT_BASE(env, assertion, message, NAPI_RETVAL_NOTHING)
+ 
+ #define NAPI_CALL_BASE(env, theCall, retVal) \
+@@ -53,6 +55,8 @@
+ 
+ #define NAPI_CALL(env, theCall) NAPI_CALL_BASE(env, theCall, nullptr)
+ 
++#define NAPI_CALL_BOOL(env, theCall) NAPI_CALL_BASE(env, theCall, false)
++
+ #define NAPI_CALL_RETURN_VOID(env, theCall) NAPI_CALL_BASE(env, theCall, NAPI_RETVAL_NOTHING)
+ 
+ #define DECLARE_NAPI_PROPERTY(name, val)                                       \

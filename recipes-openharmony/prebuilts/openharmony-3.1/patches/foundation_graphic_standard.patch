@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/graphic/standard git repository of OpenHarmony 3.1 codebase.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff --git a/foundation/graphic/standard/rosen/modules/render_service_base/include/pipeline/rs_base_render_node.h b/foundation/graphic/standard/rosen/modules/render_service_base/include/pipeline/rs_base_render_node.h
+index 7f162b922ecf..d795a3ce2fd8 100644
+--- a/foundation/graphic/standard/rosen/modules/render_service_base/include/pipeline/rs_base_render_node.h
++++ b/foundation/graphic/standard/rosen/modules/render_service_base/include/pipeline/rs_base_render_node.h
+@@ -20,6 +20,27 @@
+ 
+ #include "common/rs_common_def.h"
+ 
++/* Dirty workaround for the use of libcxx internal __libcpp_erase_if_container
++ * function, which is hidden newer LLVM versions. This is a copy-paste of the
++ * inline function in LLVM 10.0.0.
++ *
++ * If code is upgraded to c++20 or newer, use of __libcpp_erase_if_container
++ * should be replaced with std::erase_if()
++*/
++namespace std {
++  template <class _Container, class _Predicate>
++  inline void __libcpp_erase_if_container(_Container& __c, _Predicate __pred)
++  {
++    for (typename _Container::iterator __iter = __c.begin(), __last = __c.end(); __iter != __last;)
++      {
++        if (__pred(*__iter))
++          __iter = __c.erase(__iter);
++        else
++          ++__iter;
++      }
++  }
++}
++
+ namespace OHOS {
+ namespace Rosen {
+ class RSContext;
