@@ -14,7 +14,7 @@
 # limitations under the License.
 
 variables:
-  BITBAKE_CONTAINER_VERSION: "0.5"
+  BITBAKE_CONTAINER_VERSION: "0.6"
 
 .kaniko:
   stage: container
