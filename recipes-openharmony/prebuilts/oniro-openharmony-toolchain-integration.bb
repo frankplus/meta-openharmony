@@ -13,6 +13,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 S = "${WORKDIR}/src"
 B = "${WORKDIR}/build"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+
 SRC_URI += "file://setup.sh;subdir=src"
 SRC_URI += "file://relocate-ld-scripts.sh"
 SRC_URI += "file://BUILD.gn;subdir=src"
@@ -39,6 +41,8 @@ SRC_URI += "file://third_party/musl/musl_config.gni;subdir=src/overlay"
 SRC_URI += "file://build/common/musl/BUILD.gn;subdir=src/overlay"
 
 SRC_URI += "file://BUILD_host.gn"
+
+require oniro-openharmony-toolchain-integration-${OPENHARMONY_VERSION}.inc
 
 SDK_DYNAMIC_LINKER:x86-64  = "ld-linux-x86-64.so.2"
 SDK_DYNAMIC_LINKER:x86     = "ld-linux.so.2"

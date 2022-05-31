@@ -15,9 +15,13 @@ DEPENDS += "oniro-openharmony-toolchain-integration"
 S = "${WORKDIR}/src"
 B = "${WORKDIR}/build"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+
 SRC_URI += "file://patches/build_third_party.patch;apply=no;subdir=src"
 
 SRC_URI += "file://third_party/openssl/BUILD.gn;subdir=src/overlay"
+
+require oniro-openharmony-thirdparty-integration-${OPENHARMONY_VERSION}.inc
 
 do_install() {
     mkdir -p ${D}${datadir}/oniro-openharmony

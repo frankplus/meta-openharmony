@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM += "file://BUILD_target.gn;beginline=1;endline=3;md5=a153785666
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+
 SRC_URI = "file://BUILD_target.gn"
 
 TARGET_GN_CPU = "${TRANSLATED_TARGET_ARCH}"
