@@ -5,7 +5,7 @@
 BASEVER:oniro-openharmony-linux = "1.2.0"
 SRCREV:oniro-openharmony-linux = "040c1d16b468c50c04fc94edff521f1637708328"
 LIC_FILES_CHKSUM:oniro-openharmony-linux = "file://COPYRIGHT;md5=f95ee848a08ad253c04723da00cedb01"
-FILESEXTRAPATHS:prepend:oniro-openharmony-linux := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:oniro-openharmony-linux := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 SRC_URI:append:oniro-openharmony-linux = " file://openharmony-common.patch"
 SRC_URI:append:oniro-openharmony-linux = " file://openharmony-linux-user.patch"
 # This conflicts with libcap, so we have to go with libcap instead
