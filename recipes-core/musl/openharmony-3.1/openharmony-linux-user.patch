@@ -1,0 +1,1591 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch generated from OpenHarmony-v3.1-Release version, with the following commands:
+
+    cp -r porting/linux/user/* .
+    git add -A
+    git diff --staged > openharmony-linux-user.patch
+
+The hunks from 0001-Make-dynamic-linker-a-relative-symlink-to-libc.patch in
+Yocto was removed manually afterwards.
+
+The hunk for the file sys/capabilty.h has been moved to a seperate patch
+file so it can be ignored for some configurations that include components
+with a dependency on the libcap package, as this pakage already provide
+this header.
+
+Upstream-status: Pending
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+
+diff --git a/arch/arm/bits/fenv.h b/arch/arm/bits/fenv.h
+index d85fc86d7947..b497a9878800 100644
+--- a/arch/arm/bits/fenv.h
++++ b/arch/arm/bits/fenv.h
+@@ -9,10 +9,10 @@
+ #define FE_INEXACT    16
+ #define FE_ALL_EXCEPT 31
+ #define FE_TONEAREST  0
+-#define FE_DOWNWARD   0x800000
+-#define FE_UPWARD     0x400000
+ #define FE_TOWARDZERO 0xc00000
+ #endif
++#define FE_DOWNWARD   0x800000
++#define FE_UPWARD     0x400000
+ 
+ typedef unsigned long fexcept_t;
+ 
+diff --git a/arch/generic/bits/shm.h b/arch/generic/bits/shm.h
+index 8d19378191ba..da07a2a0cb50 100644
+--- a/arch/generic/bits/shm.h
++++ b/arch/generic/bits/shm.h
+@@ -1,4 +1,4 @@
+-#define SHMLBA 4096
++#define SHMLBA (4*4096)
+ 
+ struct shmid_ds {
+ 	struct ipc_perm shm_perm;
+diff --git a/include/ctype.h b/include/ctype.h
+index 7936536f577c..7b91d3ef6228 100644
+--- a/include/ctype.h
++++ b/include/ctype.h
+@@ -66,6 +66,11 @@ int   toascii(int);
+ #define _toupper(a) ((a)&0x5f)
+ #define isascii(a) (0 ? isascii(a) : (unsigned)(a) < 128)
+ 
++#include <stdint.h>
++
++const int32_t **__ctype_tolower_loc(void);
++const int32_t **__ctype_toupper_loc(void);
++
+ #endif
+ 
+ #ifdef __cplusplus
+diff --git a/include/dlfcn.h b/include/dlfcn.h
+index 13ab71dd071e..e87392e70398 100644
+--- a/include/dlfcn.h
++++ b/include/dlfcn.h
+@@ -24,6 +24,21 @@ char  *dlerror(void);
+ void  *dlopen(const char *, int);
+ void  *dlsym(void *__restrict, const char *__restrict);
+ 
++/* namespace apis */
++typedef const char* Dl_namespace;
++
++void dlns_init(Dl_namespace *, const char *);
++
++/* open dso in given namespace which has own lib search paths
++ * when namespace is null, it's same to dlopen() 
++ * void to use "default" as namespace, which is the default namespace*/
++void *dlopen_ns(Dl_namespace *, const char *, int);
++
++/* create the namespace and set lib search paths of namespace,
++ * the paths should be splited by ':'. When namespace already exist, 
++ * return error */
++int dlns_create(Dl_namespace *, const char *);
++
+ #if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
+ typedef struct {
+ 	const char *dli_fname;
+diff --git a/include/pthread.h b/include/pthread.h
+index 984db6806418..b430fbffb656 100644
+--- a/include/pthread.h
++++ b/include/pthread.h
+@@ -6,6 +6,17 @@ extern "C" {
+ 
+ #include <features.h>
+ 
++/* Musl did not provide the "owner" macro directly,
++ * so users can not access the mutex-ower-ID.
++ * Thus we added this macro for getting the owner-ID
++ * of the mutex. */
++
++/* These macros provides macros for accessing inner
++ * attributes of the pthread_mutex_t struct.
++ * It is intended for solving the coompiling failure
++ * of Dopra codes which claims that .__data.* realm
++ * can not be found in pthread_mutex_t. */
++
+ #define __NEED_time_t
+ #define __NEED_clockid_t
+ #define __NEED_struct_timespec
+@@ -78,6 +89,7 @@ int pthread_create(pthread_t *__restrict, const pthread_attr_t *__restrict, void
+ int pthread_detach(pthread_t);
+ _Noreturn void pthread_exit(void *);
+ int pthread_join(pthread_t, void **);
++pid_t pthread_gettid_np(pthread_t);
+ 
+ #ifdef __GNUC__
+ __attribute__((const))
+diff --git a/include/sys/sysinfo.h b/include/sys/sysinfo.h
+index 6a3931e52010..9b095ffb500b 100644
+--- a/include/sys/sysinfo.h
++++ b/include/sys/sysinfo.h
+@@ -5,6 +5,7 @@
+ extern "C" {
+ #endif
+ 
++#ifndef _LINUX_KERNEL_H
+ #define SI_LOAD_SHIFT 16
+ 
+ struct sysinfo {
+@@ -22,6 +23,7 @@ struct sysinfo {
+ 	unsigned mem_unit;
+ 	char __reserved[256];
+ };
++#endif
+ 
+ int sysinfo (struct sysinfo *);
+ int get_nprocs_conf (void);
+diff --git a/include/unistd.h b/include/unistd.h
+index 7bcbff943d4a..c9a87b1a14b6 100644
+--- a/include/unistd.h
++++ b/include/unistd.h
+@@ -190,6 +190,7 @@ int syncfs(int);
+ int euidaccess(const char *, int);
+ int eaccess(const char *, int);
+ ssize_t copy_file_range(int, off_t *, int, off_t *, size_t, unsigned);
++pid_t gettid(void);
+ #endif
+ 
+ #if defined(_LARGEFILE64_SOURCE) || defined(_GNU_SOURCE)
+@@ -462,6 +463,19 @@ ssize_t copy_file_range(int, off_t *, int, off_t *, size_t, unsigned);
+ #define _CS_V6_ENV	1148
+ #define _CS_V7_ENV	1149
+ 
++#ifdef _GNU_SOURCE
++#ifndef TEMP_FAILURE_RETRY
++#define MUSL_TEMP_FAILURE_RETRY(expression) \
++    (__extension__ \
++        ({ long int __result; \
++            do __result = (long int)(expression); \
++            while(__result == -1L&& errno == EINTR); \
++        __result;}))
++
++#define TEMP_FAILURE_RETRY(expression) MUSL_TEMP_FAILURE_RETRY(expression)
++#endif
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/ldso/dynlink.c b/ldso/dynlink.c
+index afec985a3dbe..1219ee601a3e 100644
+--- a/ldso/dynlink.c
++++ b/ldso/dynlink.c
+@@ -32,6 +32,7 @@ static void error(const char *, ...);
+ 
+ #define container_of(p,t,m) ((t*)((char *)(p)-offsetof(t,m)))
+ #define countof(a) ((sizeof (a))/(sizeof (a)[0]))
++#define DSO_FLAGS_NODELETE 0x1
+ 
+ struct debug {
+ 	int ver;
+@@ -56,6 +57,9 @@ struct dso {
+ 	size_t *dynv;
+ 	struct dso *next, *prev;
+ 
++	/* mark the dso status */
++	unsigned int flags;
++
+ 	Phdr *phdr;
+ 	int phnum;
+ 	size_t phentsize;
+@@ -76,10 +80,12 @@ struct dso {
+ 	char mark;
+ 	char bfs_built;
+ 	char runtime_loaded;
++	char by_dlopen;
+ 	struct dso **deps, *needed_by;
+ 	size_t ndeps_direct;
+ 	size_t next_dep;
+ 	int ctor_visitor;
++	int nr_dlopen;
+ 	char *rpath_orig, *rpath;
+ 	struct tls_module tls;
+ 	size_t tls_id;
+@@ -1021,6 +1027,8 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 			ldso.prev = tail;
+ 			tail = &ldso;
+ 		}
++		/* increase libc dlopen refcnt */
++		a_inc(&ldso.nr_dlopen);
+ 		return &ldso;
+ 	}
+ 	if (strchr(name, '/')) {
+@@ -1030,6 +1038,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 		/* Search for the name to see if it's already loaded */
+ 		for (p=head->next; p; p=p->next) {
+ 			if (p->shortname && !strcmp(p->shortname, name)) {
++				a_inc(&p->nr_dlopen);
+ 				return p;
+ 			}
+ 		}
+@@ -1046,11 +1055,13 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 			if (!sys_path) {
+ 				char *prefix = 0;
+ 				size_t prefix_len;
++				char *filename = ldso.name;
+ 				if (ldso.name[0]=='/') {
+ 					char *s, *t, *z;
+ 					for (s=t=z=ldso.name; *s; s++)
+ 						if (*s=='/') z=t, t=s;
+ 					prefix_len = z-ldso.name;
++					filename = t+1;
+ 					if (prefix_len < PATH_MAX)
+ 						prefix = ldso.name;
+ 				}
+@@ -1058,11 +1069,12 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 					prefix = "";
+ 					prefix_len = 0;
+ 				}
++				size_t name_len = strchrnul(filename, '.') - filename;
+ 				char etc_ldso_path[prefix_len + 1
+-					+ sizeof "/etc/ld-musl-" LDSO_ARCH ".path"];
++					+ sizeof "/etc/.path" + name_len];
+ 				snprintf(etc_ldso_path, sizeof etc_ldso_path,
+-					"%.*s/etc/ld-musl-" LDSO_ARCH ".path",
+-					(int)prefix_len, prefix);
++					"%.*s/etc/%.*s.path",
++					(int)prefix_len, prefix, (int)name_len, filename);
+ 				FILE *f = fopen(etc_ldso_path, "rbe");
+ 				if (f) {
+ 					if (getdelim(&sys_path, (size_t[1]){0}, 0, f) <= 0) {
+@@ -1074,7 +1086,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 					sys_path = "";
+ 				}
+ 			}
+-			if (!sys_path) sys_path = SYS_PATH_DFLT;
++			if (!sys_path) sys_path = strdup(SYS_PATH_DFLT);
+ 			fd = path_open(name, sys_path, buf, sizeof buf);
+ 		}
+ 		pathname = buf;
+@@ -1092,6 +1104,8 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 			if (!p->shortname && pathname != name)
+ 				p->shortname = strrchr(p->name, '/')+1;
+ 			close(fd);
++			/* increase dlopen refcnt */
++			a_inc(&p->nr_dlopen);
+ 			return p;
+ 		}
+ 	}
+@@ -1137,6 +1151,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 	p->ino = st.st_ino;
+ 	p->needed_by = needed_by;
+ 	p->name = p->buf;
++	p->nr_dlopen = 1;
+ 	p->runtime_loaded = runtime;
+ 	strcpy(p->name, pathname);
+ 	/* Add a shortname only if name arg was not an explicit pathname. */
+@@ -1166,6 +1181,9 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 	p->prev = tail;
+ 	tail = p;
+ 
++	if (runtime)
++		p->by_dlopen = 1;
++
+ 	if (DL_FDPIC) makefuncdescs(p);
+ 
+ 	if (ldd_mode) dprintf(1, "\t%s => %s (%p)\n", name, pathname, p->base);
+@@ -2086,6 +2104,10 @@ void *dlopen(const char *file, int mode)
+ 	 * relocations resolved to symbol definitions that get removed. */
+ 	redo_lazy_relocs();
+ 
++	if (mode & RTLD_NODELETE) {
++		p->flags |= DSO_FLAGS_NODELETE;
++	}
++
+ 	update_tls_size();
+ 	if (tls_cnt != orig_tls_cnt)
+ 		install_new_tls();
+@@ -2169,6 +2191,102 @@ static void *do_dlsym(struct dso *p, const char *s, void *ra)
+ 	return laddr(def.dso, def.sym->st_value);
+ }
+ 
++static int do_dlclose(struct dso *p)
++{
++	int old;
++	size_t n;
++	struct dso *d;
++
++	if (__dl_invalid_handle(p))
++		return -1;
++
++	if (!p->by_dlopen) {
++		error("Library %s is not loaded by dlopen", p->name);
++		return -1;
++	}
++
++	/* dso is marked  as RTLD_NODELETE library, do nothing here. */
++	if ((p->flags & DSO_FLAGS_NODELETE) != 0) {
++		return 0;
++	}
++
++	old = a_fetch_add(&p->nr_dlopen, -1);
++	if (old > 1)
++		return 0;
++
++	/* call destructors if needed */
++	if (p->constructed) {
++		size_t dyn[DYN_CNT];
++		decode_vec(p->dynv, dyn, DYN_CNT);
++		if (dyn[0] & (1<<DT_FINI_ARRAY)) {
++			n = dyn[DT_FINI_ARRAYSZ] / sizeof(size_t);
++			size_t *fn = (size_t *)laddr(p, dyn[DT_FINI_ARRAY]) + n;
++			while (n--)
++				((void (*)(void))*--fn)();
++		}
++		p->constructed = 0;
++	}
++
++	/* remove dso symbols from global list */
++	if (p->syms_next) {
++		for (d = head; d->syms_next != p; d = d->syms_next)
++			; /* NOP */
++		d->syms_next = p->syms_next;
++	} else if (p == syms_tail) {
++		for (d = head; d->syms_next != p; d = d->syms_next)
++			; /* NOP */
++		d->syms_next = NULL;
++		syms_tail = d;
++	}
++
++	/* remove dso from lazy list if needed */
++	if (p == lazy_head) {
++		lazy_head = p->lazy_next;
++	} else if (p->lazy_next) {
++		for (d = lazy_head; d->lazy_next != p; d = d->lazy_next)
++			; /* NOP */
++		d->lazy_next = p->lazy_next;
++	}
++
++	/* remove dso from fini list */
++	if (p == fini_head) {
++		fini_head = p->fini_next;
++	} else if (p->fini_next) {
++		for (d = fini_head; d->fini_next != p; d = d->fini_next)
++			; /* NOP */
++		d->fini_next = p->fini_next;
++	}
++
++	/* remove dso from global dso list */
++	if (p == tail) {
++		tail = p->prev;
++		tail->next = NULL;
++	} else {
++		p->next->prev = p->prev;
++		p->prev->next = p->next;
++	}
++
++	if (p->lazy != NULL)
++		free(p->lazy);
++	if (p->deps != no_deps)
++		free(p->deps);
++	unmap_library(p);
++	free(p);
++
++	return 0;
++}
++
++hidden int __dlclose(void *p)
++{
++	int rc;
++	pthread_rwlock_wrlock(&lock);
++	__inhibit_ptc();
++	rc = do_dlclose(p);
++	__release_ptc();
++	pthread_rwlock_unlock(&lock);
++	return rc;
++}
++
+ int dladdr(const void *addr_arg, Dl_info *info)
+ {
+ 	size_t addr = (size_t)addr_arg;
+@@ -2312,3 +2430,46 @@ static void error(const char *fmt, ...)
+ 	__dl_vseterr(fmt, ap);
+ 	va_end(ap);
+ }
++void dlns_init(Dl_namespace *ns, const char *name)
++{
++	*ns = name;
++}
++
++void *dlopen_ns(Dl_namespace *ns, const char *file, int mode)
++{
++	if (!ns) return NULL;
++
++	return dlopen(file, mode);
++}
++
++int dlns_create(Dl_namespace *ns,const char *search_path)
++{
++	int sys_length = 0;
++	int search_length =  0;
++	char * new_path = NULL;
++
++	if (!search_path || !ns) return EINVAL;
++
++	sys_length = strlen(sys_path);
++	search_length = strlen(search_path);
++
++	if (search_path[0] != ':'){
++		sys_length += search_length + 1;
++	} else  {
++		sys_length += search_length;
++	}
++
++	new_path = (char *)malloc(sys_length + 1);
++	if (!new_path) return ENOMEM;
++
++	strcpy(new_path, sys_path);
++	if (search_path[0] != ':') {
++		strcat(new_path, ":");
++	}
++	strcat(new_path, search_path);
++
++	free(sys_path);
++	sys_path = new_path;
++
++	return 0;
++}
+diff --git a/src/hook/common_def.h b/src/hook/common_def.h
+new file mode 100755
+index 000000000000..7d74b3da0c27
+--- /dev/null
++++ b/src/hook/common_def.h
+@@ -0,0 +1,10 @@
++#ifndef _COMMON_DEF_H
++#define _COMMON_DEF_H
++
++#include <unistd.h>
++#include <stdlib.h>
++
++#define	__predict_true(exp) __builtin_expect((exp) != 0, 1)
++#define	__predict_false(exp) __builtin_expect((exp) != 0, 0)
++
++#endif
+\ No newline at end of file
+diff --git a/src/hook/malloc_common.c b/src/hook/malloc_common.c
+new file mode 100755
+index 000000000000..50abc4d5e5d5
+--- /dev/null
++++ b/src/hook/malloc_common.c
+@@ -0,0 +1,33 @@
++#ifdef HOOK_ENABLE
++#include <unistd.h>
++#include <sys/types.h>
++#include "musl_malloc.h"
++#include <malloc.h>
++#include "musl_malloc_dispatch_table.h"
++#include "common_def.h"
++#include "musl_preinit_common.h"
++
++void* malloc(size_t bytes)
++{
++	volatile const struct MallocDispatchType* dispatch_table = get_current_dispatch_table();
++	if (__predict_false(dispatch_table != NULL)) {
++		void*ret = dispatch_table->malloc(bytes);
++		return ret;
++	}
++	void* result = MuslMalloc(malloc)(bytes);
++	if (__predict_false(result == NULL)) {
++		//__musl_log(__MUSL_LOG_WARN, "malloc(%zu) failed: returning null pointer\n", bytes);
++	}
++	return result;
++}
++
++void free(void* mem)
++{
++	volatile const struct MallocDispatchType* dispatch_table = get_current_dispatch_table();
++	if (__predict_false(dispatch_table != NULL)) {
++		dispatch_table->free(mem);
++	} else {
++		MuslMalloc(free)(mem);
++	}
++}
++#endif
+diff --git a/src/hook/musl_malloc.h b/src/hook/musl_malloc.h
+new file mode 100755
+index 000000000000..27f30869d0d8
+--- /dev/null
++++ b/src/hook/musl_malloc.h
+@@ -0,0 +1,26 @@
++#ifndef _MUSL_MALLOC_H
++#define _MUSL_MALLOC_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifdef HOOK_ENABLE
++#define MuslMalloc(func) __libc_ ## func
++#else
++#define MuslMalloc(func) func
++#endif
++
++void *__libc_malloc(size_t);
++void *__libc_calloc(size_t, size_t);
++void *__libc_realloc(void *, size_t);
++void __libc_free(void *);
++void *__libc_valloc(size_t);
++void *__libc_memalign(size_t, size_t);
++size_t __libc_malloc_usable_size(void *);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/src/hook/musl_malloc_dispatch.h b/src/hook/musl_malloc_dispatch.h
+new file mode 100755
+index 000000000000..15b859eea083
+--- /dev/null
++++ b/src/hook/musl_malloc_dispatch.h
+@@ -0,0 +1,37 @@
++#ifndef _MUSL_MALLOC_DISPATCH_H
++#define _MUSL_MALLOC_DISPATCH_H
++
++#include <stddef.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdbool.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++typedef void* (*MallocMallocType)(size_t);
++typedef void* (*MallocReallocType)(void*, size_t);
++typedef void* (*MallocCallocType)(size_t, size_t);
++typedef void* (*MallocVallocType)(size_t);
++typedef void (*MallocFreeType)(void*);
++typedef void* (*MallocMemalignType)(size_t, size_t);
++typedef size_t (*MallocMallocUsableSizeType)(void*);
++typedef bool (*GetHookFlagType)();
++typedef bool (*SetHookFlagType)(bool);
++
++struct MallocDispatchType {
++	MallocMallocType malloc;
++	MallocCallocType calloc;
++	MallocReallocType realloc;
++	MallocVallocType valloc;
++	MallocFreeType free;
++	MallocMemalignType memalign;
++	MallocMallocUsableSizeType malloc_usable_size;
++	GetHookFlagType get_hook_flag;
++	SetHookFlagType set_hook_flag;
++};
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/src/hook/musl_malloc_dispatch_table.h b/src/hook/musl_malloc_dispatch_table.h
+new file mode 100755
+index 000000000000..430de744bb50
+--- /dev/null
++++ b/src/hook/musl_malloc_dispatch_table.h
+@@ -0,0 +1,13 @@
++#ifndef _MUSL_MALLOC_DISPATCH_TABLE_H
++#define _MUSL_MALLOC_DISPATCH_TABLE_H
++
++#include "musl_malloc_dispatch.h"
++#include <stdatomic.h>
++
++struct musl_libc_globals {
++	volatile atomic_llong current_dispatch_table;
++	volatile atomic_llong so_dispatch_table;
++	struct MallocDispatchType malloc_dispatch_table;
++};
++
++#endif
+diff --git a/src/hook/musl_preinit.c b/src/hook/musl_preinit.c
+new file mode 100755
+index 000000000000..57a0bf12fb84
+--- /dev/null
++++ b/src/hook/musl_preinit.c
+@@ -0,0 +1,400 @@
++/*
++The hook mode has 3 kinds which can be set by command "param set":
++(1) param set libc.hook_mode "startup:\"prog1 \""
++(2) param set libc.hook_mode startup:program1
++(3) param set libc.hook_mode step
++(4) param set libc.hook_mode direct
++
++Case 1 represents "startup" mode, and the hooked process is "prog1 ",
++which loads hooking shared library when the program starts up.
++The path is added with two quotation marks because a quotation mark is a special charcter,
++which need be escaped.
++(2) is similar with (1), but no escaped character, so quotation marks doesn't need.
++(3) represents "step" mode, which loads hooking shared library by some steps.
++(4) represetnt  "direct" mode, which loads hooking shared library by a step.
++*/
++
++#ifdef HOOK_ENABLE
++#include <unistd.h>
++#include <signal.h>
++#include "musl_malloc_dispatch_table.h"
++#include "musl_malloc.h"
++#include "musl_preinit_common.h"
++#include <pthread.h>
++#include <stdlib.h>
++#include <limits.h>
++#include <dlfcn.h>
++#include <stdatomic.h>
++#include <ctype.h>
++#include <assert.h>
++#include <string.h>
++#include <malloc.h>
++
++void* ohos_malloc_hook_init_function(size_t bytes);
++
++static struct MallocDispatchType __ohos_malloc_hook_init_dispatch = {
++	.malloc = ohos_malloc_hook_init_function,
++	.free = MuslMalloc(free),
++};
++#define MAX_SYM_NAME_SIZE 1000
++static char *__malloc_hook_shared_lib = "libnative_hook.z.so";
++static char *__malloc_hook_function_prefix = "ohos_malloc_hook";
++static char *__get_param_shared_Lib = "libparam_client.z.so";
++volatile atomic_llong ohos_malloc_hook_shared_liibrary;
++void* function_of_shared_lib[LAST_FUNCTION];
++static enum EnumHookMode __hook_mode = STEP_HOOK_MODE;
++static char __hook_process_path[PATH_MAX+ 1] = {0};
++static char __progname[PATH_MAX + 1] = {0};
++
++
++static char* get_native_hook_param()
++{
++	int (*getFunction)(const char *name, char *value, unsigned int *len);
++
++	void* shared_library_handle = dlopen(__get_param_shared_Lib, RTLD_NOW | RTLD_LOCAL);
++	if (!shared_library_handle) {
++		return NULL;
++	}
++
++	getFunction = (int (*)(const char *name, char *value, unsigned int *len))dlsym((void*)shared_library_handle, "SystemGetParameter");
++	if (getFunction == NULL) {
++		dlclose(shared_library_handle);
++		return NULL;
++	}
++	const char *key =  MUSL_HOOK_PARAM_NAME;
++	char *value = (char *)malloc(OHOS_PARAM_MAX_SIZE);
++	memset(value, 0, OHOS_PARAM_MAX_SIZE);
++	if (value == NULL) {
++		dlclose(shared_library_handle);
++		return NULL;
++	}
++	unsigned int len = OHOS_PARAM_MAX_SIZE;
++	getFunction(key, value, &len);
++	dlclose(shared_library_handle);
++	return value;
++}
++
++static int parse_hook_variable(enum EnumHookMode* mode, char* path, int size)
++{
++	if (!mode || !path || size <= 0) {
++		return -1;
++	}
++
++	bool flag = __set_hook_flag(false);
++	char* hook_param_value = get_native_hook_param();
++	if (!hook_param_value) {
++		*mode = STEP_HOOK_MODE;
++		path[0] = '\0';
++	} else {
++		char* ptr = hook_param_value;
++		char* mode_str = hook_param_value;
++
++		while (*ptr && *ptr != ':') {
++			++ptr;
++		}
++
++		if (*ptr == ':') {
++			*ptr = '\0';
++			++ptr;
++		}
++
++		if (strcmp(mode_str, "startup") == 0) {
++			*mode = STATRUP_HOOK_MODE;
++		} else if (strcmp(mode_str, "direct") == 0) {
++			*mode = DIRECT_HOOK_MODE;
++		} else if (strcmp(mode_str, "step") == 0) {
++			*mode = STEP_HOOK_MODE;
++		} else {
++			*mode = STEP_HOOK_MODE;
++		}
++		if (*mode == STATRUP_HOOK_MODE) {
++			if (*ptr == '\"') {
++				++ptr;
++				int idx = 0;
++				while (idx < size - 1 && *ptr && *ptr != '\"') {
++					path[idx++] = *ptr++;
++				}
++				path[idx] = '\0';
++			} else {
++				int idx = 0;
++				while (idx < size - 1 && *ptr) {
++					path[idx++] = *ptr++;
++				}
++				path[idx] = '\0';
++			}
++		}
++
++		free(hook_param_value);
++	}
++	__set_hook_flag(flag);
++	return 0;
++}
++
++static bool init_malloc_function(void* malloc_shared_library_handler, MallocMallocType* func, const char* prefix)
++{
++	char symbol[MAX_SYM_NAME_SIZE];
++	snprintf(symbol, sizeof(symbol), "%s_%s", prefix, "malloc");
++	*func = (MallocMallocType)(dlsym(malloc_shared_library_handler, symbol));
++	if (*func == NULL) {
++		return false;
++	}
++	return true;
++}
++
++static bool init_free_function(void* malloc_shared_library_handler, MallocFreeType* func, const char* prefix)
++{
++	char symbol[MAX_SYM_NAME_SIZE];
++	snprintf(symbol, sizeof(symbol), "%s_%s", prefix, "free");
++	*func = (MallocFreeType)(dlsym(malloc_shared_library_handler, symbol));
++	if (*func == NULL) {
++		return false;
++	}
++	return true;
++}
++
++static bool init_hook_functions(void* shared_library_handler, struct MallocDispatchType* table, const char* prefix)
++{
++	if (!init_malloc_function(shared_library_handler, &table->malloc, prefix)) {
++		return false;
++	}
++	if (!init_free_function(shared_library_handler, &table->free, prefix)) {
++		return false;
++	}
++	return true;
++}
++
++static void clear_function_table()
++{
++	for (size_t i = 0; i < LAST_FUNCTION; i++) {
++		function_of_shared_lib[i] = NULL;
++	}
++}
++
++bool init_malloc_hook_shared_library(void* shared_library_handle, const char* shared_lib, const char* prefix, struct MallocDispatchType* dispatch_table)
++{
++	static const char* names[] = {
++		"initialize",
++		"finalize",
++		"get_hook_flag",
++		"set_hook_flag",
++		"on_start",
++		"on_end",
++	};
++
++	for (int i = 0; i < LAST_FUNCTION; i++) {
++		char symbol[MAX_SYM_NAME_SIZE];
++		snprintf(symbol, sizeof(symbol), "%s_%s", prefix, names[i]);
++		function_of_shared_lib[i] = dlsym(shared_library_handle, symbol);
++		if (function_of_shared_lib[i] == NULL) {
++			// __musl_log(__MUSL_LOG_ERROR, "%s: %s routine not found in %s\n", getprogname(), symbol, shared_lib);
++			clear_function_table();
++			return false;
++		}
++	}
++
++	if (!init_hook_functions(shared_library_handle, dispatch_table, prefix)) {
++		clear_function_table();
++		return false;
++	}
++
++	return true;
++}
++
++void* load_malloc_hook_shared_library(const char* shared_lib, const char* prefix, struct MallocDispatchType* dispatch_table)
++{
++	void* shared_library_handle = NULL;
++
++	shared_library_handle = dlopen(shared_lib, RTLD_NOW | RTLD_LOCAL);
++
++	if (shared_library_handle == NULL) {
++		printf("Unable to open shared library %s: %s\n", shared_lib, dlerror());
++		return NULL;
++	}
++
++	if (!init_malloc_hook_shared_library(shared_library_handle, shared_lib, prefix, dispatch_table)) {
++		dlclose(shared_library_handle);
++		shared_library_handle = NULL;
++	}
++	// printf("load_malloc_hook_shared_library success new version test\n");
++	return shared_library_handle;
++}
++
++typedef void (*finalize_func_t)();
++typedef bool (*init_func_t)(const struct MallocDispatchType*, bool*, const char*);
++typedef bool (*on_start_func_t)();
++typedef bool (*on_end_func_t)();
++
++static void malloc_finalize()
++{
++	__set_hook_flag(false);
++	((finalize_func_t)function_of_shared_lib[FINALIZE_FUNCTION])();
++
++	fclose(stdin);
++	fclose(stdout);
++	fclose(stderr);
++}
++
++bool finish_install_ohos_malloc_hooks(struct musl_libc_globals* globals, const char* options, const char* prefix)
++{
++	init_func_t init_func = (init_func_t)(function_of_shared_lib[INITIALIZE_FUNCTION]);
++	if (!init_func(&__libc_malloc_default_dispatch, NULL, options)) {
++		// __musl_log(__MUSL_LOG_ERROR, "%s: failed to enable malloc %s\n", getprogname(), prefix);
++		clear_function_table();
++		return false;
++	}
++	on_start_func_t start_func = (on_start_func_t)(function_of_shared_lib[ON_START_FUNCTION]);
++	if (!start_func()) {
++		// __musl_log(__MUSL_LOG_ERROR, "%s: failed to start %s\n", getprogname(), prefix);
++		clear_function_table();
++		return false;
++	}
++	atomic_store_explicit(&__musl_libc_globals.so_dispatch_table, (volatile long long)&globals->malloc_dispatch_table, memory_order_seq_cst);
++	atomic_store_explicit(&__musl_libc_globals.current_dispatch_table, (volatile long long)&globals->malloc_dispatch_table, memory_order_seq_cst);
++
++	int ret_value = atexit(malloc_finalize);
++	if (ret_value != 0) {
++		// __musl_log(__MUSL_LOG_ERROR, "failed to set atexit cleanup function: %d\n", ret_value);
++	}
++	return true;
++}
++
++static bool is_empty_string(const char* str)
++{
++	while (*str) {
++		if (!isspace((unsigned char)(*str))) {
++			return false;
++		}
++	}
++	return true;
++}
++
++static void install_ohos_malloc_hook(struct musl_libc_globals* globals)
++{
++	volatile void* shared_library_handle = (volatile void *)atomic_load_explicit(&ohos_malloc_hook_shared_liibrary, memory_order_acquire);
++	assert(shared_library_handle == NULL || shared_library_handle == (volatile void*)-1);
++	shared_library_handle = (volatile void*)load_malloc_hook_shared_library(__malloc_hook_shared_lib, __malloc_hook_function_prefix, &globals->malloc_dispatch_table);
++	if (shared_library_handle == NULL) {
++		// __musl_log(__MUSL_LOG_ERROR, "Can't load shared library '%s'\n", __malloc_hook_shared_lib);
++		return;
++	}
++
++	if (finish_install_ohos_malloc_hooks(globals, NULL, __malloc_hook_function_prefix)) {
++		atomic_store_explicit(&ohos_malloc_hook_shared_liibrary, (volatile long long)shared_library_handle, memory_order_seq_cst);
++	} else {
++		// __musl_log(__MUSL_LOG_ERROR, "finish_install_ohos_malloc_hooks failed\n");
++		dlclose((void *)shared_library_handle);
++		atomic_store_explicit(&ohos_malloc_hook_shared_liibrary, (volatile long long)0, memory_order_seq_cst);
++	}
++}
++
++static void* init_ohos_malloc_hook()
++{
++	bool flag = __set_hook_flag(false);
++	install_ohos_malloc_hook(&__musl_libc_globals);
++	__set_hook_flag(flag);
++	return NULL;
++}
++
++void* ohos_malloc_hook_init_function(size_t bytes)
++{
++	if (atomic_exchange(&__musl_libc_globals.current_dispatch_table, (volatile const long long)NULL)) {
++		pthread_t thread_id;
++		if (pthread_create(&thread_id, NULL, init_ohos_malloc_hook, NULL) != 0) {
++			// __musl_log(__MUSL_LOG_ERROR, "%s: ohos_malloc_hook: failed to pthread_create\n", getprogname());
++		} else if (pthread_detach(thread_id) != 0) {
++			// __musl_log(__MUSL_LOG_ERROR, "%s: ohos_malloc_hook: failed to pthread_detach\n", getprogname());
++		}
++	}
++	void*ptr = MuslMalloc(malloc)(bytes);
++	return ptr;
++
++}
++
++static void __set_default_malloc()
++{
++	atomic_store_explicit(&__musl_libc_globals.current_dispatch_table, (volatile const long long)NULL, memory_order_seq_cst);
++}
++
++static void __install_malloc_hook()
++{
++	atomic_store_explicit(&__hook_enable_hook_flag, (volatile bool)true, memory_order_seq_cst);
++
++	volatile void* shared_library_handle = (volatile void* )atomic_load_explicit(&ohos_malloc_hook_shared_liibrary, memory_order_acquire);
++	if (shared_library_handle == NULL) {
++		if (__hook_mode == STEP_HOOK_MODE) {
++			atomic_store_explicit(&__musl_libc_globals.current_dispatch_table, (volatile const long long)&__ohos_malloc_hook_init_dispatch, memory_order_seq_cst);
++			atomic_store_explicit(&ohos_malloc_hook_shared_liibrary, (volatile long long)-1, memory_order_seq_cst);
++		} else {
++			init_ohos_malloc_hook();
++		}
++	} else if (shared_library_handle != (void*)-1) {
++		bool flag = __set_hook_flag(false);
++		on_start_func_t start_func = (on_start_func_t)(function_of_shared_lib[ON_START_FUNCTION]);
++		if (start_func && !start_func()) {
++			// __musl_log(__MUSL_LOG_ERROR, "%s: failed to enable malloc\n", getprogname());
++		}
++		__set_hook_flag(flag);
++		volatile const struct MallocDispatchType* so_dispatch_value = (volatile const struct MallocDispatchType* )atomic_load_explicit(&__musl_libc_globals.so_dispatch_table, memory_order_acquire);
++		atomic_store_explicit(&__musl_libc_globals.current_dispatch_table, (volatile long long)so_dispatch_value, memory_order_seq_cst);
++	}
++}
++
++static void __uninstal_malloc_hook()
++{
++	atomic_store_explicit(&__hook_enable_hook_flag, (volatile bool)false, memory_order_seq_cst);
++
++	bool flag = __set_hook_flag(false);
++	__set_default_malloc();
++	on_end_func_t end_func = (on_end_func_t)(function_of_shared_lib[ON_END_FUNCTION]);
++	if (end_func) {
++		end_func();
++	}
++	__set_hook_flag(flag);
++}
++
++static void __install_malloc_hook_signal_handler()
++{
++	struct sigaction actionInstallHook = {};
++	actionInstallHook.sa_handler = __install_malloc_hook;
++	sigemptyset(&actionInstallHook.sa_mask);
++	sigaddset(&actionInstallHook.sa_mask, SIGUNHOOK);
++	sigaction(SIGHOOK, &actionInstallHook, NULL);
++
++	struct sigaction actionDef = {};
++	actionDef.sa_handler = __uninstal_malloc_hook;
++	sigemptyset(&actionDef.sa_mask);
++	sigaddset(&actionDef.sa_mask, SIGHOOK);
++	sigaction(SIGUNHOOK, &actionDef, NULL);
++}
++
++static void __initialize_malloc()
++{
++	__install_malloc_hook_signal_handler();
++}
++
++
++__attribute__((constructor(1))) static void __musl_initialize()
++{
++	atomic_store_explicit(&__hook_enable_hook_flag, (volatile bool)false, memory_order_seq_cst);
++	__set_default_malloc();
++	//__init_musl_log();
++	parse_hook_variable(&__hook_mode, __hook_process_path, sizeof(__hook_process_path));
++	if (__hook_mode == STATRUP_HOOK_MODE) {
++		readlink("/proc/self/exe", __progname, sizeof(__progname) - 1);
++		const char *pos = strrchr(__progname, '/');
++		const char* filename;
++		if (pos) {
++			filename = pos + 1;
++		} else {
++			filename = __progname;
++		}
++		if (strcmp(filename, __hook_process_path) == 0) {
++			atomic_store_explicit(&__hook_enable_hook_flag, (volatile bool)true, memory_order_seq_cst);
++			init_ohos_malloc_hook();
++		} else {
++			__hook_mode = STEP_HOOK_MODE;
++		}
++	}
++	__initialize_malloc();
++}
++#endif
+diff --git a/src/hook/musl_preinit_common.c b/src/hook/musl_preinit_common.c
+new file mode 100755
+index 000000000000..7db57bc0223d
+--- /dev/null
++++ b/src/hook/musl_preinit_common.c
+@@ -0,0 +1,17 @@
++#ifdef HOOK_ENABLE
++#include "musl_preinit_common.h"
++#include "musl_malloc.h"
++#include <stdatomic.h>
++#include <malloc.h>
++#include <stdlib.h>
++
++struct musl_libc_globals __musl_libc_globals;
++
++struct MallocDispatchType __libc_malloc_default_dispatch = {
++	.malloc = MuslMalloc(malloc),
++	.free = MuslMalloc(free),
++};
++
++volatile atomic_bool __hook_enable_hook_flag;
++
++#endif
+diff --git a/src/hook/musl_preinit_common.h b/src/hook/musl_preinit_common.h
+new file mode 100755
+index 000000000000..b3920f58bd94
+--- /dev/null
++++ b/src/hook/musl_preinit_common.h
+@@ -0,0 +1,99 @@
++#ifndef _MUSL_PREINIT_COMMON_H
++#define _MUSL_PREINIT_COMMON_H
++
++#include <stdatomic.h>
++#include "musl_malloc_dispatch_table.h"
++#include "musl_malloc_dispatch.h"
++
++extern struct musl_libc_globals __musl_libc_globals;
++
++extern struct MallocDispatchType __libc_malloc_default_dispatch;
++
++extern volatile atomic_bool __hook_enable_hook_flag;
++
++enum EnumFunc {
++	INITIALIZE_FUNCTION,
++	FINALIZE_FUNCTION,
++	GET_HOOK_FLAG_FUNCTION,
++	SET_HOOK_FLAG_FUNCTION,
++	ON_START_FUNCTION,
++	ON_END_FUNCTION,
++	LAST_FUNCTION,
++};
++
++enum EnumHookMode {
++	STATRUP_HOOK_MODE,
++	DIRECT_HOOK_MODE,
++	STEP_HOOK_MODE,
++};
++
++extern void* function_of_shared_lib[];
++extern volatile atomic_llong ohos_malloc_hook_shared_liibrary;
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++__attribute__((always_inline))
++inline bool __get_global_hook_flag()
++{
++	volatile bool g_flag = atomic_load_explicit(&__hook_enable_hook_flag, memory_order_acquire);
++	return g_flag;
++}
++
++__attribute__((always_inline))
++inline bool __get_hook_flag()
++{
++	volatile void* impl_handle = (void *)atomic_load_explicit(&ohos_malloc_hook_shared_liibrary, memory_order_acquire);
++	if (impl_handle == NULL) {
++		return false;
++	}
++	else if (impl_handle == (void *)-1) {
++		return true;
++	}
++	else {
++		GetHookFlagType get_hook_func_ptr = (GetHookFlagType)(function_of_shared_lib[GET_HOOK_FLAG_FUNCTION]);
++		bool flag = get_hook_func_ptr();
++		return flag;
++	}
++}
++
++__attribute__((always_inline))
++inline bool __set_hook_flag(bool flag)
++{
++	volatile void* impl_handle = (void *)atomic_load_explicit(&ohos_malloc_hook_shared_liibrary, memory_order_acquire);
++	if (impl_handle == NULL) {
++		return false;
++	}
++	else if (impl_handle == (void *)-1) {
++		return true;
++	}
++	else {
++		SetHookFlagType set_hook_func_ptr = (SetHookFlagType)(function_of_shared_lib[SET_HOOK_FLAG_FUNCTION]);
++		return set_hook_func_ptr(flag);
++	}
++}
++
++__attribute__((always_inline))
++inline volatile const struct MallocDispatchType* get_current_dispatch_table()
++{
++	volatile const struct MallocDispatchType* ret = (struct MallocDispatchType *)atomic_load_explicit(&__musl_libc_globals.current_dispatch_table, memory_order_acquire);
++	if (ret != NULL) {
++		if (!__get_global_hook_flag()) {
++			ret = NULL;
++		}
++		else if (!__get_hook_flag()) {
++			ret = NULL;
++		}
++	}
++	return ret;
++}
++
++#define MUSL_HOOK_PARAM_NAME "libc.hook_mode"
++#define OHOS_PARAM_MAX_SIZE 96
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/src/internal/dynlink.h b/src/internal/dynlink.h
+index 764e3a1a8fa9..6b9492753595 100644
+--- a/src/internal/dynlink.h
++++ b/src/internal/dynlink.h
+@@ -98,6 +98,7 @@ struct fdpic_dummy_loadmap {
+ typedef void (*stage2_func)(unsigned char *, size_t *);
+ 
+ hidden void *__dlsym(void *restrict, const char *restrict, void *restrict);
++hidden int __dlclose(void *p);
+ 
+ hidden void __dl_seterr(const char *, ...);
+ hidden int __dl_invalid_handle(void *);
+diff --git a/src/internal/pthread_impl.h b/src/internal/pthread_impl.h
+index 5742dfc55cb9..816cfa7dbe99 100644
+--- a/src/internal/pthread_impl.h
++++ b/src/internal/pthread_impl.h
+@@ -75,12 +75,22 @@ struct __timer {
+ #define _a_sched __u.__i[3*__SU+1]
+ #define _a_policy __u.__i[3*__SU+2]
+ #define _a_prio __u.__i[3*__SU+3]
++
++/* we define the original value of _m_* in include/pthread.h
++ * as macros MUTEX_* to make the user be able to
++ * access the inner attribute of the mutex struct.
++ * Then, we modify the value of _m_* macros to MUTEX_* here,
++ * so that we can immediately be aware of the changes that
++ * the open source society has made to these original macros,
++ * because patching will fail if the value of the _m_* are
++ * changed by musl society */
+ #define _m_type __u.__i[0]
+ #define _m_lock __u.__vi[1]
+ #define _m_waiters __u.__vi[2]
+ #define _m_prev __u.__p[3]
+ #define _m_next __u.__p[4]
+ #define _m_count __u.__i[5]
++
+ #define _c_shared __u.__p[0]
+ #define _c_seq __u.__vi[2]
+ #define _c_waiters __u.__vi[3]
+@@ -173,6 +183,7 @@ hidden void __inhibit_ptc(void);
+ hidden void __tl_lock(void);
+ hidden void __tl_unlock(void);
+ hidden void __tl_sync(pthread_t);
++hidden struct pthread* __pthread_list_find(pthread_t, const char*);
+ 
+ extern hidden volatile int __thread_list_lock;
+ 
+diff --git a/src/internal/syscall.h b/src/internal/syscall.h
+index 975a0031d4fb..fb64c282263d 100644
+--- a/src/internal/syscall.h
++++ b/src/internal/syscall.h
+@@ -278,10 +278,6 @@ hidden long __syscall_ret(unsigned long),
+ #define SYS_utimensat SYS_utimensat_time64
+ #endif
+ 
+-#ifndef SYS_pselect6
+-#define SYS_pselect6 SYS_pselect6_time64
+-#endif
+-
+ #ifndef SYS_ppoll
+ #define SYS_ppoll SYS_ppoll_time64
+ #endif
+diff --git a/src/ldso/dlclose.c b/src/ldso/dlclose.c
+index e437422a675a..566c8c3b61aa 100644
+--- a/src/ldso/dlclose.c
++++ b/src/ldso/dlclose.c
+@@ -1,7 +1,14 @@
+ #include <dlfcn.h>
+ #include "dynlink.h"
+ 
+-int dlclose(void *p)
++static int dummy(void *p)
+ {
+ 	return __dl_invalid_handle(p);
+ }
++weak_alias(dummy, __dlclose);
++
++int dlclose(void *p)
++{
++	return __dlclose(p);
++}
++
+diff --git a/src/legacy/ulimit.c b/src/legacy/ulimit.c
+index 1f59e8e619f5..d1620e6e2812 100644
+--- a/src/legacy/ulimit.c
++++ b/src/legacy/ulimit.c
+@@ -1,6 +1,7 @@
+ #include <sys/resource.h>
+ #include <ulimit.h>
+ #include <stdarg.h>
++#include <limits.h>
+ 
+ long ulimit(int cmd, ...)
+ {
+@@ -15,5 +16,5 @@ long ulimit(int cmd, ...)
+ 		rl.rlim_cur = 512ULL * val;
+ 		if (setrlimit(RLIMIT_FSIZE, &rl)) return -1;
+ 	}
+-	return rl.rlim_cur / 512;
++	return rl.rlim_cur == RLIM_INFINITY? LONG_MAX : rl.rlim_cur / 512;
+ }
+diff --git a/src/linux/gettid.c b/src/linux/gettid.c
+new file mode 100644
+index 000000000000..70767137e92f
+--- /dev/null
++++ b/src/linux/gettid.c
+@@ -0,0 +1,8 @@
++#define _GNU_SOURCE
++#include <unistd.h>
++#include "pthread_impl.h"
++
++pid_t gettid(void)
++{
++	return __pthread_self()->tid;
++}
+diff --git a/src/malloc/malloc.c b/src/malloc/malloc.c
+index 51fa4a3ac399..45a1a936bac5 100644
+--- a/src/malloc/malloc.c
++++ b/src/malloc/malloc.c
+@@ -9,11 +9,17 @@
+ #include "atomic.h"
+ #include "pthread_impl.h"
+ #include "malloc_impl.h"
++#include <sys/prctl.h>
+ 
+ #if defined(__GNUC__) && defined(__PIC__)
+ #define inline inline __attribute__((always_inline))
+ #endif
+ 
++#ifdef HOOK_ENABLE
++void *__libc_malloc(size_t);
++void __libc_free(void *p);
++#endif
++
+ static struct {
+ 	volatile uint64_t binmap;
+ 	struct bin bins[64];
+@@ -281,7 +287,11 @@ static void trim(struct chunk *self, size_t n)
+ 	__bin_chunk(split);
+ }
+ 
++#ifdef HOOK_ENABLE
++void *__libc_malloc(size_t n)
++#else
+ void *malloc(size_t n)
++#endif
+ {
+ 	struct chunk *c;
+ 	int i, j;
+@@ -376,6 +386,10 @@ void *realloc(void *p, size_t n)
+ 	void *new;
+ 
+ 	if (!p) return malloc(n);
++	if (!n) {
++		free(p);
++		return NULL;
++	}
+ 
+ 	if (adjust_size(&n) < 0) return 0;
+ 
+@@ -519,7 +533,11 @@ static void unmap_chunk(struct chunk *self)
+ 	__munmap(base, len);
+ }
+ 
++#ifdef HOOK_ENABLE
++void __libc_free(void *p)
++#else
+ void free(void *p)
++#endif
+ {
+ 	if (!p) return;
+ 
+diff --git a/src/multibyte/wcsnrtombs.c b/src/multibyte/wcsnrtombs.c
+index 676932b5dcaa..95e25e708dd9 100644
+--- a/src/multibyte/wcsnrtombs.c
++++ b/src/multibyte/wcsnrtombs.c
+@@ -1,41 +1,33 @@
+ #include <wchar.h>
++#include <limits.h>
++#include <string.h>
+ 
+ size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict wcs, size_t wn, size_t n, mbstate_t *restrict st)
+ {
+-	size_t l, cnt=0, n2;
+-	char *s, buf[256];
+ 	const wchar_t *ws = *wcs;
+-	const wchar_t *tmp_ws;
+-
+-	if (!dst) s = buf, n = sizeof buf;
+-	else s = dst;
+-
+-	while ( ws && n && ( (n2=wn)>=n || n2>32 ) ) {
+-		if (n2>=n) n2=n;
+-		tmp_ws = ws;
+-		l = wcsrtombs(s, &ws, n2, 0);
+-		if (!(l+1)) {
+-			cnt = l;
+-			n = 0;
++	size_t cnt = 0;
++	if (!dst) n=0;
++	while (ws && wn) {
++		char tmp[MB_LEN_MAX];
++		size_t l = wcrtomb(n<MB_LEN_MAX ? tmp : dst, *ws, 0);
++		if (l==-1) {
++			cnt = -1;
+ 			break;
+ 		}
+-		if (s != buf) {
+-			s += l;
++		if (dst) {
++			if (n<MB_LEN_MAX) {
++				if (l>n) break;
++				memcpy(dst, tmp, l);
++			}
++			dst += l;
+ 			n -= l;
+ 		}
+-		wn = ws ? wn - (ws - tmp_ws) : 0;
+-		cnt += l;
+-	}
+-	if (ws) while (n && wn) {
+-		l = wcrtomb(s, *ws, 0);
+-		if ((l+1)<=1) {
+-			if (!l) ws = 0;
+-			else cnt = l;
++		if (!*ws) {
++			ws = 0;
+ 			break;
+ 		}
+-		ws++; wn--;
+-		/* safe - this loop runs fewer than sizeof(buf) times */
+-		s+=l; n-=l;
++		ws++;
++		wn--;
+ 		cnt += l;
+ 	}
+ 	if (dst) *wcs = ws;
+diff --git a/src/network/inet_legacy.c b/src/network/inet_legacy.c
+index 621b47b05086..6d91b6e179f6 100644
+--- a/src/network/inet_legacy.c
++++ b/src/network/inet_legacy.c
+@@ -12,12 +12,12 @@ struct in_addr inet_makeaddr(in_addr_t n, in_addr_t h)
+ 	if (n < 256) h |= n<<24;
+ 	else if (n < 65536) h |= n<<16;
+ 	else h |= n<<8;
+-	return (struct in_addr){ h };
++	return (struct in_addr){ htonl(h) };
+ }
+ 
+ in_addr_t inet_lnaof(struct in_addr in)
+ {
+-	uint32_t h = in.s_addr;
++	uint32_t h = ntohl(in.s_addr);
+ 	if (h>>24 < 128) return h & 0xffffff;
+ 	if (h>>24 < 192) return h & 0xffff;
+ 	return h & 0xff;
+@@ -25,7 +25,7 @@ in_addr_t inet_lnaof(struct in_addr in)
+ 
+ in_addr_t inet_netof(struct in_addr in)
+ {
+-	uint32_t h = in.s_addr;
++	uint32_t h = ntohl(in.s_addr);
+ 	if (h>>24 < 128) return h >> 24;
+ 	if (h>>24 < 192) return h >> 16;
+ 	return h >> 8;
+diff --git a/src/passwd/getspnam_r.c b/src/passwd/getspnam_r.c
+index 541e85314d56..e738d656cfb7 100644
+--- a/src/passwd/getspnam_r.c
++++ b/src/passwd/getspnam_r.c
+@@ -15,8 +15,15 @@
+ static long xatol(char **s)
+ {
+ 	long x;
++	int sign;
+ 	if (**s == ':' || **s == '\n') return -1;
++
++	sign = (int)(unsigned char)**s;
++	if (sign == '-' || sign == '+') ++*s;
++
+ 	for (x=0; **s-'0'<10U; ++*s) x=10*x+(**s-'0');
++
++	if (sign == '-') return -x;
+ 	return x;
+ }
+ 
+diff --git a/src/sched/sched_getparam.c b/src/sched/sched_getparam.c
+index 76f10e49d987..b31f00892ef2 100644
+--- a/src/sched/sched_getparam.c
++++ b/src/sched/sched_getparam.c
+@@ -1,8 +1,20 @@
+-#include <sched.h>
+-#include <errno.h>
+-#include "syscall.h"
+-
+-int sched_getparam(pid_t pid, struct sched_param *param)
+-{
+-	return __syscall_ret(-ENOSYS);
+-}
++#include <sched.h>
++#include <errno.h>
++#include "syscall.h"
++#include <string.h>
++
++int sched_getparam(pid_t pid, struct sched_param *param)
++{
++	int r;
++	if (!param) {
++		r = -EINVAL;
++		goto exit;
++	}
++	memset(param, 0, sizeof(struct sched_param));
++	r = __syscall(SYS_sched_getparam, pid , param);
++	if (r >= 0) {
++		r = 0;
++	}
++exit:
++	return __syscall_ret(r);
++}
+diff --git a/src/sched/sched_getscheduler.c b/src/sched/sched_getscheduler.c
+index 394e508b467c..454ac8bcec16 100644
+--- a/src/sched/sched_getscheduler.c
++++ b/src/sched/sched_getscheduler.c
+@@ -1,8 +1,9 @@
+-#include <sched.h>
+-#include <errno.h>
+-#include "syscall.h"
+-
+-int sched_getscheduler(pid_t pid)
+-{
+-	return __syscall_ret(-ENOSYS);
+-}
++#include <sched.h>
++#include <errno.h>
++#include "syscall.h"
++
++int sched_getscheduler(pid_t pid)
++{
++	int r = __syscall(SYS_sched_getscheduler, pid);
++	return  __syscall_ret(r);
++}
+\ No newline at end of file
+diff --git a/src/sched/sched_setparam.c b/src/sched/sched_setparam.c
+index 18623ee49b15..2e0f79bff69d 100644
+--- a/src/sched/sched_setparam.c
++++ b/src/sched/sched_setparam.c
+@@ -1,8 +1,15 @@
+-#include <sched.h>
+-#include <errno.h>
+-#include "syscall.h"
+-
+-int sched_setparam(pid_t pid, const struct sched_param *param)
+-{
+-	return __syscall_ret(-ENOSYS);
+-}
++#include <sched.h>
++#include <errno.h>
++#include "syscall.h"
++
++int sched_setparam(pid_t pid, const struct sched_param *param)
++{
++	int r;
++	if (!param) {
++		r = -EINVAL;
++		goto exit;
++	}
++	r = __syscall(SYS_sched_setparam, pid, param);
++exit:
++	return __syscall_ret(r);
++}
+\ No newline at end of file
+diff --git a/src/sched/sched_setscheduler.c b/src/sched/sched_setscheduler.c
+index 4435f2164671..fcb5873f59b1 100644
+--- a/src/sched/sched_setscheduler.c
++++ b/src/sched/sched_setscheduler.c
+@@ -4,5 +4,12 @@
+ 
+ int sched_setscheduler(pid_t pid, int sched, const struct sched_param *param)
+ {
+-	return __syscall_ret(-ENOSYS);
+-}
++	int r;
++	if (!param) {
++		r = -EINVAL;
++		goto exit;
++	}
++	r = __syscall(SYS_sched_setscheduler, pid , sched , param);
++exit:
++	return __syscall_ret(r);
++}
+\ No newline at end of file
+diff --git a/src/thread/arm/clone.s b/src/thread/arm/clone.s
+index bb0965dafe82..2070dd51bd27 100644
+--- a/src/thread/arm/clone.s
++++ b/src/thread/arm/clone.s
+@@ -3,8 +3,14 @@
+ .global __clone
+ .hidden __clone
+ .type   __clone,%function
++.cfi_startproc
+ __clone:
+ 	stmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 16
++	.cfi_rel_offset r4, 0
++	.cfi_rel_offset r5, 4
++	.cfi_rel_offset r6, 8
++	.cfi_rel_offset r7, 12
+ 	mov r7,#120
+ 	mov r6,r3
+ 	mov r5,r0
+@@ -17,6 +23,7 @@ __clone:
+ 	tst r0,r0
+ 	beq 1f
+ 	ldmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 0
+ 	bx lr
+ 
+ 1:	mov r0,r6
+@@ -26,3 +33,4 @@ __clone:
+ 	b 2b
+ 
+ 3:	bx r5
++.cfi_endproc
+\ No newline at end of file
+diff --git a/src/thread/arm/syscall_cp.s b/src/thread/arm/syscall_cp.s
+index e607dd426afc..03a83dc952b9 100644
+--- a/src/thread/arm/syscall_cp.s
++++ b/src/thread/arm/syscall_cp.s
+@@ -7,11 +7,16 @@
+ .hidden __cp_cancel
+ .hidden __cancel
+ .global __syscall_cp_asm
+-.hidden __syscall_cp_asm
+ .type __syscall_cp_asm,%function
++.cfi_startproc
+ __syscall_cp_asm:
+ 	mov ip,sp
+ 	stmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 16
++	.cfi_rel_offset r4, 0
++	.cfi_rel_offset r5, 4
++	.cfi_rel_offset r6, 8
++	.cfi_rel_offset r7, 12
+ __cp_begin:
+ 	ldr r0,[r0]
+ 	cmp r0,#0
+@@ -23,7 +28,10 @@ __cp_begin:
+ 	svc 0
+ __cp_end:
+ 	ldmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 0
+ 	bx lr
+ __cp_cancel:
+ 	ldmfd sp!,{r4,r5,r6,r7}
++	.cfi_def_cfa_offset 0
+ 	b __cancel
++.cfi_endproc	
