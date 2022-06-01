@@ -68,6 +68,15 @@ You can run these commands to do this:
 	repo init -u https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony.git -b kirkstone
 	repo sync --no-clone-bundle
 
+After this is done, you need to initialize the build environment. This modifies
+the shell environment, so need to be done again after rebooting or starting
+another shell/terminal. Run this in the ohoe directory:
+
+    TEMPLATECONF=../meta-openharmony/conf source oe-core/oe-init-build-env
+
+The current directory will be changed to the build directory, from where you
+should be running your `bitbake` build commands and so on.
+
 ## QEMU example image
 
 The meta-openharmony provides an example image recipe which can be used for
