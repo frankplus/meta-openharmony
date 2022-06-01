@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Use g++ instead of c++ binary.
+
+Apply to repo drivers/framework
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/tools/hc-gen/Makefile b/tools/hc-gen/Makefile
+index eb53513..d34915b 100644
+--- a/tools/hc-gen/Makefile
++++ b/tools/hc-gen/Makefile
+@@ -2,7 +2,7 @@ Q = @
+ BUILD_DIR := build
+ TARGET := $(BUILD_DIR)/hc-gen
+ 
+-CXX := c++
++CXX := g++
+ CXX_FLAGS := -std=gnu++14
+ CXX_LD_FLAGS := -lstdc++
+ 

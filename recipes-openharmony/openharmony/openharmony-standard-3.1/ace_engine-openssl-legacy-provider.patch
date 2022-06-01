@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Workaround for problem with nodejs 17 and openssl 3.0
+error:0308010C:digital envelope routines::unsupported
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/build/tools/build_js.py b/build/tools/build_js.py
+index e2d26c792970..b9c83a907ace 100755
+--- a/build/tools/build_js.py
++++ b/build/tools/build_js.py
+@@ -29,6 +29,7 @@ def main(argv):
+ 
+     buildEnv = os.environ
+     buildEnv["PATH"] = nodejs_path + ":" + buildEnv["PATH"]
++    buildEnv["NODE_OPTIONS"] = "--openssl-legacy-provider"
+ 
+     interface_target_path = os.path.join(target_out_path, "interface")
+     if os.path.exists(interface_target_path):

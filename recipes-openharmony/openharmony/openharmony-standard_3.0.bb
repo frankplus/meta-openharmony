@@ -16,12 +16,13 @@ DEPENDS += "nodejs-native"
 DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
 
-require ${PN}-sources-${PV}.inc
+require ${PN}-sources-${OPENHARMONY_VERSION}.inc
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
 
 # TODO: we probably want these
 SRC_URI += "file://hilog-Add-tests.patch"
-
-FILESPATH =. "${FILE_DIRNAME}/openharmony-standard-${PV}:"
 
 SRC_URI += "file://bison_parser.patch;patchdir=${S}/third_party/libxkbcommon"
 SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"

@@ -6,6 +6,7 @@ DEPENDS += "oniro-openharmony-bundle oniro-openharmony-toolchain-integration-nat
 DEPENDS += "gn-native ninja-native"
 DEPENDS += "hc-gen-native"
 DEPENDS += "clang-native compiler-rt-native libcxx-native"
+DEPENDS += "openssl-native"
 
 do_configure_oniro_ohos[dirs] = "${S}"
 do_configure_oniro_ohos() {

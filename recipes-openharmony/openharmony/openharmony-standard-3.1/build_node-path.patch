@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.1 codebase.
+
+This tricks rebase_path() to point to the Yocto native node.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/ohos_var.gni b/ohos_var.gni
+index 4993234..8ffa632 100755
+--- a/ohos_var.gni
++++ b/ohos_var.gni
+@@ -181,7 +181,7 @@ nodejs_version = "v12.18.4"
+ if (host_os == "mac") {
+   nodejs = "//prebuilts/build-tools/common/nodejs/node-${nodejs_version}-darwin-x64/bin/node"
+ } else {
+-  nodejs = "//prebuilts/build-tools/common/nodejs/node-${nodejs_version}-${host_os}-x64/bin/node"
++  nodejs = "//../recipe-sysroot-native/usr/bin/node"
+ }
+ default_hap_private_key_path = "OpenHarmony Application Release"
+ default_signature_algorithm = "SHA256withECDSA"

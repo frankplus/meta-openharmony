@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix compilation with g++ 11.2.0. The problem is related to ordering of the
+initialization of the static member variable (attrProcessFuncs) and the
+__attribute__ ((constructor)) function that accesses this variable. With g++
+11.2.0 the attrProcessFuncs variable is not being initialized before accessed.
+
+Apply to foundation/graphic/standard repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/frameworks/wmserver/src/wmlayout_scss_parser/main.cpp b/frameworks/wmserver/src/wmlayout_scss_parser/main.cpp
+index e1102845e15d..424e536ede0e 100644
+--- a/frameworks/wmserver/src/wmlayout_scss_parser/main.cpp
++++ b/frameworks/wmserver/src/wmlayout_scss_parser/main.cpp
+@@ -59,7 +59,10 @@ private:
+ 
+     Driver driver;
+     std::map<uint32_t, struct Layout> modeLayoutMap[WINDOW_MODE_MAX];
+-    static inline std::map<std::string, AttributeProcessFunction> attrProcessFuncs;
++    static std::map<std::string, AttributeProcessFunction> & getAttrProcessFuncs() {
++        static std::map<std::string, AttributeProcessFunction> _attrProcessFuncs;
++        return _attrProcessFuncs;
++  };
+ };
+ 
+ int32_t Main::Compile(std::ifstream &input)
+@@ -122,6 +125,7 @@ void Main::ParseAttr(const struct Driver::CSSBlock &block, struct Layout &layout
+         if (attribute.find("_") != std::string::npos) {
+             attribute.replace(attribute.find("_"), 1, "");
+         }
++        auto attrProcessFuncs = Main::getAttrProcessFuncs();
+         auto it = attrProcessFuncs.find(attribute);
+         if (it == attrProcessFuncs.end()) {
+             std::cerr << "cannot process attribute: " << attribute << std::endl;
+@@ -137,7 +141,7 @@ void Main::ParseAttr(const struct Driver::CSSBlock &block, struct Layout &layout
+ 
+ void Main::RegAttrProcessFunc(const char *attr, AttributeProcessFunction func)
+ {
+-    attrProcessFuncs[attr] = func;
++    Main::getAttrProcessFuncs()[attr] = func;
+ }
+ 
+ namespace {

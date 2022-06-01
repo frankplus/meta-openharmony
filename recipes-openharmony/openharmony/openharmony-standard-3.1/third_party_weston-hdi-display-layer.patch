@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix build system to link in display layer system
+(LayerInitialize/LayerUninitialize symbols) for non-hisilicon builds. This patch
+probably breaks support hisilicon builds, as they use a different approach for
+display layer integration.
+
+Apply to third_party/weston repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/BUILD.gn b/BUILD.gn
+index aa2b7f062599..2ed0e5ae4fb1 100755
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -622,6 +622,7 @@ ohos_shared_library("hdi-backend") {
+     ":soft_vsync",
+     ":trace",
+     "//drivers/peripheral/display/hal:hdi_display_device",
++    "//drivers/peripheral/display/hal:hdi_display_layer",
+     "//drivers/peripheral/display/hdi_service/gralloc/client:hdi_gralloc_client",
+     "//foundation/graphic/standard:libgraphic_dumper_client",
+     "//foundation/graphic/standard/frameworks/vsync:libvsync_module",

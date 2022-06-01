@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Don't waste time on trying to build windows and mac tools.
+
+Apply to repo base/global/resmgr_standard repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/bundle.json b/bundle.json
+index e06db271fd40..2b152058d0d7 100644
+--- a/bundle.json
++++ b/bundle.json
+@@ -56,9 +56,7 @@
+             "sub_component": [
+               "//base/global/resmgr_standard/interfaces/js/kits:resourcemanager",
+               "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
+-              "//base/global/resmgr_standard/frameworks/resmgr:librawfile",
+-              "//base/global/resmgr_standard/frameworks/resmgr:win_resmgr",
+-              "//base/global/resmgr_standard/frameworks/resmgr:mac_resmgr"
++              "//base/global/resmgr_standard/frameworks/resmgr:librawfile"
+             ],
+             "inner_kits": [
+               {
+@@ -88,4 +86,4 @@
+             ]
+         }
+     }
+-}
+\ No newline at end of file
++}

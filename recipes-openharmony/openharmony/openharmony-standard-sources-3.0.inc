@@ -177,10 +177,10 @@ PREMIRRORS:append = " \
 # NPM package shrinkwrap files. These files describe all dependencies
 # needed by a npm package usually downloaded and installed by the
 # command 'npm install'
-SRC_URI += "npmsw://${THISDIR}/openharmony-3.0/npm-shrinkwrap_jsframework.json;dev=1;destsuffix=${OH_SRCDIR}/third_party/jsframework"
-SRC_URI += "npmsw://${THISDIR}/openharmony-3.0/npm-shrinkwrap_ace-ets2bundle-compiler.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-ets2bundle/compiler"
-SRC_URI += "npmsw://${THISDIR}/openharmony-3.0/npm-shrinkwrap_ace-js2bundle-ace-loader.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-js2bundle/ace-loader"
-SRC_URI += "npmsw://${THISDIR}/openharmony-3.0/npm-shrinkwrap_ts2panda.json;dev=1;destsuffix=${OH_SRCDIR}/ark/ts2abc/ts2panda"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_jsframework.json;dev=1;destsuffix=${OH_SRCDIR}/third_party/jsframework"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-ets2bundle-compiler.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-ets2bundle/compiler"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-js2bundle-ace-loader.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-js2bundle/ace-loader"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ts2panda.json;dev=1;destsuffix=${OH_SRCDIR}/ark/ts2abc/ts2panda"
 
 # Allow network connectivity from do_unpack() task. This is needed for
 # git lfs operations that are executed within do_unpack()

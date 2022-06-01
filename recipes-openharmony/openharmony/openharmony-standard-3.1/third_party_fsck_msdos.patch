@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix compilation with host gcc toolchain as used in bitbake builds.
+
+Apply to repo third_party/fsck_msdos
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/BUILD.gn b/BUILD.gn
+index cf69cc609640..9c08ccff477f 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -52,6 +52,10 @@ ohos_executable("fsck_msdos") {
+     "fat.c",
+     "main.c",
+   ]
++  cflags = [
++    "-Dlint",
++    "-Wno-error=#warnings",
++  ]
+ 
+   include_dirs = [
+     ".",
+diff --git a/ext.h b/ext.h
+index 532e840acfc8..80a8e8225ab8 100644
+--- a/ext.h
++++ b/ext.h
+@@ -51,7 +51,7 @@ extern int allow_mmap;  /* allow the use of mmap() */
+ /*
+  * function declarations
+  */
+-int ask(int, const char *, ...) __printflike(2, 3);
++int ask(int, const char *, ...);
+ 
+ /*
+  * Check the dirty flag.  If the file system is clean, then return 1.
+diff --git a/main.c b/main.c
+index b91fddd9cfa6..654dce92897d 100644
+--- a/main.c
++++ b/main.c
+@@ -50,8 +49,6 @@ int rdonly;		/* device is opened read only (supersedes above) */
+ int skipclean;		/* skip clean file systems if preening */
+ int allow_mmap;		/* Allow the use of mmap(), if possible */
+ 
+-static void usage(void) __dead2;
+-
+ static void
+ usage(void)
+ {

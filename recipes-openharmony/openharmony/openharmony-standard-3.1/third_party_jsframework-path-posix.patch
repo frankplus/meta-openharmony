@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/jsframework git repository of OpenHarmony 3.1 codebase.
+
+Fix posix/path issue in jsframework.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/runtime/main/extend/systemplugin/napi/bundle.js b/runtime/main/extend/systemplugin/napi/bundle.js
+index d620013d8271..0553b344e8cb 100644
+--- a/runtime/main/extend/systemplugin/napi/bundle.js
++++ b/runtime/main/extend/systemplugin/napi/bundle.js
+@@ -14,7 +14,6 @@
+  */
+ 
+ import { paramMock } from "../utils"
+-import {resolve} from 'path/posix'
+ import {BundleInfoMock} from './bundle/bundleInfo'
+ import {ApplicationInfoMock} from './bundle/applicationInfo'
+ import {AbilityInfoMock} from './bundle/abilityInfo'
+@@ -22,6 +22,9 @@ import {WantMock} from './bundle/applicationInfo'
+ import {ShortcutInfoMock} from './bundle/applicationInfo'
+ import {ModuleUsageRecordMock} from './bundle/applicationInfo'
+ 
++import posix from "path"
++const resolve = posix.resolve;
++
+ export function mockBundle() {
+ 
+     const bundle = {
+diff --git a/runtime/main/extend/systemplugin/napi/innerBundleManager.js b/runtime/main/extend/systemplugin/napi/innerBundleManager.js
+index 72fe60d6f826..408b329d4dee 100644
+--- a/runtime/main/extend/systemplugin/napi/innerBundleManager.js
++++ b/runtime/main/extend/systemplugin/napi/innerBundleManager.js
+@@ -14,7 +14,6 @@
+  */
+ 
+ import { paramMock } from "../utils"
+-import {resolve} from 'path/posix'
+ import {BundleInfoMock} from './bundle/bundleInfo'
+ import {ApplicationInfoMock} from './bundle/applicationInfo'
+ import {AbilityInfoMock} from './bundle/abilityInfo'
+@@ -23,6 +23,9 @@ import {ShortcutInfoMock} from './bundle/applicationInfo'
+ import {ModuleUsageRecordMock} from './bundle/applicationInfo'
+ import {LauncherAbilityInfoMock} from './bundle/launcherAbilityInfo'
+ 
++import posix from "path"
++const resolve = posix.resolve;
++
+ export function mockInnerBundle() {
+     const innerBundleManager = {
+         getLauncherAbilityInfos: function(...args){
+diff --git a/tsconfig.json b/tsconfig.json
+index d4e849464064..71c0c2109789 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -1,6 +1,7 @@
+ {
+   "compileOnSave": false,
+   "compilerOptions": {
++    "importHelpers": true,
+     "allowJs": true,
+     "allowSyntheticDefaultImports": true,
+     "esModuleInterop": true,

@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/ace/ace_engine git repository of OpenHarmony 3.1 codebase.
+
+Remove unused variable as gn complains about it.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/frameworks/core/accessibility/js_inspector/BUILD.gn b/frameworks/core/accessibility/js_inspector/BUILD.gn
+index 763b4b747..7ad9cd0eb 100644
+--- a/frameworks/core/accessibility/js_inspector/BUILD.gn
++++ b/frameworks/core/accessibility/js_inspector/BUILD.gn
+@@ -78,7 +78,7 @@ template("js_inspector") {
+ }
+ 
+ foreach(item, ace_platforms) {
+-  platform = item.name
++  #platform = item.name
+   js_inspector("js_inspector_" + item.name) {
+     defines = []
+     config = {

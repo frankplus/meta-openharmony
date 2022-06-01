@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix build of unittest.
+
+Apply to base/account/os_account repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/test/systemtest/common/resource/fuzzTest/src/fuzz_test_manager.cpp b/test/systemtest/common/resource/fuzzTest/src/fuzz_test_manager.cpp
+index a09edd597f1c..4567666c9cee 100644
+--- a/test/systemtest/common/resource/fuzzTest/src/fuzz_test_manager.cpp
++++ b/test/systemtest/common/resource/fuzzTest/src/fuzz_test_manager.cpp
+@@ -19,7 +19,6 @@
+ #include "app_account_manager.h"
+ #include "fuzz_config_parser.h"
+ #include "getparam.h"
+-#include "hilog_wrapper.h"
+ 
+ #undef private
+ #undef protected

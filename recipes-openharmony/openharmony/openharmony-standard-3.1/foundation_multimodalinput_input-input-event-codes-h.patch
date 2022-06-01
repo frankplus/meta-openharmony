@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix compilation with host gcc toolchain as used in bitbake builds.
+
+Apply to repo foundation/multimodalinput/input
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/patch/diff_libinput_mmi/hdf/libinput_hdf_0000.diff b/patch/diff_libinput_mmi/hdf/libinput_hdf_0000.diff
+index 6f3713566dbd..b56fa84f3f25 100755
+--- a/patch/diff_libinput_mmi/hdf/libinput_hdf_0000.diff
++++ b/patch/diff_libinput_mmi/hdf/libinput_hdf_0000.diff
+@@ -1509,7 +1509,7 @@ diff -Naur old/src/evdev-joystick.c new/src/evdev-joystick.c
+ +#include "config.h"
+ +#include "libinput-version.h"
+ +#include "evdev-joystick.h"
+-+#include "input-event-codes.h"
+++#include <linux/input-event-codes.h>
+ +#include "libinput.h"
+ +#include "libinput-util.h"
+ +
+diff --git a/patch/diff_libinput_mmi/libinput/libinput_0000.diff b/patch/diff_libinput_mmi/libinput/libinput_0000.diff
+index 231eceaa35a5..eea8ea74761c 100755
+--- a/patch/diff_libinput_mmi/libinput/libinput_0000.diff
++++ b/patch/diff_libinput_mmi/libinput/libinput_0000.diff
+@@ -1548,7 +1548,7 @@ diff -Naur old/src/evdev-joystick.c new/src/evdev-joystick.c
+ +#include "config.h"
+ +#include "libinput-version.h"
+ +#include "evdev-joystick.h"
+-+#include "input-event-codes.h"
+++#include <linux/input-event-codes.h>
+ +#include "libinput.h"
+ +#include "libinput-util.h"
+ +
+diff --git a/service/event_dispatch/src/event_dispatch.cpp b/service/event_dispatch/src/event_dispatch.cpp
+index 5a4b7050bcb1..db0e6d28220f 100755
+--- a/service/event_dispatch/src/event_dispatch.cpp
++++ b/service/event_dispatch/src/event_dispatch.cpp
+@@ -24,7 +24,7 @@
+ #include "input_event_handler.h"
+ #include "input_event_monitor_manager.h"
+ #include "input_handler_manager_global.h"
+-#include "input-event-codes.h"
++#include <linux/input-event-codes.h>
+ #include "interceptor_manager_global.h"
+ #include "key_event_subscriber.h"
+ #include "system_event_handler.h"
+diff --git a/service/mouse_event_handler/src/mouse_event_handler.cpp b/service/mouse_event_handler/src/mouse_event_handler.cpp
+index 186e242af95d..7a2c0cbad35a 100755
+--- a/service/mouse_event_handler/src/mouse_event_handler.cpp
++++ b/service/mouse_event_handler/src/mouse_event_handler.cpp
+@@ -16,7 +16,7 @@
+ #include "mouse_event_handler.h"
+ #include <cinttypes>
+ #include "libmmi_util.h"
+-#include "input-event-codes.h"
++#include <linux/input-event-codes.h>
+ #include "util.h"
+ #include "input_windows_manager.h"
+ #include "input_event_handler.h"

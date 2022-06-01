@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix build system to link in display layer system
+(LayerInitialize/LayerUninitialize symbols) for non-hisilicon builds. This patch
+probably breaks support hisilicon builds, as they use a different approach for
+display layer integration.
+
+Apply to foundation/graphic/standard repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/rosen/modules/composer/BUILD.gn b/rosen/modules/composer/BUILD.gn
+index 56d3c9f0c6f0..ffd68b26dbf6 100644
+--- a/rosen/modules/composer/BUILD.gn
++++ b/rosen/modules/composer/BUILD.gn
+@@ -69,6 +69,7 @@ ohos_shared_library("libcomposer") {
+   deps = [
+     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+     "//drivers/peripheral/display/hal:hdi_display_device",
++    "//drivers/peripheral/display/hal:hdi_display_layer",
+     "//foundation/graphic/standard:libsurface",
+     "//foundation/graphic/standard/frameworks/vsync:libvsync_module",
+     "//foundation/graphic/standard/utils:libgraphic_utils",

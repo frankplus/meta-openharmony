@@ -1,0 +1,10 @@
+{
+  "features": {
+    "common_feature_verify": true
+  },
+  "part_to_feature": {
+    "common": [
+      "common_feature_verify"
+    ]
+  }
+}

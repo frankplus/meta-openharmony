@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //drivers/peripheral git repository of OpenHarmony 3.1 codebase.
+
+Force inclusion of rpi3 camera config.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/camera/hal/camera.gni b/camera/hal/camera.gni
+index df003b68..eb35a853 100755
+--- a/camera/hal/camera.gni
++++ b/camera/hal/camera.gni
+@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
+       "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
+ } else {
+   import("//build/ohos.gni")
+-  if ("${product_name}" == "ohos-arm64") {
++  if (true) {
+     import(
+         "//drivers/peripheral/camera/hal/adapter/chipset/rpi/rpi3/device/camera/product.gni")
+   } else if ("${product_name}" == "Hi3516DV300") {

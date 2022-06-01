@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/ace/ace_engine git repository of OpenHarmony 3.1 codebase.
+
+This disables ace_engine win and mac platform
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/adapter/preview/build/platform.gni b/adapter/preview/build/platform.gni
+index 6798d40d7..a2460ab89 100644
+--- a/adapter/preview/build/platform.gni
++++ b/adapter/preview/build/platform.gni
+@@ -16,7 +16,7 @@ import("config.gni")
+ 
+ platforms = []
+ 
+-if (use_mingw_win || true) {
++if (use_mingw_win) {
+   windows_platform = {
+     name = "windows"
+     config = {
+@@ -27,7 +27,7 @@ if (use_mingw_win || true) {
+   platforms += [ windows_platform ]
+ }
+ 
+-if (use_mac || true) {
++if (use_mac) {
+   mac_platform = {
+     name = "mac"
+     config = {

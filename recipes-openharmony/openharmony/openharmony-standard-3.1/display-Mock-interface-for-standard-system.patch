@@ -1,0 +1,93 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //drivers/peripheral git repository of OpenHarmony 3.1 codebase.
+
+Compile stubbed display APIs.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/drivers/peripheral/display/hal/BUILD.gn b/drivers/peripheral/display/hal/BUILD.gn
+index a232730b..3e374d56 100644
+--- a/drivers/peripheral/display/hal/BUILD.gn
++++ b/drivers/peripheral/display/hal/BUILD.gn
+@@ -15,6 +15,77 @@ if (defined(ohos_lite)) {
+   group("hdi_display") {
+     public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
+   }
++} else if (true) {
++  import("//build/ohos.gni")
++
++  config("display_hdi_public_config") {
++    visibility = [ ":*" ]
++    include_dirs = [
++      "//drivers/peripheral/base",
++      "//drivers/peripheral/display/interfaces/include",
++      "//drivers/peripheral/display/hal",
++      "//drivers/framework/include/utils",
++      "//drivers/adapter/uhdf2/osal/include",
++      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
++      "//third_party/bounds_checking_function/include",
++    ]
++  }
++
++  group("hdi_display") {
++    deps = [
++      ":hdi_display_device",
++      ":hdi_display_gfx",
++      ":hdi_display_gralloc",
++      ":hdi_display_layer",
++    ]
++  }
++
++  ohos_shared_library("hdi_display_device") {
++    sources = [
++      "//drivers/peripheral/display/hal/default/standard_system/display_device.c",
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++    subsystem_name = "hdf"
++    part_name = "mocks"
++  }
++
++  ohos_shared_library("hdi_display_layer") {
++    sources = [
++      "//device/qemu/hardware/display/display_layer.c",
++    ]
++    deps = [
++      "//third_party/bounds_checking_function:libsec_static",
++      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog"
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++    subsystem_name = "hdf"
++    part_name = "mocks"
++  }
++
++  ohos_shared_library("hdi_display_gfx") {
++    sources = [
++      "//device/qemu/hardware/display/display_gfx.c",
++    ]
++    deps = [
++      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog"
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++    subsystem_name = "hdf"
++    part_name = "mocks"
++  }
++
++  ohos_shared_library("hdi_display_gralloc") {
++    sources = [
++      "//device/qemu/hardware/display/display_gralloc.c",
++    ]
++    deps = [
++      "//third_party/bounds_checking_function:libsec_static",
++      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog"
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++    subsystem_name = "hdf"
++    part_name = "mocks"
++  }
+ } else {
+   config("display_hdi_public_config") {
+     visibility = [ ":*" ]

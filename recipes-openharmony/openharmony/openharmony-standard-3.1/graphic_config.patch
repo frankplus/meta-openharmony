@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/graphic/standard git repository of OpenHarmony 3.1 codebase.
+
+Disable gpu for unknown product names.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/graphic_config.gni b/graphic_config.gni
+index 1e4f66c1..a14ff8a5 100644
+--- a/graphic_config.gni
++++ b/graphic_config.gni
+@@ -22,7 +22,7 @@ if ("${product_name}" == "watchos" || "${product_name}" == "Hi3516DV300" ||
+   ace_enable_gpu = true
+   libgl = [ "//device/hihope/hardware/gpu:mali-bifrost-g52-g2p0-ohos" ]
+ } else {
+-  gpu_defines = [ "ACE_ENABLE_GL" ]
+-  ace_enable_gpu = true
+-  libgl = [ "//device/hisilicon/hardware/gpu:gpu_libs" ]
++  gpu_defines = [ "ACE_DISABLE_GL" ]
++  ace_enable_gpu = false
++  libgl = [ ]
+ }

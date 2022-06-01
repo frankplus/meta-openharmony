@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix compilation with host gcc toolchain as used in bitbake builds.
+
+Gcc and Clang does not align well with which -W arguments they accept, and this
+patch therefore avoids passing arguments to gcc that it does not accept.
+
+Apply to //developtools/hdc_standard repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/hdc.gni b/hdc.gni
+index b82081574ad8..77d1c02ac333 100644
+--- a/hdc.gni
++++ b/hdc.gni
+@@ -29,6 +29,10 @@ code_check_flag = [
+   "-Wall",
+   "-Wmissing-field-initializers",
+   "-Wuninitialized",
++]
++
++if (is_clang) {
++  code_check_flag += [
+   "-Wnull-pointer-arithmetic",
+   "-Wunused-lambda-capture",
+   "-Wuser-defined-warnings",
+@@ -36,6 +40,10 @@ code_check_flag = [
+   "-Wunneeded-internal-declaration",
+   "-Wundefined-var-template",
+   "-Wnonportable-include-path",
++  ]
++}
++
++code_check_flag += [
+   "-Wformat-extra-args",
+   "-Wformat",
+   "-Wsign-compare",

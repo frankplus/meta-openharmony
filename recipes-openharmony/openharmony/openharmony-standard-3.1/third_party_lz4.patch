@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix compilation with host gcc toolchain as used in bitbake builds.
+
+Gcc does not support `-Wimplicit-function-declaration` for C++ code, and
+lz4_config is used by //developtools/hdc_standard in C++ code, so we simply
+disable that argument for our builds.
+
+Apply to repo third_party/lz4
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/BUILD.gn b/BUILD.gn
+index bfb945b87279..c1ddc7295c4e 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -19,7 +19,6 @@ config("lz4_config") {
+   cflags = [
+     "-Wno-incompatible-pointer-types",
+     "-Werror",
+-    "-Wimplicit-function-declaration",
+   ]
+ }
+ ohos_static_library("liblz4_static") {

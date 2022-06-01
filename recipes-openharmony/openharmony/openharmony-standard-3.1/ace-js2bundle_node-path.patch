@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //developtools/ace-js2bundle git repository of OpenHarmony 3.1 codebase.
+
+This tricks os.path.relpath() to point to the Yocto native node.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 86206bd..4373c18 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -46,7 +46,7 @@ action("build_ace_loader_library") {
+   # different host platform nodejs tool directory
+   if (host_os == "linux") {
+     if (is_standard_system) {
+-      nodejs_path = "//prebuilts/build-tools/common/nodejs/node-v12.18.4-linux-x64/bin/node"
++      nodejs_path = "//../recipe-sysroot-native/usr/bin/node"
+     } else {
+       nodejs_path =
+           "//prebuilts/ace-toolkit/nodejs/node-v12.18.4-linux-x64/bin/node"
