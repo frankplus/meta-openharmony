@@ -14,7 +14,7 @@ OH_SRCDIR = "src"
 S = "${WORKDIR}/${OH_SRCDIR}"
 
 # This China mirror backs up gitee source repositories
-#MIRRORS:append = " git://gitee.com/.* http://114.116.235.68/source-mirror/ \n "
+MIRRORS:append = " git://gitee.com/.* http://114.116.235.68/source-mirror/ \n "
 
 SRC_URI += "${GITEE_URL}/applications_hap.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=e2edb8a0804ecf020b5dffdb6493ef386a9d688b;destsuffix=${OH_SRCDIR}/applications/standard/hap"
 SRC_URI += "${GITEE_URL}/ark_js_runtime.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=7496452bc10b8f88d624eab6ade1d856ca526e9a;destsuffix=${OH_SRCDIR}/ark/js_runtime"
