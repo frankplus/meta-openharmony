@@ -208,7 +208,6 @@ SRC_URI += "${GITEE_URL}/resources.git;protocol=https;nobranch=1;branch=OpenHarm
 
 # Prebuilt HAP signing tool
 ### CONTAINS BINARIES. NEED TO BE BUILT FROM SOURCES INSTEAD ###
-SRC_URI += "${GITEE_URL}/signcenter_tool.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=10ff08d5b10fac544475c634e9b36a74ad3a08ab;destsuffix=${OH_SRCDIR}/prebuilts/signcenter"
 SRC_URI += "${GITEE_URL}/developtools_packing_tool.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=e44a0c2f2ec99bcefee75285258dc5e90582cd6f;destsuffix=${OH_SRCDIR}/developtools/packing_tool"
 
 SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/restool/2.007/restool-2.007.tar.gz;name=restool;subdir=${OH_SRCDIR}/prebuilts/build-tools/common"
