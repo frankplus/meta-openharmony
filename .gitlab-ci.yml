@@ -188,7 +188,6 @@ fetch:
         echo Fetching DISTRO=$DISTRO MACHINE=$MACHINE RECIPE=$RECIPE ;
         bitbake $RECIPE --runall=fetch ;
       done ; done ; done
-    - mkdir -pv mirror-updates-ch
   after_script:
     # Copy all regular files from downloads dir (except *.done files) to
     # mirror dirs.  Note, file is first copied to a temporary file (in same
@@ -200,6 +199,7 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
+    - mkdir -pv mirror-updates-ch
     - rm -f build/downloads/*.done build/downloads/npm2/*.{done,resolved}
     - for f in build/downloads/* build/downloads/npm2/* ; do if test -f "$f" -a ! -L "$f" ; then
         fname=$(basename "$f") ;
