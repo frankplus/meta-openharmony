@@ -48,7 +48,7 @@ index a232730b..3e374d56 100644
 +    ]
 +    public_configs = [ ":display_hdi_public_config" ]
 +    subsystem_name = "hdf"
-+    part_name = "mocks"
++    part_name = "display_device_driver"
 +  }
 +
 +  ohos_shared_library("hdi_display_layer") {
@@ -61,7 +61,7 @@ index a232730b..3e374d56 100644
 +    ]
 +    public_configs = [ ":display_hdi_public_config" ]
 +    subsystem_name = "hdf"
-+    part_name = "mocks"
++    part_name = "display_device_driver"
 +  }
 +
 +  ohos_shared_library("hdi_display_gfx") {
@@ -73,7 +73,7 @@ index a232730b..3e374d56 100644
 +    ]
 +    public_configs = [ ":display_hdi_public_config" ]
 +    subsystem_name = "hdf"
-+    part_name = "mocks"
++    part_name = "display_device_driver"
 +  }
 +
 +  ohos_shared_library("hdi_display_gralloc") {
@@ -86,7 +86,7 @@ index a232730b..3e374d56 100644
 +    ]
 +    public_configs = [ ":display_hdi_public_config" ]
 +    subsystem_name = "hdf"
-+    part_name = "mocks"
++    part_name = "display_device_driver"
 +  }
  } else {
    config("display_hdi_public_config") {
