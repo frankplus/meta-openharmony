@@ -154,6 +154,11 @@ do_install () {
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/profile/* ${D}${libdir}/openharmony/profile
     ln -sfT ..${libdir}/openharmony/profile ${D}/system/profile
 
+    # odd files in /system/usr
+    mkdir -p ${D}${libdir}/openharmony/usr
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/usr/* ${D}${libdir}/openharmony/usr
+    ln -sfT ..${libdir}/openharmony/usr ${D}/system/usr
+
     # OpenHarmony etc (configuration) files
     mkdir -p ${D}${sysconfdir}/openharmony
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
@@ -201,7 +206,7 @@ FILES:${PN} += "${libdir}/media ${libdir}/module ${libdir}/ark ${libdir}/openhar
 FILES:${PN}-configs = "${sysconfdir}"
 FILES:${PN}-fonts = "${datadir}/fonts"
 
-FILES:${PN} += "/system/bin /system/lib /system/profile /vendor/bin /vendor/lib"
+FILES:${PN} += "/system/bin /system/lib /system/profile /system/usr /vendor/bin /vendor/lib"
 FILES:${PN}-configs += "/system/etc /vendor/etc"
 FILES:${PN}-fonts += "/system/fonts"
 
