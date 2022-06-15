@@ -1,0 +1,41 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+PTEST_PATH=$(dirname $(readlink -f $0))
+cd ${PTEST_PATH}
+
+# Start systemd services as needed
+if [ -f systemd-units ] ; then
+    for unit in $(cat systemd-units) ; do
+        systemctl start $unit
+    done
+fi
+
+TEST_RESULT=0
+
+find_tcs() {
+    ts=$1
+    for tc in $ts/* $ts/*/*Test $ts/*/*_test ; do
+        if [ -f $tc -a -x $tc ] ; then
+            echo $tc
+        fi
+    done
+}
+
+for ts in unittest moduletest systemtest ; do
+    for tc in $(find_tcs $ts) ; do
+        echo "RUNNING $tc"
+        ./$tc
+        test_result=$?
+        if test "$test_result" -eq 0; then
+            echo "PASS: $tc"
+        else
+            echo "FAIL: $tc"
+            TEST_RESULT=1
+        fi
+    done
+done
+
+exit $TEST_RESULT
