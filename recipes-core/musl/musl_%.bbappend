@@ -23,3 +23,7 @@ LDFLAGS:append:toolchain-clang = " ${@bb.utils.contains('COMPILER_RT', '-rtlib=c
 # Possible fix is to rewrite the hooks implementation to use the musl internal
 # atomic.h functions instead.
 #CFLAGS:append:oniro-openharmony-linux = "-DHOOK_ENABLE"
+
+do_install:append:oniro-openharmony-linux () {
+    echo "${libdir}/module" >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path
+}
