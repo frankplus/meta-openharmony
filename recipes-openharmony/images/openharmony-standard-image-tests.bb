@@ -14,7 +14,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 TEST_SUITES = "ping ssh ptest"
 
 # slirp provides networking without the need for sudo to setup TUN/TAP
-TEST_QEMUBOOT_TIMEOUT = "60"
+TEST_QEMUBOOT_TIMEOUT = "300"
 TEST_SERVER_IP = "127.0.0.1"
 QEMU_USE_SLIRP = "1"
 
