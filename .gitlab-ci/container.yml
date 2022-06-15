@@ -15,6 +15,7 @@
 
 variables:
   BITBAKE_CONTAINER_VERSION: "0.6"
+  OPENHARMONY_CONTAINER_VERSION: "0.1"
 
 .kaniko:
   stage: container
@@ -82,4 +83,22 @@ bitbake-toolbox:
     CONTAINER_FROM: bitbake-builder
   needs:
     - job: bitbake-builder
+      artifacts: false
+
+openharmony-builder:
+  extends: .kaniko
+  variables:
+    CONTAINER_NAME: openharmony-builder
+    CONTAINER_VERSION: $OPENHARMONY_CONTAINER_VERSION
+
+openharmony-toolbox:
+  extends: .kaniko
+  variables:
+    CONTAINER_NAME: openharmony-toolbox
+    CONTAINER_VERSION: $OPENHARMONY_CONTAINER_VERSION
+    CONTAINER_PATH: openharmony-builder
+    CONTAINER_DOCKERFILE: Dockerfile.toolbox
+    CONTAINER_FROM: openharmony-builder
+  needs:
+    - job: openharmony-builder
       artifacts: false

@@ -52,6 +52,8 @@ variables:
   # to push to git.ostc-eu.org first, and wait for the bitbake-builder image to
   # be pushed to the registry before starting a pipeline on gitlab.eclipse.org.
   BITBAKE_BUILDER: "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony/bitbake-builder"
+  # And same for openharmony-builder
+  OPENHARMONY_BUILDER: "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony/openharmony-builder"
 
 stages:
   - container
@@ -274,8 +276,10 @@ build:
       - build/tmp-*/deploy/sdk
     expire_in: 1 month
 
-# Build OpenHarmony images using normal CI runners
-test:
+# Build and execute OpenHarmony test image.
+#
+# This will execute all included ptest test suites.
+ptest:
   stage: test
   needs:
     - job: build
@@ -318,6 +322,103 @@ build_ch:
   variables:
     MANIFEST_FILE: manifests/gitee/ci.xml
     SOURCE_MIRROR_URL: $SOURCE_MIRROR_URL_CH
+
+# URL and filename for tarball containing entire OpenHarmony OS codebase
+.openharmony_tarball:
+  before_script:
+    - if [ "${OPENHARMONY_VERSION}" = "3.0" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0/code-v3.0-LTS.tar.gz";
+      elif [ "${OPENHARMONY_VERSION}" = "3.0.1" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.1/code-v3.0.1-LTS.tar.gz";
+      elif [ "${OPENHARMONY_VERSION}" = "3.0.2" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.2/code-v3.0.2-LTS.tar.gz";
+      elif [ "${OPENHARMONY_VERSION}" = "3.0.3" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.3/code-v3.0.3-LTS.tar.gz";
+      elif [ "${OPENHARMONY_VERSION}" = "3.1" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.1-Release/code-v3.1-Release.tar.gz";
+      elif [ "${OPENHARMONY_VERSION}" = "3.1.1" ]; then
+        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.1.1/code-v3.1.1-Release.tar.gz";
+      else
+        echo "OPENHARMONY_VERSION=${OPENHARMONY_VERSION} is not supported";
+        exit 1;
+      fi
+    - TARBALL_FILE=$(basename $TARBALL_URL)
+    - mkdir -p downloads
+    # Use runner persistent storage if available
+    - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
+        TARBALL_FILE="$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/$TARBALL_FILE" ;
+        touch downloads/.dummy_file ;
+      else
+        TARBALL_FILE="downloads/$TARBALL_FILE" ;
+      fi ;
+      echo "Using $TARBALL_FILE"
+
+# Fetch OpenHarmony OS codebase.
+#
+# This is for use in ohos test jobs.
+ohos_fetch:
+  stage: fetch
+  image:
+    name: $OPENHARMONY_BUILDER:$OPENHARMONY_CONTAINER_VERSION
+  extends: .openharmony_tarball
+  parallel:
+    matrix:
+      - OPENHARMONY_VERSION: ["3.0", "3.1"]
+  script:
+    # Integrity check of cached tarball
+    - if [ -f "${TARBALL_FILE}.sha256" -a -f "${TARBALL_FILE}" ] ; then
+        read tarball_sha256 _ <<<$(sha256sum "${TARBALL_FILE}") ;
+        read expected_sha256 _ < "${TARBALL_FILE}.sha256" ;
+        if [ "$tarball_sha256" = "$expected_sha256" ] ; then
+          echo "Using cached ${TARBALL_FILE}" ;
+          exit 0 ;
+        else
+          echo "Deleting bad ${TARBALL_FILE}" ;
+          rm -f "${TARBALL_FILE}" "${TARBALL_FILE}.sha256" ;
+        fi ;
+      elif [ -f "${TARBALL_FILE}.sha256" ] ; then
+          echo "Deleting ${TARBALL_FILE}.sha256" ;
+          rm -f "${TARBALL_FILE}.sha256" ;
+      fi
+    - pushd $(dirname $TARBALL_FILE)
+    # Download tarball (should continue if partial download is found
+    - wget --progress=dot:giga "${TARBALL_URL}" --timestamping --no-if-modified-since
+    # Download sha256 signature
+    - wget "${TARBALL_URL}.sha256" --timestamping --no-if-modified-since
+    - popd
+    - read tarball_sha256 _ <<<$(sha256sum "${TARBALL_FILE}") ;
+    - read expected_sha256 _ < "${TARBALL_FILE}.sha256" ;
+    - if [ "$tarball_sha256" != "$expected_sha256" ] ; then
+        echo "Deleting bad ${TARBALL_FILE}" ;
+        rm -f "${TARBALL_FILE}" "${TARBALL_FILE}.sha256" ;
+        exit 1 ;
+      fi
+  artifacts:
+    paths:
+      - downloads
+    expire_in: 1 month
+
+# Test prebuilts images against OpenHarmony OS codebase
+ohos:
+  stage: test
+  needs:
+    - job: ohos_fetch
+      artifacts: true
+    - job: build
+      artifacts: true
+  parallel:
+    matrix:
+      - OPENHARMONY_VERSION: ["3.0", "3.1"]
+        PREBUILT_IMAGE: [oniro-openharmony-toolchain, oniro-openharmony-bundle]
+  image:
+    name: $OPENHARMONY_BUILDER:$OPENHARMONY_CONTAINER_VERSION
+  extends: .openharmony_tarball
+  script:
+    - tar xfz $TARBALL_FILE
+    - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony
+    - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-*.sh -y -d oniro
+    - ./oniro/setup.sh
+    - ./build.sh --product-name Hi3516DV300
 
 # Job for triggering a prune of the sstate-cache mirror in runner persistent
 # storage.  This should be done periodically, but as I believe it removes a
