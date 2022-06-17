@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.1 codebase.
+
+This adds 2 gn args (remove_unstripped_execs and remove_unstripped_so)
+used to delete unstripped lib and exe binary files from the out folder
+when set to 1. This saves many gigs of disk space on CI runner.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/build/toolchain/gcc_toolchain.gni b/build/toolchain/gcc_toolchain.gni
+index 0221f06..39758e0 100755
+--- a/build/toolchain/gcc_toolchain.gni
++++ b/build/toolchain/gcc_toolchain.gni
+@@ -29,6 +29,14 @@ declare_args() {
+       # default only when other args allow.
+       (is_official_build ||
+        (!strip_debug_info && symbol_level > 0 && !is_component_build))
++
++  # Temporary workaround for extremely high disk space usage by
++  # statically-linked executables
++  remove_unstripped_execs = false
++
++  # Temporary workaround for extremely high disk space usage by
++  # statically-linked shared libraries
++  remove_unstripped_so = false
+ }
+ 
+ # When the arg is set via args.gn, it applies to all toolchains. In order to not
+@@ -369,6 +377,12 @@ template("gcc_toolchain") {
+       }
+       command = "$command -- $link_command"
+ 
++      if (defined(invoker.strip)) {
++        if (remove_unstripped_so) {
++          command += " && rm \"$unstripped_sofile\""
++        }
++      }
++
+       rspfile_content = "-Wl,--whole-archive {{inputs}} {{solibs}} -Wl,--no-whole-archive $solink_libs_section_prefix {{libs}} $solink_libs_section_postfix"
+ 
+       description = "SOLINK $sofile"
+@@ -427,6 +441,9 @@ template("gcc_toolchain") {
+       if (defined(invoker.strip)) {
+         strip_command = "${invoker.strip} -o \"$sofile\" \"$unstripped_sofile\""
+         command += " && " + strip_command
++        if (remove_unstripped_so) {
++           command += " && rm \"$unstripped_sofile\""
++        }
+       }
+       rspfile_content = "-Wl,--whole-archive {{inputs}} {{solibs}} -Wl,--no-whole-archive $solink_libs_section_prefix {{libs}} $solink_libs_section_postfix"
+ 
+@@ -515,6 +532,11 @@ template("gcc_toolchain") {
+       link_wrapper =
+           rebase_path("//build/toolchain/gcc_link_wrapper.py", root_build_dir)
+       command = "$python_path \"$link_wrapper\" --output=\"$outfile\"$strip_switch$map_switch -- $link_command"
++      if (defined(invoker.strip)) {
++        if (remove_unstripped_execs) {
++          command += " && rm \"$unstripped_outfile\""
++        }
++      }
+       description = "LINK $outfile"
+       rspfile_content = "{{inputs}}"
+       outputs = [ outfile ]
+@@ -568,7 +590,7 @@ template("clang_toolchain") {
+   }
+ 
+   gcc_toolchain(target_name) {
+-    prefix = rebase_path("$clang_base_path/bin", root_build_dir)
++    prefix = rebase_path("$clang_base_path/usr/bin", root_build_dir)
+     cc = "$prefix/clang"
+     cxx = "$prefix/clang++"
+     ld = cxx

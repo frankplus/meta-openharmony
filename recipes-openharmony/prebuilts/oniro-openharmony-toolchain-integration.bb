@@ -22,6 +22,7 @@ SRC_URI += "file://toolchain.gni;subdir=src"
 SRC_URI += "file://third_party.gni;subdir=src"
 
 SRC_URI += "file://patches/build.patch;apply=no;subdir=src"
+SRC_URI += "file://patches/build_gcc-toolchain-gni.patch;apply=no;subdir=src"
 SRC_URI += "file://patches/drivers_peripheral.patch;apply=no;subdir=src"
 SRC_URI += "file://patches/drivers_framework.patch;apply=no;subdir=src"
 SRC_URI += "file://patches/drivers_adapter_khdf_linux.patch;apply=no;subdir=src"
