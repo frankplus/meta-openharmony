@@ -206,10 +206,6 @@ SRC_URI += "${GITEE_URL}/utils.git;protocol=https;nobranch=1;branch=OpenHarmony-
 SRC_URI += "${GITEE_URL}/utils_native.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=72b83a79b468d8aa2b4efa4bf040583d87577897;destsuffix=${OH_SRCDIR}/utils/native"
 SRC_URI += "${GITEE_URL}/resources.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=f3079ef097ec279f026ab84e62fb1af645654ad6;destsuffix=${OH_SRCDIR}/utils/resources"
 
-# Prebuilt HAP signing tool
-### CONTAINS BINARIES. NEED TO BE BUILT FROM SOURCES INSTEAD ###
-SRC_URI += "${GITEE_URL}/developtools_packing_tool.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=e44a0c2f2ec99bcefee75285258dc5e90582cd6f;destsuffix=${OH_SRCDIR}/developtools/packing_tool"
-
 SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/restool/2.007/restool-2.007.tar.gz;name=restool;subdir=${OH_SRCDIR}/prebuilts/build-tools/common"
 SRC_URI[restool.sha256sum] = "4cd763315d80ceecbde5f64f20252d7edf89f0083ac7c1794b12fbe556a9b826"
 

@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.1 codebase.
+
+This modifies the path to the OpenHarmony packing tool jar files so
+rebase_path() points to the bitbake brewed ones in the native sysroot.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/ohos_var.gni b/ohos_var.gni
+index 40f5ccb..85766a0 100755
+--- a/ohos_var.gni
++++ b/ohos_var.gni
+@@ -175,8 +175,8 @@ if (host_os == "mac") {
+ }
+ 
+ hapsigner = "//../recipe-sysroot-native/usr/lib/hap-sign-tool/hap-sign-tool.jar"
+-hap_unpacking_tool = "//developtools/packing_tool/jar/app_unpacking_tool.jar"
+-hap_packing_tool = "//developtools/packing_tool/jar/app_packing_tool.jar"
++hap_unpacking_tool = "//../recipe-sysroot-native/usr/lib/app_unpacking_tool.jar"
++hap_packing_tool = "//../recipe-sysroot-native/usr/lib/app_packing_tool.jar"
+ nodejs_version = "v12.18.4"
+ if (host_os == "mac") {
+   nodejs = "//prebuilts/build-tools/common/nodejs/node-${nodejs_version}-darwin-x64/bin/node"
