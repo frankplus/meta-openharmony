@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+The OpenHarmony packing tool sources are using a different name for the
+fastjson package. This patch makes use of the original package name.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/adapter/ohos/CollectBinInfo.java b/adapter/ohos/CollectBinInfo.java
+index ed14304..4443cd7 100644
+--- a/adapter/ohos/CollectBinInfo.java
++++ b/adapter/ohos/CollectBinInfo.java
+@@ -15,7 +15,7 @@
+ 
+ package ohos;
+ 
+-import ohos.utils.fastjson.JSONObject;
++import com.alibaba.fastjson.JSONObject;
+ 
+ import java.io.File;
+ import java.io.IOException;
+diff --git a/adapter/ohos/FileUtils.java b/adapter/ohos/FileUtils.java
+index 4681a10..035c444 100644
+--- a/adapter/ohos/FileUtils.java
++++ b/adapter/ohos/FileUtils.java
+@@ -15,7 +15,7 @@
+ 
+ package ohos;
+ 
+-import ohos.utils.fastjson.JSONObject;
++import com.alibaba.fastjson.JSONObject;
+ 
+ import java.io.BufferedReader;
+ import java.io.BufferedInputStream;
+diff --git a/adapter/ohos/JsonUtil.java b/adapter/ohos/JsonUtil.java
+index 19d8914..3b2c890 100644
+--- a/adapter/ohos/JsonUtil.java
++++ b/adapter/ohos/JsonUtil.java
+@@ -22,8 +22,8 @@ import java.util.HashMap;
+ import java.util.Map;
+ import java.util.Locale;
+ 
+-import ohos.utils.fastjson.JSONObject;
+-import ohos.utils.fastjson.JSONArray;
++import com.alibaba.fastjson.JSONObject;
++import com.alibaba.fastjson.JSONArray;
+ 
+ /**
+  * Json Util.
