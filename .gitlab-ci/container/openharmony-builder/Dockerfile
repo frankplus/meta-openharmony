@@ -34,6 +34,7 @@ RUN apt-get update -qq \
       doxygen git subversion tofrodos pigz expect python3-xlrd python-xlrd \
       git-core gperf build-essential zlib1g-dev libc6-dev-i386 lib32z-dev \
       openjdk-8-jdk \
+      ruby cpio \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN locale-gen
 
