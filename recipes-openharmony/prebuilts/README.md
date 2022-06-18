@@ -34,7 +34,7 @@ repository, you should do something like this:
     tar xfz $DOWNLOADS/code-v3.0-LTS.tar.gz
     cd code-v3.0-LTS/OpenHarmony
     $DOWNLOADS/oniro-openharmony-bundle-cortexa7-neon-vfpv4-3.0.sh -y -d oniro
-    ./oniro/setup.should
+    ./oniro/setup.sh
 
 After this, you can use normal OpenHarmony build system procedures to build as
 usual.  To build image for HiSilicon Hi3516DV300 (taurus) board:
