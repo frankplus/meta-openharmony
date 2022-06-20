@@ -31,9 +31,9 @@ and entire git repositories!
 To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0-LTS
 repository, you should do something like this:
 
-    tar xfz $DOWNLOADS/code-v3.0-LTS.tar.gz
-    cd code-v3.0-LTS/OpenHarmony
-    $DOWNLOADS/oniro-openharmony-bundle-cortexa7-neon-vfpv4-3.0.sh -y -d oniro
+    tar xfz $DOWNLOADS/code-v3.1-Release.tar.gz
+    cd code-v3.1-Relase/OpenHarmony
+    $DOWNLOADS/oniro-openharmony-bundle-3.1-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
     ./oniro/setup.sh
 
 After this, you can use normal OpenHarmony build system procedures to build as
