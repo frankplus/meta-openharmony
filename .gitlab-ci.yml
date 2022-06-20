@@ -148,6 +148,7 @@ stages:
         echo "BB_NUMBER_PARSE_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
       fi >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
+    - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
     - bitbake "${RECIPE}"
   after_script:
@@ -181,13 +182,19 @@ fetch:
     # Configure build to create mirror tarballs of VCS repositories
     - echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/auto.conf
     # Run fetch tasks for all builds
+    # For this fetch job, the OPENHARMONY_VERSION variable is set just here
+    # and was not set in the before_script section of the .bitbake job.
+    # We modify it here in auto.conf with a sed substitution as it was added
+    # there by .bitbake before_script but with an empty string.
     - export DISTRO MACHINE
     - for DISTRO in oniro-openharmony-linux ; do
+      for OPENHARMONY_VERSION in 3.0 3.1 ; do
       for MACHINE in qemuarma7 ; do
       for RECIPE in oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests ; do
-        echo Fetching DISTRO=$DISTRO MACHINE=$MACHINE RECIPE=$RECIPE ;
+        echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE RECIPE=$RECIPE ;
+        sed -r "s/^OPENHARMONY_VERSION.*/OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"/" -i conf/auto.conf ;
         bitbake $RECIPE --runall=fetch ;
-      done ; done ; done
+      done ; done ; done ; done
   after_script:
     # Copy all regular files from downloads dir (except *.done files) to
     # mirror dirs.  Note, file is first copied to a temporary file (in same
@@ -258,6 +265,7 @@ build:
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
+        OPENHARMONY_VERSION: ["3.0", "3.1"]
         MACHINE: [qemuarma7]
         RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image]
   artifacts:
@@ -282,6 +290,7 @@ test:
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
+        OPENHARMONY_VERSION: ["3.0", "3.1"]
         MACHINE: [qemuarma7]
         RECIPE: [openharmony-standard-image-tests]
   artifacts:
