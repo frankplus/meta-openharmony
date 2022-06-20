@@ -15,3 +15,4 @@ SRC_URI += "file://patches/foundation_graphic_standard.patch;apply=no;subdir=src
 SRC_URI += "file://patches/productdefine_common.patch;apply=no;subdir=src"
 SRC_URI += "file://patches/third_party_libevdev.patch;apply=no;subdir=src"
 SRC_URI += "file://patches/third_party_libusb.patch;apply=no;subdir=src"
+SRC_URI += "file://patches/third_party_e2fsprogs-backports-to-3.1.patch;apply=no;subdir=src"
