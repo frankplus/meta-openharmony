@@ -98,6 +98,14 @@ another shell/terminal. Run this in the ohoe directory:
 The current directory will be changed to the build directory, from where you
 should be running your `bitbake` build commands and so on.
 
+## OpenHarmony version
+
+You can choose which version of OpenHarmony to be built by uncommenting the
+variable `OPENHARMONY_VERSION` in the `local.conf` file and setting it to the
+desired value.
+
+Supported versions are `3.0` and `3.1`.
+
 ## QEMU example image
 
 The meta-openharmony provides an example image recipe which can be used for
