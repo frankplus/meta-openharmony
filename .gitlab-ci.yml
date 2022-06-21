@@ -162,6 +162,7 @@ stages:
   cache:
     key: bitbake-cache
     paths:
+      - build/downloads/uninative
       - build/mirror
       - build/cache
       - build/tmp*/cache
