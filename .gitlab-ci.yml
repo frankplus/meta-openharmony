@@ -277,7 +277,6 @@ build:
 # Build OpenHarmony images using normal CI runners
 test:
   stage: test
-  allow_failure: true
   needs:
     - job: build
       artifacts: false
