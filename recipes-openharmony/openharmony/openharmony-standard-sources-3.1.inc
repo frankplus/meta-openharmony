@@ -77,15 +77,8 @@ SRC_URI += "${GITEE_URL}/developtools_hdc_standard.git;protocol=https;nobranch=1
 SRC_URI += "${GITEE_URL}/developtools_profiler.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=69cc2df0204581de2dec7d19dbce4107c2e43057;destsuffix=${OH_SRCDIR}/developtools/profiler;lfs=0"
 SRC_URI += "${GITEE_URL}/device_qemu.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=5a8cfa754c3696925f3d6a60e7d760c90c70787c;destsuffix=${OH_SRCDIR}/device/qemu"
 SRC_URI += "${GITEE_URL}/drivers_adapter.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=a8aef38d2a9a25d9ffda5e5ccf96597ab702cf67;destsuffix=${OH_SRCDIR}/drivers/adapter"
-
-# The 2 next repositories are set to different revisions from the ones
-# they are set to in the official release of OpenHarmony 3.0-LTS.
-# These revisions are known to boot the Linux kernel on the HiSpark AI
-# Camera Dev Kit (Hi3516DV300 board), enabling support for emmc mmcblk0
-# (i.e. where the rootfs resides).
 SRC_URI += "${GITEE_URL}/drivers_adapter_khdf_linux.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=c2122b866972b9ecf49df0e03732a8b712f3ee97;destsuffix=${OH_SRCDIR}/drivers/adapter/khdf/linux"
 SRC_URI += "${GITEE_URL}/drivers_framework.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=54fb2f84e045d9c0ce153f8bb8aaed18acddb968;destsuffix=${OH_SRCDIR}/drivers/framework"
-
 SRC_URI += "${GITEE_URL}/drivers_interface.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=4bdf4e1ea870bc08024718a5775c22757d9c9582;destsuffix=${OH_SRCDIR}/drivers/interface"
 SRC_URI += "${GITEE_URL}/drivers_peripheral.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=6b0270147fb817a94acacaa34d418d8acb9e9223;destsuffix=${OH_SRCDIR}/drivers/peripheral"
 SRC_URI += "${GITEE_URL}/aafwk_standard.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=4c0d3f8985b2212782476d9f2010acac90fda7e3;destsuffix=${OH_SRCDIR}/foundation/aafwk/standard"
@@ -135,7 +128,6 @@ SRC_URI += "${GITEE_URL}/third_party_exfat-utils.git;protocol=https;nobranch=1;b
 SRC_URI += "${GITEE_URL}/third_party_expat.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=c299d0a4d0e70d0809ebff81a0c81275b75736fd;destsuffix=${OH_SRCDIR}/third_party/expat"
 SRC_URI += "${GITEE_URL}/third_party_f2fs-tools.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=045b625c0f02123d86f800c1ea1ca7587e812b40;destsuffix=${OH_SRCDIR}/third_party/f2fs-tools"
 SRC_URI += "${GITEE_URL}/third_party_ffmpeg.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=3c2931b6ecb6abb7c845197c79a26a79fb4ded7d;destsuffix=${OH_SRCDIR}/third_party/ffmpeg"
-#SRC_URI += "${GITEE_URL}/third_party_flatbuffers.git;protocol=https;nobranch=1;branch=OpenHarmony-3.0-LTS;rev=503ba88ad7048df58d4fce0443f681c77f05f354;destsuffix=${OH_SRCDIR}/third_party/flatbuffers;lfs=0"
 SRC_URI += "${GITEE_URL}/third_party_flutter.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=f56c51f210e04b1856cbfb2cae81c10bbb070422;destsuffix=${OH_SRCDIR}/third_party/flutter;lfs=0"
 SRC_URI += "${GITEE_URL}/third_party_fsck_msdos.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=707f44ba9bd50cc6b0aad2b22e09f8b9cfd172fb;destsuffix=${OH_SRCDIR}/third_party/fsck_msdos"
 SRC_URI += "${GITEE_URL}/third_party_gettext.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1-Release;rev=7f6b21954643e899a9d86bee83658bcef75b13d9;destsuffix=${OH_SRCDIR}/third_party/gettext"
