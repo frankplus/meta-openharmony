@@ -193,11 +193,11 @@ fetch:
     - for DISTRO in oniro-openharmony-linux ; do
       for OPENHARMONY_VERSION in 3.0 3.1 ; do
       for MACHINE in qemuarma7 ; do
-      for RECIPE in oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests ; do
+        RECIPES="oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests" ;
         echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE RECIPE=$RECIPE ;
         sed -r "s/^OPENHARMONY_VERSION.*/OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"/" -i conf/auto.conf ;
-        bitbake $RECIPE --runall=fetch ;
-      done ; done ; done ; done
+        time bitbake $RECIPES --runall=fetch ;
+      done ; done ; done
   after_script:
     # Copy all regular files from downloads dir (except *.done files) to
     # mirror dirs.  Note, file is first copied to a temporary file (in same
