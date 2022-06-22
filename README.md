@@ -41,6 +41,27 @@ See the `LICENSES` subdirectory.
 	branch: master
 
 
+## Introduction
+
+OpenHarmony is an open-source project launched by the OpenAtom Foundation, and
+serves as an open-source, distributed operating system (OS) that is intended to
+address all conceivable usage scearios. OpenHarmony uses a multi-kernel design,
+supporting both Linux and LiteOS.
+
+OpenHarmony project provides a specification, a certification program and a
+reference implementation.
+
+This meta-openharmony repository is a Yocto meta-data layer, providing Yocto
+recipes for integrating parts of the OpenHarmony reference (Linux)
+implementation with Yocto based projects. The layer is developed and maintained
+by the Oniro Project under Eclipse Foundation, but should be usable both when
+using Oniro and for non-Oniro Yocto projects.
+
+Aside from enabling the use of OpenHarmony components in Yocto based projects,
+meta-openharmony allows building an updated Clang/LLVM toolchain which can be
+used instead of the default toolchain Clang/LLVM provided by OpenHarmony
+projects for building OpenHarmony reference implementation.
+
 ## General usage
 
 In order to build with this layer, you need to use a compatible host OS. See
