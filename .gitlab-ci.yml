@@ -191,7 +191,7 @@ fetch:
     # there by .bitbake before_script but with an empty string.
     - export DISTRO MACHINE
     - for DISTRO in oniro-openharmony-linux ; do
-      for OPENHARMONY_VERSION in 3.0 3.1 ; do
+      for OPENHARMONY_VERSION in 3.1 3.0 ; do
       for MACHINE in qemuarma7 ; do
         RECIPES="oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests" ;
         echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE RECIPE=$RECIPE ;
@@ -268,7 +268,7 @@ build:
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
-        OPENHARMONY_VERSION: ["3.0", "3.1"]
+        OPENHARMONY_VERSION: ["3.1", "3.0"]
         MACHINE: [qemuarma7]
         RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image]
   artifacts:
@@ -294,7 +294,7 @@ ptest:
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
-        OPENHARMONY_VERSION: ["3.0", "3.1"]
+        OPENHARMONY_VERSION: ["3.1", "3.0"]
         MACHINE: [qemuarma7]
         RECIPE: [openharmony-standard-image-tests]
   artifacts:
