@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenHarmony Appspawn service
+Requires=hilogd.service
+
+[Service]
+Type=exec
+ExecStartPre=mkdir -p /data/app
+ExecStart=/usr/bin/appspawn
+
+[Install]
+WantedBy=multi-user.target

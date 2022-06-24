@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/appspawn_standard repository of OpenHarmony 3.0 codebase.
+
+This replaces the use of ps CLI command, and uses procps file directly instead,
+making the test more portable by avoiding depdency on toybox ps command specific
+syntax.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/test/moduletest/appspawn_module_test.cpp b/test/moduletest/appspawn_module_test.cpp
+index 33c4e81e556e..47234746d1b9 100644
+--- a/test/moduletest/appspawn_module_test.cpp
++++ b/test/moduletest/appspawn_module_test.cpp
+@@ -206,7 +206,7 @@ bool checkProcName(const int32_t &pid, const AppSpawnStartMsg &params)
+ {
+     FILE *fp = nullptr;
+     char cmd[CMD_SIZE];
+-    if (sprintf_s(cmd, sizeof(cmd), "ps -o ARGS=CMD -p %d |grep -v CMD", pid) <= 0) {
++    if (sprintf_s(cmd, sizeof(cmd), "/proc/%d/cmdline", pid) <= 0) {
+         HiLog::Error(LABEL, "cmd sprintf_s fail .");
+         return CHECK_ERROR;
+     }
+@@ -214,9 +214,9 @@ bool checkProcName(const int32_t &pid, const AppSpawnStartMsg &params)
+         HiLog::Error(LABEL, " cmd length is too long  .");
+         return CHECK_ERROR;
+     }
+-    fp = popen(cmd, "r");
++    fp = fopen(cmd, "r");
+     if (fp == nullptr) {
+-        HiLog::Error(LABEL, " popen function call failed .");
++        HiLog::Error(LABEL, " fopen function call failed .");
+         return CHECK_ERROR;
+     }
+     char procName[BUFFER_SIZE];
+@@ -238,7 +238,7 @@ bool checkProcName(const int32_t &pid, const AppSpawnStartMsg &params)
+     } else {
+         HiLog::Error(LABEL, "Getting procName failed.");
+     }
+-    pclose(fp);
++    fclose(fp);
+ 
+     return CHECK_ERROR;
+ }

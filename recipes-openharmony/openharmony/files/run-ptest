@@ -13,6 +13,11 @@ if [ -f systemd-units ] ; then
     done
 fi
 
+# Component level test fixture setup
+if [ -f setup.sh ]; then
+    source setup.sh
+fi
+
 TEST_RESULT=0
 
 find_tcs() {
@@ -25,17 +30,32 @@ find_tcs() {
 }
 
 for ts in unittest moduletest systemtest ; do
-    for tc in $(find_tcs $ts) ; do
-        echo "RUNNING $tc"
-        ./$tc
-        test_result=$?
-        if test "$test_result" -eq 0; then
-            echo "PASS: $tc"
-        else
-            echo "FAIL: $tc"
-            TEST_RESULT=1
+    (
+        # Test suite level test fixture setup
+        if [ -f $ts/setup.sh ]; then
+            source $ts/setup.sh
         fi
-    done
+        for tc in $(find_tcs $ts) ; do
+            echo "RUNNING $tc"
+            ./$tc
+            test_result=$?
+            if test "$test_result" -eq 0; then
+                echo "PASS: $tc"
+            else
+                echo "FAIL: $tc"
+                TEST_RESULT=1
+            fi
+        done
+        # Test suite level test fixture teardown
+        if [ -f $ts/teardown.sh ]; then
+            source $ts/teardown.sh
+        fi
+    )
 done
+
+# Component level test fixture teardown
+if [ -f setup.sh ]; then
+    source teardown.sh
+fi
 
 exit $TEST_RESULT
