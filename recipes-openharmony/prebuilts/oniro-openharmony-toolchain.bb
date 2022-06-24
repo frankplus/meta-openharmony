@@ -15,7 +15,7 @@ folders before building."
 
 inherit populate_sdk
 
-TOOLCHAIN_OUTPUTNAME = "${PN}-${TUNE_PKGARCH}-${SDK_VERSION}"
+TOOLCHAIN_OUTPUTNAME = "${PN}-${OPENHARMONY_VERSION}-${TUNE_PKGARCH}-${SDK_VERSION}"
 SDK_VERSION ?= "${DISTRO_VERSION}"
 
 TOOLCHAIN_HOST_TASK += "nativesdk-oniro-openharmony-toolchain-integration"

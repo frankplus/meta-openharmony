@@ -48,6 +48,7 @@ SRC_URI += "file://graphic_config.patch;patchdir=${S}/foundation/graphic/standar
 SRC_URI += "file://camera_hal.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "file://ace-js2bundle_node-path.patch;patchdir=${S}/developtools/ace-js2bundle"
 SRC_URI += "file://hc-gen-compiler.patch;patchdir=${S}/drivers/framework"
+SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/framework"
 SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_hapsigner-tool.patch;patchdir=${S}/build"
 SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"

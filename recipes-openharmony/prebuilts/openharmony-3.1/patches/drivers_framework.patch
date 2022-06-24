@@ -63,16 +63,3 @@ index 6497fab81da3..66495ef184e0 100644
  {
      int i;
      struct HdfDriverEntry *driverEntry = NULL;
-diff --git a/drivers/framework/tools/hdi-gen/Makefile b/drivers/framework/tools/hdi-gen/Makefile
-index 033c257575dc..99e0d0ca7a0a 100644
---- a/drivers/framework/tools/hdi-gen/Makefile
-+++ b/drivers/framework/tools/hdi-gen/Makefile
-@@ -27,9 +28,9 @@ endif
- 
- all:
- 	$(Q) echo start build $(TARGET) ...
--	$(Q) $(MAKE) -f $(MAKE_FILE_NAME)
-+	$(Q) $(MAKE) CXX=${BUILD_CXX} -f $(MAKE_FILE_NAME)
- 
- clean:
- 	$(Q) $(MAKE) -f $(MAKE_FILE_NAME) clean
