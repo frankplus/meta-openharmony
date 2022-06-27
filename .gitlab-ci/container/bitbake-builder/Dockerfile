@@ -28,7 +28,6 @@ COPY --chown=root:root ppa/zyga-ubuntu-oh-tools.gpg /etc/apt/trusted.gpg.d/
 RUN eatmydata apt-get update -qq \
  && eatmydata apt-get install -qq -y \
         bash git-repo apt-utils build-essential chrpath cpio diffstat gawk git sudo wget \
-        flex bison \
         language-pack-en-base time locales python-is-python3 python3-distutils libssl-dev \
         iproute2 iputils-ping curl jq ca-certificates git-lfs \
         lz4 zstd git-restore-mtime \
