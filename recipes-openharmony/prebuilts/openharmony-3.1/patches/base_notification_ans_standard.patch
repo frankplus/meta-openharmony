@@ -10,6 +10,19 @@ not supported by Clang 14.
 Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
 Upstream-Status: Inappropriate [configuration/integration]
 
+diff --git a/base/notification/ans_standard/interfaces/kits/napi/ans/src/publish.cpp b/base/notification/ans_standard/interfaces/kits/napi/ans/src/publish.cpp
+index b0e575b..dfe8fa8 100644
+--- a/base/notification/ans_standard/interfaces/kits/napi/ans/src/publish.cpp
++++ b/base/notification/ans_standard/interfaces/kits/napi/ans/src/publish.cpp
+@@ -173,7 +173,7 @@ bool CheckProperty(const napi_env &env, const napi_value &content, const std::st
+ 
+     bool hasProperty = false;
+ 
+-    NAPI_CALL(env, napi_has_named_property(env, content, property.data(), &hasProperty));
++    NAPI_CALL_BOOL(env, napi_has_named_property(env, content, property.data(), &hasProperty));
+     if (!hasProperty) {
+         ANS_LOGW("Property %{public}s expected.", property.c_str());
+     }
 diff --git a/base/notification/ans_standard/interfaces/kits/napi/ans/src/reminder/reminder_common.cpp b/base/notification/ans_standard/interfaces/kits/napi/ans/src/reminder/reminder_common.cpp
 index a3ebc189d762..490e8180ed06 100644
 --- a/base/notification/ans_standard/interfaces/kits/napi/ans/src/reminder/reminder_common.cpp

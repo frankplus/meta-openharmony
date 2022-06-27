@@ -13,14 +13,14 @@ Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
 Upstream-Status: Inappropriate
 
 diff --git a/ohos_var.gni b/ohos_var.gni
-index 7c14944..40f5ccb 100755
+index d2c3569..40f5ccb 100755
 --- a/ohos_var.gni
 +++ b/ohos_var.gni
 @@ -174,7 +174,7 @@ if (host_os == "mac") {
    restool = "//prebuilts/build-tools/common/restool/restool"
  }
  
--hapsigner = "//prebuilts/signcenter/hapsigntool/hapsigntoolv2.jar"
+-hapsigner = "//developtools/hapsigner/dist/hap-sign-tool.jar"
 +hapsigner = "//../recipe-sysroot-native/usr/lib/hap-sign-tool/hap-sign-tool.jar"
  hap_unpacking_tool = "//developtools/packing_tool/jar/app_unpacking_tool.jar"
  hap_packing_tool = "//developtools/packing_tool/jar/app_packing_tool.jar"
@@ -29,41 +29,8 @@ index 7c14944..40f5ccb 100755
  default_signature_algorithm = "SHA256withECDSA"
  default_key_alias = "123456"
  default_keystore_password = "123456"
--default_keystore_path = "//prebuilts/signcenter/key/OpenHarmony.p12"
+-default_keystore_path = "//developtools/hapsigner/dist/OpenHarmony.p12"
 +default_keystore_path = "//../recipe-sysroot-native/usr/lib/hap-sign-tool/OpenHarmony.p12"
  default_hap_certificate_file =
--    "//prebuilts/signcenter/certificates/OpenHarmonyApplication.pem"
+-    "//developtools/hapsigner/dist/OpenHarmonyApplication.pem"
 +    "//../recipe-sysroot-native/usr/lib/hap-sign-tool/OpenHarmonyApplication.pem"
-diff --git a/scripts/hapbuilder.py b/scripts/hapbuilder.py
-index b78b6f2..1bf4e8a 100755
---- a/scripts/hapbuilder.py
-+++ b/scripts/hapbuilder.py
-@@ -26,18 +26,17 @@ from util import build_utils  # noqa: E402
- def sign_hap(hapsigner, private_key_path, sign_algo, certificate_profile,
-              keystore_path, keystorepasswd, keyalias, certificate_file,
-              unsigned_hap_path, signed_hap_path):
--    cmd = ['java', '-jar', hapsigner, 'sign']
--    cmd.extend(['-mode', 'localjks'])
-+    cmd = ['java', '-jar', hapsigner, 'sign-app']
-+    cmd.extend(['-mode', 'localSign'])
-     cmd.extend(['-signAlg', sign_algo])
--    cmd.extend(['-privatekey', private_key_path])
--    cmd.extend(['-inputFile', unsigned_hap_path])
--    cmd.extend(['-outputFile', signed_hap_path])
--    cmd.extend(['-profile', certificate_profile])
--    cmd.extend(['-keystore', keystore_path])
--    cmd.extend(['-keystorepasswd', keystorepasswd])
--    cmd.extend(['-keyaliaspasswd', keyalias])
--    cmd.extend(['-certpath', certificate_file])
--    cmd.extend(['-profileSigned', '1'])
-+    cmd.extend(['-keyAlias', private_key_path])
-+    cmd.extend(['-inFile', unsigned_hap_path])
-+    cmd.extend(['-outFile', signed_hap_path])
-+    cmd.extend(['-profileFile', certificate_profile])
-+    cmd.extend(['-keystoreFile', keystore_path])
-+    cmd.extend(['-keystorePwd', keystorepasswd])
-+    cmd.extend(['-keyPwd', keyalias])
-+    cmd.extend(['-appCertFile', certificate_file])
-     child = subprocess.Popen(cmd,
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
