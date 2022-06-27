@@ -4,9 +4,9 @@
 
 # Make sure we have java tools in $PATH
 
-DEPENDS:append:oniro-openharmony-linux = " openjdk-8-native"
-INHERIT:append:oniro-openharmony-linux = " java"
-JAVA_BUILD_VERSION:oniro-openharmony-linux = "openjdk-8-native"
-export JAVA_HOME:oniro-openharmony-linux = "${STAGING_LIBDIR_JVM_NATIVE}/${JAVA_BUILD_VERSION}"
-export CLASSPATH:oniro-openharmony-linux += "${STAGING_LIBDIR_JVM_NATIVE}/${JAVA_BUILD_VERSION}/lib/tools.jar"
-EXTRANATIVEPATH:append:oniro-openharmony-linux = " ../${baselib}/jvm/${JAVA_BUILD_VERSION}/bin"
+DEPENDS:append = " openjdk-8-native"
+INHERIT:append = " java"
+JAVA_BUILD_VERSION = "openjdk-8-native"
+export JAVA_HOME = "${STAGING_LIBDIR_JVM_NATIVE}/${JAVA_BUILD_VERSION}"
+export CLASSPATH += "${STAGING_LIBDIR_JVM_NATIVE}/${JAVA_BUILD_VERSION}/lib/tools.jar"
+EXTRANATIVEPATH:append = " ../${baselib}/jvm/${JAVA_BUILD_VERSION}/bin"
