@@ -17,6 +17,7 @@ DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
 
 require ${PN}-sources-${OPENHARMONY_VERSION}.inc
+require musl-ldso-paths-sanity-check.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"

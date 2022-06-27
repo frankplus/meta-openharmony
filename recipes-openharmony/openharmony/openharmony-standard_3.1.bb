@@ -23,6 +23,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSIO
 
 require ${PN}-sources-${OPENHARMONY_VERSION}.inc
 require java-tools.inc
+require musl-ldso-paths-sanity-check.inc
 
 SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
 
