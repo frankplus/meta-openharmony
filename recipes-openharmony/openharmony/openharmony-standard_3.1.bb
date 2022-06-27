@@ -65,6 +65,7 @@ SRC_URI += "file://ace_engine-openssl-legacy-provider.patch;patchdir=${S}/founda
 SRC_URI += "file://developtools_hdc_standard-gcc.patch;patchdir=${S}/developtools/hdc_standard"
 SRC_URI += "file://foundation_graphic_standard-hdi-display-layer.patch;patchdir=${S}/foundation/graphic/standard"
 SRC_URI += "file://third_party_weston-hdi-display-layer.patch;patchdir=${S}/third_party/weston"
+SRC_URI += "file://third_party_selinux-flex-bison-path.patch;patchdir=${S}/third_party/selinux"
 SRC_URI += "file://features.json;subdir=${OHOS_BUILD_CONFIGS_DIR}"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
@@ -111,6 +112,8 @@ GN_ARGS += 'treat_warnings_as_errors=false'
 GN_ARGS += 'node_path="${RECIPE_SYSROOT_NATIVE}/usr/bin"'
 GN_ARGS += 'host_toolchain="//oniro:clang_x64"'
 GN_ARGS += 'install_oniro_third_party=false'
+GN_ARGS += 'flex_path="${RECIPE_SYSROOT_NATIVE}/usr/bin/flex"'
+GN_ARGS += 'bison_path="${RECIPE_SYSROOT_NATIVE}/usr/bin/bison"'
 
 # OpenHarmony unit tests are statically linked and therefore not stripped
 # binaries sum up to almost 80GB which makes it difficult to build OpenHarmony
