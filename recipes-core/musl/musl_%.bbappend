@@ -25,20 +25,7 @@ LDFLAGS:append:toolchain-clang = " ${@bb.utils.contains('COMPILER_RT', '-rtlib=c
 #CFLAGS:append:oniro-openharmony-linux = "-DHOOK_ENABLE"
 
 do_install:append:oniro-openharmony-linux () {
-    cat >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path << EOF
-${libdir}/module
-${libdir}/module/ability
-${libdir}/module/account
-${libdir}/module/app
-${libdir}/module/application
-${libdir}/module/bundle
-${libdir}/module/data
-${libdir}/module/distributedhardware
-${libdir}/module/events
-${libdir}/module/multimedia
-${libdir}/module/multimodalinput
-${libdir}/module/net
-${libdir}/module/security
-${libdir}/module/telephony
-EOF
+    for folder in ${MUSL_LDSO_PATHS}; do
+        echo "${libdir}/${folder}" >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path
+    done
 }
