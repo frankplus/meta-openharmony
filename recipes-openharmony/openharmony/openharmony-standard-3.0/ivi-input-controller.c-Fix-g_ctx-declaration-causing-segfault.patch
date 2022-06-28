@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+From d0e7b03296acfcdd3b68fc368e35e169ccc6a8a7 Mon Sep 17 00:00:00 2001
+From: Robert Drab <robert.drab@huawei.com>
+Date: Wed, 22 Jun 2022 16:18:41 +0200
+Subject: [PATCH] ivi-input-controller.c: Fix g_ctx declaration causing
+ segfault
+
+g_ctx was declared as a pointer instead of a structure. The problem does not
+always occur as it depends on the heap layout. It was observed on qemu-arm
+system.
+
+The file is compiled with -Wno-incompatible-pointer-types flag which is hiding
+following error:
+
+../../third_party/wayland-ivi-extension/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c:101:12: error: incompatible pointer types returning 'struct input_context **' from a function with result type 'struct input_context *'; remove & [-Werror,-Wincompatible-pointer-types]
+    return &g_ctx;
+           ^~~~~~
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Change-Id: I38f7a4f17c611f5d265a3febe81f34e745c6956f
+
+Upstream-Status: Submitted [https://gitee.com/openharmony/third_party_wayland-ivi-extension/pulls/21]
+
+---
+ .../ivi-input-controller/src/ivi-input-controller.c             | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c b/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
+index 6e608b8..87c46e7 100644
+--- a/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
++++ b/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
+@@ -94,7 +94,7 @@ struct wl_keyboard_data {
+     uint32_t serial;
+ };
+ 
+-static struct input_context *g_ctx = {0};
++static struct input_context g_ctx = {0};
+ struct input_context *
+ get_instance(void)
+ {
+-- 
+2.25.1
+

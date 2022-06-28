@@ -59,6 +59,7 @@ SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/d
 SRC_URI += "file://display-Use-temporary-qemuarm-implementation.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "file://display_gralloc_gbm.c-Use-card-drm-node.patch;patchdir=${S}/device/hihope"
 SRC_URI += "file://hihope-gralloc-Backport-to-3.0.patch;patchdir=${S}/device/hihope"
+SRC_URI += "file://ivi-input-controller.c-Fix-g_ctx-declaration-causing-segfault.patch;patchdir=${S}/third_party/wayland-ivi-extension"
 
 
 inherit python3native gn_base ptest
