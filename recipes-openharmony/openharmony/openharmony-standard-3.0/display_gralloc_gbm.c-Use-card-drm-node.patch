@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+display_gralloc_gbm.c: Use card drm node
+
+DRM_IOCTL_MODE_CREATE_DUMB ioctl is not allowed for render nodes.
+
+This patch is applied to //device/hihope directory containing Apache-2.0
+licensed HiHope gralloc implementation. This directory is a part of the
+OpenHarmony 3.1 device_board_hihope.git repository.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/hardware/display/src/display_gralloc/display_gralloc_gbm.c b/hardware/display/src/display_gralloc/display_gralloc_gbm.c
+index 2dad8c1..1445819 100644
+--- a/hardware/display/src/display_gralloc/display_gralloc_gbm.c
++++ b/hardware/display/src/display_gralloc/display_gralloc_gbm.c
+@@ -34,7 +34,7 @@
+ #include "display_gralloc_private.h"
+ #include "display_common.h"
+ 
+-const char *g_drmFileNode = "/dev/dri/renderD128";
++const char *g_drmFileNode = "/dev/dri/card0";
+ static GrallocManager *g_grallocManager = NULL;
+ static pthread_mutex_t g_lock;
+ 
