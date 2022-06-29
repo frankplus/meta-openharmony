@@ -54,8 +54,14 @@ SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_s
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
 
-SRC_URI += "file://display-Mock-interface-for-standard-system.patch"
+SRC_URI += "file://peripherals-Limit-drivers-list-to-supported-by-the-qemuarm.patch;patchdir=${S}/drivers/adapter"
 SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/default/standard_system"
+SRC_URI += "file://display-Use-temporary-qemuarm-implementation.patch;patchdir=${S}/drivers/peripheral"
+SRC_URI += "file://display_gralloc_gbm.c-Use-card-drm-node.patch;patchdir=${S}/device/hihope"
+SRC_URI += "file://hihope-gralloc-Backport-to-3.0.patch;patchdir=${S}/device/hihope"
+SRC_URI += "file://ivi-input-controller.c-Fix-g_ctx-declaration-causing-segfault.patch;patchdir=${S}/third_party/wayland-ivi-extension"
+SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_party/libdrm"
+
 
 inherit python3native gn_base ptest
 
@@ -265,7 +271,7 @@ generate_parts_json() {
         "global:resmgr_standard",
         "graphic:graphic_standard",
         "hdf:hdf",
-        "hdf:mocks",
+        "hdf:display_device_driver",
         "hiviewdfx:faultloggerd",
         "hiviewdfx:hilog",
         "hiviewdfx:hilog_native",

@@ -65,6 +65,15 @@ SRC_URI += "${GITEE_URL}/developtools_profiler.git;protocol=https;branch=OpenHar
 SRC_URI += "${GITEE_URL}/device_qemu.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=00bf590c9d04ee5af641ccff7e8a02eb6ff727e0;destsuffix=${OH_SRCDIR}/device/qemu"
 SRC_URI += "${GITEE_URL}/drivers_adapter.git;protocol=https;branch=OpenHarmony-3.0-LTS;rev=9f6cd92cfa61cae193328e53577899f51d5b5fca;destsuffix=${OH_SRCDIR}/drivers/adapter"
 
+# TODO: This should be removed whenever upstream OpenHarmony provides qemu
+# compatible gralloc implementation. Currently we have to use OpenHarmony 3.1
+# HiHope implementation from a repository that contains, alongside required
+# sources, binaries that we do not want. Therefore it is cloned to temporary
+# repository, from which only necessary files will be copied to the OH_SRCDIR
+# and the rest will be removed in the do_unpack stage postfunc.
+OH_GRALLOC_TMP_DIR = "tmp_hihope"
+SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf;destsuffix=${OH_GRALLOC_TMP_DIR}"
+
 # The 2 next repositories are set to different revisions from the ones
 # they are set to in the official release of OpenHarmony 3.0-LTS.
 # These revisions are known to boot the Linux kernel on the HiSpark AI
@@ -225,6 +234,22 @@ create_symlinks() {
     fi
 }
 
+# TODO: This should be removed whenever upstream OpenHarmony provides qemu
+# compatible gralloc implementation.
+# Cherry-pick display directory containing required gralloc implementation
+# out of hihope board repository and remove the rest
+cherry_pick_sources() {
+    if [ ! -d "${WORKDIR}/${OH_GRALLOC_TMP_DIR}" ]; then
+        bbfatal "OH_GRALLOC_TMP_DIR (${WORKDIR}/${OH_GRALLOC_TMP_DIR}) not found!"
+    fi
+
+    TARGET_DIR="${WORKDIR}/${OH_SRCDIR}/device/hihope/hardware/"
+    install -d "${TARGET_DIR}"
+    cp -R "${WORKDIR}/${OH_GRALLOC_TMP_DIR}/hardware/display" "${TARGET_DIR}"
+    rm -r "${WORKDIR}/${OH_GRALLOC_TMP_DIR}"
+}
+
 do_unpack[postfuncs] += "create_symlinks"
+do_unpack[postfuncs] += "cherry_pick_sources"
 
 require oniro-prebuilts.inc

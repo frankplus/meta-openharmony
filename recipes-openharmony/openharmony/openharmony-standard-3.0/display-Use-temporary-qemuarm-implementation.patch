@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+display: Use temporary qemuarm implementation
+
+OpenHarmony 3.0 requires two display components:
+
+- hdi_display_device
+- hdi_display_gralloc
+
+none of which is available for qemuarm standard system. Therefore we have to
+provide mock implementation of non-essential hdi_display_device and a proper
+implementation of hdi_display_gralloc without which OpenHarmony graphic stack
+will not work.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/display/hal/BUILD.gn b/display/hal/BUILD.gn
+index a232730b..80f03706 100644
+--- a/display/hal/BUILD.gn
++++ b/display/hal/BUILD.gn
+@@ -11,10 +11,49 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
++import("//build/ohos.gni")
++
+ if (defined(ohos_lite)) {
+   group("hdi_display") {
+     public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
+   }
++} else if (product_name == "yocto-ohos-qemuarm") {
++  config("display_hdi_public_config") {
++    visibility = [ ":*" ]
++    include_dirs = [
++      "//drivers/peripheral/base",
++      "//drivers/peripheral/display/interfaces/include",
++      "//drivers/peripheral/display/hal",
++      "//drivers/framework/include/utils",
++      "//drivers/adapter/uhdf2/osal/include",
++      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
++      "//third_party/bounds_checking_function/include",
++    ]
++  }
++
++  group("hdi_display") {
++    deps = [
++      ":hdi_display_device",
++      ":hdi_display_gralloc",
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++  }
++
++  ohos_shared_library("hdi_display_device") {
++    sources = [
++      "//drivers/peripheral/display/hal/default/standard_system/display_device.c",
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++    subsystem_name = "hdf"
++    part_name = "display_device_driver"
++  }
++
++  group("hdi_display_gralloc") {
++    deps = [
++      "//device/hihope/hardware/display:display_gralloc"
++    ]
++    public_configs = [ ":display_hdi_public_config" ]
++  }
+ } else {
+   config("display_hdi_public_config") {
+     visibility = [ ":*" ]

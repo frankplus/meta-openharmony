@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+xf86drm.c: Add drmWaitVBlank hack
+
+DRM_IOCTL_WAIT_VBLANK is not supported by the virtio drm driver. This feature
+is essential for the inner workings of the OpenHarmony graphic stack, therefore
+adding a hack that simulates this behaviour until a proper solution is
+provided.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/xf86drm.c b/xf86drm.c
+index b49d42f..0e2805a 100644
+--- a/xf86drm.c
++++ b/xf86drm.c
+@@ -2171,14 +2171,15 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
+         fprintf(stderr, "clock_gettime failed: %s\n", strerror(errno));
+         goto out;
+     }
+-    timeout.tv_sec++;
++    /* HACK: return 0 after 16ms - value observed on the Taurus board */
++    timeout.tv_nsec += 16000000;
+ 
+     do {
+        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
+        vbl->request.type &= ~DRM_VBLANK_RELATIVE;
+-       if (ret && errno == EINTR) {
++       if (ret && (errno == EINTR || errno == ENOTSUP)) {
+            clock_gettime(CLOCK_MONOTONIC, &cur);
+-           /* Timeout after 1s */
++           /* HACK: return 0 after 16ms - value observed on the Taurus board */
+            if (cur.tv_sec > timeout.tv_sec + 1 ||
+                (cur.tv_sec == timeout.tv_sec && cur.tv_nsec >=
+                 timeout.tv_nsec)) {
+@@ -2187,9 +2188,11 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
+                    break;
+            }
+        }
+-    } while (ret && errno == EINTR);
++    } while (ret && (errno == EINTR || errno == ENOTSUP));
+ 
+ out:
++    if (errno == EBUSY)
++        return 0;
+     return ret;
+ }
+ 
