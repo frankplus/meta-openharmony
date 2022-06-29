@@ -4,9 +4,10 @@
 
 import("//build/ohos.gni")
 import("//oniro/third_party.gni")
+import("musl_config.gni")
 
-ohos_prebuilt_executable("ld-musl-arm.so") {
-  source = "//oniro/sysroots/target/lib/ld-musl-arm.so.1"
+ohos_prebuilt_executable("ld-musl.so") {
+  source = "//oniro/sysroots/target/lib/ld-musl-${musl_arch}.so.1"
   subsystem_name = "common"
   part_name = "common"
   install_enable = install_oniro_third_party
