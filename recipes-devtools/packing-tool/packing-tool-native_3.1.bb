@@ -6,7 +6,7 @@ SUMMARY = "OpenHarmony Packing Tool"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a832eda17114b48ae16cda6a500941c2"
 
-inherit cmake native
+inherit cmake
 
 require recipes-openharmony/openharmony/java-tools.inc
 
@@ -19,3 +19,6 @@ SRC_URI += "file://fastjson-pkg-name.patch"
 # Fetch fastjson-2.0.7.jar package from maven repository. Licensed under Apache 2.0
 SRC_URI += "https://search.maven.org/remote_content?g=com.alibaba&a=fastjson&v=2.0.7;unpack=0;subdir=${S}/lib;downloadfilename=fastjson.jar;name=fastjson"
 SRC_URI[fastjson.sha256sum] = "902de86ba19b188efca83f3138b1004578882de4306d6e70463dbc89595bf6b7"
+
+# native class must be inherited last
+inherit native
