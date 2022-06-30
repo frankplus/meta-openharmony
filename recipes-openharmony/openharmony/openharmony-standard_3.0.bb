@@ -62,6 +62,7 @@ SRC_URI += "file://hihope-gralloc-Backport-to-3.0.patch;patchdir=${S}/device/hih
 SRC_URI += "file://ivi-input-controller.c-Fix-g_ctx-declaration-causing-segfault.patch;patchdir=${S}/third_party/wayland-ivi-extension"
 SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_party/libdrm"
 
+SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;patchdir=${S}/foundation/graphic/standard"
 
 inherit python3native gn_base ptest
 
@@ -356,11 +357,6 @@ RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest ${PN}-hilog"
 
 INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
-
-# We have the following problem:
-# ERROR: openharmony-standard-3.0-r0 do_package_qa: QA Issue: /usr/lib/module/multimedia/libcamera_napi.z.so contained in package openharmony-standard requires libwms_client.z.so, but no providers found in RDEPENDS:openharmony-standard? [file-rdeps]
-# and seems to be a bug in OpenHarmony 3.0
-INSANE_SKIP:${PN} = "file-rdeps"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
 INSANE_SKIP:${PN} += "already-stripped"
