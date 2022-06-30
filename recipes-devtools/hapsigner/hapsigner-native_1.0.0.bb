@@ -6,8 +6,6 @@ SUMMARY = "HAP signer tool"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-inherit native
-
 S = "${WORKDIR}/src"
 
 SRC_URI = "git://gitee.com/openharmony/developtools_hapsigner.git;protocol=http;branch=OpenHarmony-3.1-Release;rev=ff2cf76f14f7d6c6fa55c9d0f02c4c1eb9c795a9;destsuffix=${S}"
@@ -33,3 +31,6 @@ do_install() {
 	install -m 0644 dist/OpenHarmony.p12 ${D}/${DSTDIR}/
 	install -m 0644 dist/OpenHarmonyApplication.pem ${D}/${DSTDIR}/
 }
+
+# native class must be inherited last
+inherit native
