@@ -4,7 +4,7 @@
 
 group("musl_install") {
   deps = [
-    "//third_party/musl:ld-musl-arm.so",
+    "//third_party/musl:ld-musl.so",
     "//third_party/musl:libc.so",
   ]
 }

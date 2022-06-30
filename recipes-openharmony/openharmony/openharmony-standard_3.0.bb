@@ -95,6 +95,12 @@ GN_ARGS += 'node_path="${RECIPE_SYSROOT_NATIVE}/usr/bin"'
 GN_ARGS += 'host_toolchain="//oniro:host_toolchain"'
 GN_ARGS += 'install_oniro_third_party=false'
 
+# OpenHarmony build system needs a bit of help to be able to find the right
+# ld-musl-*.so path
+inherit linuxloader
+MUSL_LDSO_ARCH = "${@get_musl_loader_arch(d)}"
+GN_ARGS += 'musl_arch="${MUSL_LDSO_ARCH}"'
+
 # OpenHarmony unit tests are statically linked and therefore not stripped
 # binaries sum up to almost 80GB which makes it difficult to build OpenHarmony
 # with tests on a normal desktop, let alone the CI runner

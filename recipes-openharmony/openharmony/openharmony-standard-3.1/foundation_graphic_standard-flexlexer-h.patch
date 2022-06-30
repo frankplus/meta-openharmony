@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Fix host OS dependency on flex package by copying the FlexLexer.h file from recipe-sysroot-native.
+
+Apply to foundation/graphic/standard repository.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/utils/lex_yacc/gen_flexlexer_header.py b/utils/lex_yacc/gen_flexlexer_header.py
+index cde71464bfe8..f32c7e68184d 100755
+--- a/utils/lex_yacc/gen_flexlexer_header.py
++++ b/utils/lex_yacc/gen_flexlexer_header.py
+@@ -22,10 +22,11 @@ import sys
+ def parse_args(args):
+     parser = optparse.OptionParser()
+     parser.add_option("--output")
++    parser.add_option("--includedir", default="/usr/include")
+     opts, _ = parser.parse_args(args)
+     return opts
+ 
+ if __name__ == '__main__':
+     options = parse_args(sys.argv[1:])
+     parse_scripts = subprocess.check_call(
+-        ["cp", "-f", "/usr/include/FlexLexer.h", options.output])
++        ["cp", "-f", "%s/FlexLexer.h"%(options.includedir,), options.output])
+diff --git a/utils/lex_yacc/lex_yacc.gni b/utils/lex_yacc/lex_yacc.gni
+index 5c27743c507e..905252a93cf7 100644
+--- a/utils/lex_yacc/lex_yacc.gni
++++ b/utils/lex_yacc/lex_yacc.gni
+@@ -15,6 +15,10 @@ import("//build/ohos.gni")
+ 
+ gni_filepath = "//foundation/graphic/standard/utils/lex_yacc"
+ 
++declare_args() {
++  flex_includedir = "/usr/include"
++}
++
+ template("lex_yacc") {
+   lex_name = invoker.lex
+   yacc_name = invoker.yacc
+@@ -33,6 +37,8 @@ template("lex_yacc") {
+     args = [
+       "--output",
+       flexlexer_pathname,
++      "--includedir",
++      rebase_path(flex_includedir)
+     ]
+   }
+ 

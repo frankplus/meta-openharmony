@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/selinux git repository of OpenHarmony 3.1 codebase.
+
+This allows overriding the path to flex and bison tools using GN arguments.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 34616600fac4..a8fb10dbc96c 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -20,8 +20,13 @@ SECILC_ROOT_DIR = "//third_party/selinux/secilc"
+ LIBFTS_ROOT_DIR = "//third_party/FreeBSD"
+ LIBPCRE2_ROOT_DIR = "//third_party/pcre2"
+ 
++declare_args() {
++  flex_path = "/usr/bin/flex"
++  bison_path = "/usr/bin/bison"
++}
++
+ ohos_shared_library("libsepol") {
+-  exec_script("/usr/bin/flex",
++  exec_script(flex_path,
+               [
+                 "-o",
+                 rebase_path("libsepol/cil/src/cil_lexer.c"),
+@@ -314,7 +319,7 @@ ohos_executable("getpidcon") {
+ }
+ 
+ ohos_executable("checkpolicy") {
+-  exec_script("/usr/bin/bison",
++  exec_script(bison_path,
+               [
+                 "-y",
+                 "-d",
+@@ -323,7 +328,7 @@ ohos_executable("checkpolicy") {
+                 rebase_path("checkpolicy/y.tab.c"),
+               ],
+               "")
+-  exec_script("/usr/bin/flex",
++  exec_script(flex_path,
+               [
+                 "-o",
+                 rebase_path("checkpolicy/policy_scan.c"),
