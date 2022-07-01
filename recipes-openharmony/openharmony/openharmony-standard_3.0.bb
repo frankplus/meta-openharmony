@@ -22,6 +22,8 @@ require musl-ldso-paths-sanity-check.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
 
+SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
+
 # TODO: we probably want these
 SRC_URI += "file://hilog-Add-tests.patch"
 
@@ -216,6 +218,8 @@ do_install_ptest () {
     do
         install -D -m 755 "${B}/tests/$f" "${D}${PTEST_PATH}/$f"
     done
+    # undo the default installation of ptest done by ptest.bbclass
+    rm -f ${D}${PTEST_PATH}/run-ptest
 }
 
 generate_platforms_build_file() {
@@ -326,22 +330,24 @@ RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
+# //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog ${PN}-hilog-ptest"
 SYSTEMD_PACKAGES = "${PN}-hilog"
 SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
 SRC_URI += "file://hilogd.service"
-SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://hilog.run-ptest', '', d)}"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
-    rm -f ${D}${sysconfdir}/init/hilogd.cfg
+    rm -f ${D}${sysconfdir}/openharmony/init/hilogd.cfg
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
 }
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hilog/ptest"
 do_install_ptest:append() {
-    install -D ${WORKDIR}/hilog.run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
-    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog/* ${D}${libdir}/${BPN}-hilog/ptest/
-    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog ${D}${libdir}/${BPN}-hilog/ptest/moduletest
+    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx
+    echo "hilogd.service" > ${D}${libdir}/${BPN}-hilog/ptest/systemd-units
 }
 FILES:${PN}-hilog = "\
     ${bindir}/hilog* \
@@ -350,10 +356,12 @@ FILES:${PN}-hilog = "\
     ${systemd_unitdir}/hilogd.service \
 "
 FILES:${PN}-hilog-ptest = "${libdir}/${BPN}-hilog/ptest"
-RDEPENDS:${PN}-hilog += "musl libcxx ${PN}-libutilsecurec"
-RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog musl libcxx"
 RDEPENDS:${PN} += "${PN}-hilog"
 RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest ${PN}-hilog"
+RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog"
+RDEPENDS:${PN}-hilog       += "musl libcxx"
+RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
+RDEPENDS:${PN}-hilog       += "${PN}-libutilsecurec"
 
 INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
