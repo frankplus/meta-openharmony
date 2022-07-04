@@ -50,6 +50,7 @@ SRC_URI += "${GITEE_URL}/security_deviceauth.git;protocol=https;nobranch=1;branc
 SRC_URI += "${GITEE_URL}/security_device_security_level.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=a8326ac7a599d7638a592947888a72b4d076418f;destsuffix=${OH_SRCDIR}/base/security/device_security_level"
 SRC_URI += "${GITEE_URL}/security_huks.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=e4f0c051cdbea87b93e9879ecac0efd5f2ebf75d;destsuffix=${OH_SRCDIR}/base/security/huks"
 SRC_URI += "${GITEE_URL}/security_permission.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=807a32ca68f71834d54375d2f7eaf11f81a1127e;destsuffix=${OH_SRCDIR}/base/security/permission"
+SRC_URI += "${GITEE_URL}/security_selinux.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=65c7a8741164f8fdead9f5cba52b7c2d32984d8d;destsuffix=${OH_SRCDIR}/base/security/selinux/"
 SRC_URI += "${GITEE_URL}/sensors_sensor.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=54999891f299b412a9b0cdbfada6b61e33cd7110;destsuffix=${OH_SRCDIR}/base/sensors/sensor"
 SRC_URI += "${GITEE_URL}/startup_appspawn.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=b7447b8f4f48598068ea5381f1a33905fe552214;destsuffix=${OH_SRCDIR}/base/startup/appspawn_standard"
 SRC_URI += "${GITEE_URL}/startup_init_lite.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=5158c9ade29dda41a9a8466ba78d8d17ac007936;destsuffix=${OH_SRCDIR}/base/startup/init_lite"

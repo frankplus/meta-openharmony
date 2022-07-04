@@ -18,6 +18,8 @@ DEPENDS += "ruby-native"
 DEPENDS += "hapsigner-native"
 DEPENDS += "packing-tool-native"
 
+DEPENDS += "fts"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
 
@@ -68,6 +70,8 @@ SRC_URI += "file://third_party_weston-hdi-display-layer.patch;patchdir=${S}/thir
 SRC_URI += "file://third_party_selinux-flex-bison-path.patch;patchdir=${S}/third_party/selinux"
 SRC_URI += "file://foundation_graphic_standard-flexlexer-h.patch;patchdir=${S}/foundation/graphic/standard"
 SRC_URI += "file://features.json;subdir=${OHOS_BUILD_CONFIGS_DIR}"
+SRC_URI += "file://third_party_selinux-fts.patch;patchdir=${S}/third_party/selinux"
+SRC_URI += "file://base_security_selinux-fts.patch;patchdir=${S}/base/security/selinux"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
