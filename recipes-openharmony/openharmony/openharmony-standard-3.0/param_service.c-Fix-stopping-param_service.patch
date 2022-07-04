@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/init_lite
+
+param_service.c: Fix stopping param_service
+
+StopParamService() have to be called from the uv_loop context to be able to
+successfully stop the uv_loop. To achieve that we need an uv_idle callback.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/services/param/service/param_service.c b/services/param/service/param_service.c
+index cd5d93be..6634fa3d 100644
+--- a/services/param/service/param_service.c
++++ b/services/param/service/param_service.c
+@@ -241,12 +241,36 @@ void StopParamService()
+     PARAM_LOGI("StopParamService.");
+ }
+ 
++/*
++ * uv_stop() must be called from the uv_loop context and therefore
++ * StopParamService() cannot do it's job when called from the signal handler.
++ * We need a uv_idle callback that will call StopParamService() which calls
++ * uv_stop() from the uv_loop context to actually stop the param service loop.
++ */
++int g_paramService_asyncStopRequest = 0;
++
++int ParamServiceAsyncStopRequest() {
++    g_paramService_asyncStopRequest = 0;
++    return 0;
++}
++
++void ParamServiceLoopIdleCallback(uv_idle_t *handle) {
++    if (g_paramService_asyncStopRequest) {
++        PARAM_LOGI("%s(): %d Stopping param service...", __FUNCTION__, __LINE__);
++        StopParamService();
++    }
++}
++
+ int StartParamService()
+ {
+     PARAM_LOGI("StartParamService.");
+     uv_fs_t req;
+     uv_fs_unlink(uv_default_loop(), &req, PIPE_NAME, NULL);
+ 
++    uv_idle_t idler;
++    uv_idle_init(uv_default_loop(), &idler);
++    uv_idle_start(&idler, ParamServiceLoopIdleCallback);
++
+     uv_pipe_t pipeServer;
+     int ret = uv_pipe_init(uv_default_loop(), &pipeServer, 0);
+     PARAM_CHECK(ret == 0, return ret, "Failed to uv_pipe_init %d", ret);
+diff --git a/services/include/param/init_param.h b/services/include/param/init_param.h
+index 73a06795..4574cbaa 100644
+--- a/services/include/param/init_param.h
++++ b/services/include/param/init_param.h
+@@ -51,6 +51,14 @@ int StartParamService();
+  */
+ void StopParamService();
+ 
++/**
++ * ParamServiceAsyncStopRequest interface
++ * Allows stopping ParamService from outside event loop context,
++ * e.g. from signal handler
++ *
++ */
++int ParamServiceAsyncStopRequest(void);
++
+ /**
+  * Init 接口
+  * 加载默认的参数值

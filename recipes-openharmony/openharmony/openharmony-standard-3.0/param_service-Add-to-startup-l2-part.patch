@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/appspawn_standard
+
+appspawn_standard: Add param_service to startup l2 part
+
+In OpenHarmony 3.0 param service is a part of init part which is we don not
+use and therefore we have to add it to a different part.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/ohos.build b/ohos.build
+index 650790f..85b3bde 100644
+--- a/ohos.build
++++ b/ohos.build
+@@ -9,7 +9,11 @@
+         "//base/startup/appspawn_standard:appspawn.rc",
+         "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
+         "//base/startup/syspara_lite/interfaces/kits/js:deviceinfo",
+-        "//base/startup/syspara_lite/interfaces/kits/js:systemparameter"
++        "//base/startup/syspara_lite/interfaces/kits/js:systemparameter",
++        "//base/startup/init_lite/services:param_service",
++        "//base/startup/init_lite/services:ohos.para",
++        "//base/startup/init_lite/services/param:getparam",
++        "//base/startup/init_lite/services/param:setparam"
+       ],
+       "inner_kits": [
+           {
