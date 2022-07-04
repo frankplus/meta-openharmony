@@ -49,6 +49,8 @@ SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_pa
 
 SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;patchdir=${S}/foundation/graphic/standard"
 
+SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
+
 inherit python3native gn_base ptest
 
 B = "${S}/out/ohos-arm-release"
@@ -346,6 +348,41 @@ RDEPENDS:${PN}-hilog       += "musl libcxx"
 RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
 RDEPENDS:${PN}-hilog       += "${PN}-libutilsecurec"
 
+# //base/startup/appspawn_standard component
+PACKAGES =+ "${PN}-appspawn ${PN}-appspawn-ptest"
+SYSTEMD_PACKAGES += "${PN}-appspawn"
+SYSTEMD_SERVICE:${PN}-appspawn = "appspawn.service"
+SRC_URI += "file://appspawn.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/appspawn.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/appspawn.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appspawn/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appspawn/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/startup_l2/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/startup_l2/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/*/startup_l2
+    echo "appspawn.service" > ${D}${libdir}/${BPN}-appspawn/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
+FILES:${PN}-appspawn = "\
+    ${bindir}/appspawn* \
+    ${libdir}/libappspawn* \
+    ${systemd_unitdir}/appspawnd.service \
+"
+FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
+RDEPENDS:${PN} += "${PN}-appspawn"
+RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest ${PN}-appspawn"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
+RDEPENDS:${PN}-appspawn       += "musl libcxx"
+RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
+RDEPENDS:${PN}-appspawn       += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-appspawn       += "${PN}"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}"
 
 # Disable all ptest suites that are know to not work for now. When the x-bit is
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
