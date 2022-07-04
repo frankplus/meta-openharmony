@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //third_party/selinux git repository of OpenHarmony 3.1 codebase.
+
+This disables the _FORTIFY_SOURCE macro for native build with gcc.
+This fixes the following compiler error for libselinux:
+ "error: inlining failed in call to always_inline ‘syslog’: function body can be overwritten at link time"
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/third_party/selinux/BUILD.gn b/third_party/selinux/BUILD.gn
+index 34616600..a9ca7cf5 100644
+--- a/third_party/selinux/BUILD.gn
++++ b/third_party/selinux/BUILD.gn
+@@ -199,6 +199,11 @@ ohos_shared_library("libselinux") {
+     "-DAUDITD_LOG_TAG=1003",
+     "-DPCRE2_CODE_UNIT_WIDTH=8",
+   ]
++
++  if (!is_clang) {
++    cflags += [ "-U_FORTIFY_SOURCE" ]
++  }
++
+   deps = [
+     ":libsepol",
+     "$LIBPCRE2_ROOT_DIR:libpcre2",
