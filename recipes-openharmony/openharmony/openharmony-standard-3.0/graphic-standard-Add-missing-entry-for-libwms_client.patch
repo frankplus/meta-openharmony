@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+graphic-standard: Add missing entry for libwms_client
+
+libwms_client is required by the libcamera_napi library but is not being
+installed to the system image.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inactive-Upstream [OpenHarmony 3.0 upstream repository https://gitee.com/openharmony/graphic_standard marked as closed]
+
+diff --git a/ohos.build b/ohos.build
+index f2b6d0da..827f223a 100755
+--- a/ohos.build
++++ b/ohos.build
+@@ -20,6 +20,7 @@
+ 
+         "//foundation/graphic/standard/frameworks/bootanimation:bootanimation",
+         "//foundation/graphic/standard/frameworks/bootanimation:bootanimation-480x960.raw",
++        "//foundation/graphic/standard:libwms_client",
+         "//foundation/graphic/standard:default.scss",
+         "//foundation/graphic/standard:graphic.rc"
+       ],
