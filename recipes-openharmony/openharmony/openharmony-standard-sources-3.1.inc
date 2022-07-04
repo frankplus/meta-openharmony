@@ -150,6 +150,7 @@ SRC_URI += "${GITEE_URL}/third_party_libexif.git;protocol=https;nobranch=1;branc
 SRC_URI += "${GITEE_URL}/third_party_libffi.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=66962913be641f90546c5a69e2abd17c35068e4d;destsuffix=${OH_SRCDIR}/third_party/libffi"
 SRC_URI += "${GITEE_URL}/third_party_libinput.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=c2191e5259eb2b97944905abd8c28efdcd96fea0;destsuffix=${OH_SRCDIR}/third_party/libinput"
 SRC_URI += "${GITEE_URL}/third_party_libjpeg.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=064bfd10e9cf7ee82c1f5c67e4872aa2fa44f71c;destsuffix=${OH_SRCDIR}/third_party/libjpeg"
+SRC_URI += "${GITEE_URL}/third_party_libnl.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=3fd37ca55113ce0651aadce2384521882c86667c;destsuffix=${OH_SRCDIR}/third_party/libnl"
 SRC_URI += "${GITEE_URL}/third_party_libphonenumber.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=21585c1eac7518b8360dd4652e45bca0c4a94018;destsuffix=${OH_SRCDIR}/third_party/libphonenumber;lfs=0"
 SRC_URI += "${GITEE_URL}/third_party_libpng.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=f9775057a8bc3b99fedc687e2a2f3b06dec60487;destsuffix=${OH_SRCDIR}/third_party/libpng"
 SRC_URI += "${GITEE_URL}/third_party_libpsl.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.1.1-Release;rev=c2e76526c400448f9474d480bd5ba7f846babf1f;destsuffix=${OH_SRCDIR}/third_party/libpsl"
