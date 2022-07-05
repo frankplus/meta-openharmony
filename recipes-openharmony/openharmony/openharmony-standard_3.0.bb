@@ -34,23 +34,6 @@ SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
 SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsframework"
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 
-# Should be covered by Oniro prebuilts
-# TODO: Cleanup prebuilts recipe with these component specific patches instead
-#       of adding arguments in toolchain definition.
-#SRC_URI += "file://toolchain-compiler-path.patch;patchdir=${S}/build"
-#SRC_URI += "file://ark-runtime_core-compiler-option.patch;patchdir=${S}/ark/runtime_core"
-#SRC_URI += "file://ark-runtime_core-libpandabase.patch;patchdir=${S}/ark/runtime_core"
-#SRC_URI += "file://libweston_config-Add-Wno-unused-but-set-variable-com.patch;patchdir=${S}/third_party/weston"
-#SRC_URI += "file://libunwind-compiler-option.patch;patchdir=${S}/third_party/libunwind"
-#SRC_URI += "file://protobuf-compiler-option.patch;patchdir=${S}/third_party/protobuf"
-#SRC_URI += "file://multimedia-audio-compiler-option.patch;patchdir=${S}/foundation/multimedia/audio_standard"
-#SRC_URI += "file://quickjs-compiler-option.patch;patchdir=${S}/third_party/quickjs"
-#SRC_URI += "file://ace_engine-clang-config.patch;patchdir=${S}/foundation/ace/ace_engine"
-#SRC_URI += "file://icu-compile-option.patch;patchdir=${S}/third_party/icu"
-#SRC_URI += "file://ark-js_runtime-compile-option.patch;patchdir=${S}/ark/js_runtime"
-#SRC_URI += "file://ts2abc_host-toolchain.patch;patchdir=${S}/ark/ts2abc"
-#SRC_URI += "file://hc-gen-compiler.patch;patchdir=${S}/drivers/framework"
-
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
