@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/appspawn_standard repository of OpenHarmony 3.1 codebase.
+
+Fix App_Spawn_Server_Override_007 test.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/test/unittest/app_spawn_server_test/app_spawn_server_override_test.cpp b/test/unittest/app_spawn_server_test/app_spawn_server_override_test.cpp
+index 8956e0c272b9..516ca82a8ef6 100644
+--- a/test/unittest/app_spawn_server_test/app_spawn_server_override_test.cpp
++++ b/test/unittest/app_spawn_server_test/app_spawn_server_override_test.cpp
+@@ -208,8 +208,9 @@ HWTEST_F(AppSpawnServerOverrideTest, App_Spawn_Server_Override_007, TestSize.Lev
+ {
+     GTEST_LOG_(INFO) << "App_Spawn_Server_Override_007 start";
+ 
+-    char longProcName[20] = "longProcName";
+-    int64_t longProcNameLen = strlen(longProcName);
++    char longProcName[22] = "longProcName";
++    // longProcName array must be large enough to hold processName set below
++    int64_t longProcNameLen = sizeof(longProcName);
+     char processName[32] = "processName0123456789";
+     int32_t len = sizeof(processName);
+ 
