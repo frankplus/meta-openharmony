@@ -337,6 +337,7 @@ copy_subsystem_config_json_file() {
     cp "${S}/build/subsystem_config.json" "${OHOS_BUILD_CONFIGS_DIR}/"
 }
 
+# //utils/native component
 PACKAGES =+ "${PN}-libutilsecurec ${PN}-libutils"
 FILES:${PN}-libutilsecurec = "${libdir}/libutilsecurec*${SOLIBS}"
 FILES:${PN}-libutils = "${libdir}/libutils*${SOLIBS}"
@@ -415,6 +416,33 @@ RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog"
 # TODO: remove when needed parts are split out
 RDEPENDS:${PN}-appspawn       += "${PN}"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}"
+
+# //foundation/appexecfwk/standard component
+PACKAGES =+ "${PN}-appexecfwk ${PN}-appexecfwk-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appexecfwk/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appexecfwk/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/unittest
+    mv ${D}${PTEST_PATH}/systemtest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/systemtest
+}
+OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
+FILES:${PN}-appexecfwk = "\
+    ${libdir}/libappexecfwk*${SOLIBS} \
+"
+FILES:${PN}-appexecfwk-ptest = "${libdir}/${BPN}-appexecfwk/ptest"
+RDEPENDS:${PN} += "${PN}-appexecfwk"
+RDEPENDS:${PN}-ptest += "${PN}-appexecfwk-ptest ${PN}-appexecfwk"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-appexecfwk"
+RDEPENDS:${PN}-appexecfwk       += "musl libcxx"
+RDEPENDS:${PN}-appexecfwk-ptest += "musl libcxx"
+#RDEPENDS:${PN}-appexecfwk       += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+RDEPENDS:${PN}-appexecfwk       += "${PN}-libutils ${PN}-hilog"
+#RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-libeventhandler ${PN}-hichecker ${PN}-hitrace"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appspawn"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-appexecfwk += "${PN}"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}"
 
 # Disable all ptest suites that are know to not work for now. When the x-bit is
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
