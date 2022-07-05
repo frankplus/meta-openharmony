@@ -346,7 +346,6 @@ RDEPENDS:${PN}-hilog       += "musl libcxx"
 RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
 RDEPENDS:${PN}-hilog       += "${PN}-libutilsecurec"
 
-INSANE_SKIP:${PN} = "already-stripped"
 EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
