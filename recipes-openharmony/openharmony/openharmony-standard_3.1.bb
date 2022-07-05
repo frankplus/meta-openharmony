@@ -535,7 +535,7 @@ do_install_ptest:append() {
     rmdir ${D}${PTEST_PATH}/*/appspawn
     echo "appspawn.service" > ${D}${libdir}/${BPN}-appspawn/ptest/systemd-units
 }
-OPENHARMONY_PTEST_IS_BROKEN = "appspawn"
+OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
 FILES:${PN}-appspawn = "\
     ${bindir}/appspawn* \
     ${libdir}/libappspawn* \
@@ -562,7 +562,7 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/unittest
     mv ${D}${PTEST_PATH}/systemtest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/systemtest
 }
-OPENHARMONY_PTEST_IS_BROKEN = "appexecfwk"
+OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
 FILES:${PN}-appexecfwk = "\
     ${libdir}/libappexecfwk*${SOLIBS} \
 "
@@ -594,7 +594,7 @@ do_install_ptest:append() {
     rmdir ${D}${PTEST_PATH}/unittest/samgr_standard
     echo "samgr.service" > ${D}${libdir}/${BPN}-samgr/ptest/systemd-units
 }
-OPENHARMONY_PTEST_IS_BROKEN = "samgr"
+OPENHARMONY_PTEST_IS_BROKEN += "samgr"
 FILES:${PN}-samgr = "\
     ${bindir}/samgr \
     ${libdir}/libsamgr*${SOLIBS} \
@@ -619,7 +619,7 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/safwk/safwk ${D}${libdir}/${BPN}-safwk/ptest/unittest
     rmdir ${D}${PTEST_PATH}/unittest/safwk
 }
-OPENHARMONY_PTEST_IS_BROKEN = "safwk"
+OPENHARMONY_PTEST_IS_BROKEN += "safwk"
 FILES:${PN}-safwk = "\
     ${libdir}/libsystem_ability_fwk*${SOLIBS} \
 "
@@ -639,7 +639,7 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/ipc ${D}${libdir}/${BPN}-ipc/ptest/unittest
     mv ${D}${PTEST_PATH}/moduletest/ipc ${D}${libdir}/${BPN}-ipc/ptest/moduletest
 }
-OPENHARMONY_PTEST_IS_BROKEN = "ipc"
+OPENHARMONY_PTEST_IS_BROKEN += "ipc"
 FILES:${PN}-ipc = "\
     ${libdir}/libipc*${SOLIBS} \
     ${libdir}/librpc*${SOLIBS} \
@@ -661,7 +661,7 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/device_manager_base/component_loader_test ${D}${libdir}/${BPN}-devicemanager/ptest/unittest
     rmdir ${D}${PTEST_PATH}/unittest/device_manager_base
 }
-OPENHARMONY_PTEST_IS_BROKEN = "devicemanager"
+OPENHARMONY_PTEST_IS_BROKEN += "devicemanager"
 FILES:${PN}-devicemanager = "\
     ${libdir}/libdevicemanager*${SOLIBS} \
     ${libdir}/module/distributedhardware/libdevicemanager*${SOLIBS} \
@@ -699,7 +699,7 @@ do_install_ptest:append() {
     echo "accesstoken.service" >  ${D}${libdir}/${BPN}-accesstoken/ptest/systemd-units
     echo "tokensync.service"   >> ${D}${libdir}/${BPN}-accesstoken/ptest/systemd-units
 }
-OPENHARMONY_PTEST_IS_BROKEN = "accesstoken"
+OPENHARMONY_PTEST_IS_BROKEN += "accesstoken"
 FILES:${PN}-accesstoken = "\
     ${libdir}/libaccesstoken*${SOLIBS} \
     ${libdir}/libtoken*sync*${SOLIBS} \
@@ -734,7 +734,7 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/dsoftbus_standard ${D}${libdir}/${BPN}-dsoftbus/ptest/unittest
     echo "dsoftbus.service" > ${D}${libdir}/${BPN}-dsoftbus/ptest/systemd-units
 }
-OPENHARMONY_PTEST_IS_BROKEN = "dsoftbus"
+OPENHARMONY_PTEST_IS_BROKEN += "dsoftbus"
 FILES:${PN}-dsoftbus = "\
     ${libdir}/libsoftbus*${SOLIBS} \
     ${sysconfdir}/openharmony/communication/softbus \
@@ -803,7 +803,6 @@ RDEPENDS:${PN}-hitrace       += "${PN}"
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
 # will be run when executing it.
 # TODO: Fix all components and tests and remove all of this
-OPENHARMONY_PTEST_IS_BROKEN = "accesstoken appexecfwk appspawn devicemanager dsoftbus ipc safwk samgr"
 do_install_ptest:append() {
     for component in ${OPENHARMONY_PTEST_IS_BROKEN} ; do
         chmod -x ${D}${libdir}/${BPN}-$component/ptest/run-ptest
