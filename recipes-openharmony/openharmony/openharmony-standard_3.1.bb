@@ -20,6 +20,8 @@ DEPENDS += "ruby-native"
 DEPENDS += "hapsigner-native"
 DEPENDS += "packing-tool-native"
 
+# libfts.a is needed by //third_party/selinux:libselinux in order to
+# avoid the use of //third_party/FreeBSD.
 DEPENDS += "fts"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
