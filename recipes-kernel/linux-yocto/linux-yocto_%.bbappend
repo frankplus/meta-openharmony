@@ -4,10 +4,10 @@
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-yocto:"
 
-SRC_URI:append:openharmony = " file://ashmem.cfg"
-SRC_URI:append:openharmony = " file://driver-add-hilog-and-hievent-buffer-management-drive.patch"
-SRC_URI:append:openharmony = " file://driver-add-hilog-and-hievent-buffer-management-drive.cfg"
-SRC_URI:append:openharmony = " file://android_binder_ipc.cfg"
+SRC_URI:append:df-openharmony = " file://ashmem.cfg"
+SRC_URI:append:df-openharmony = " file://driver-add-hilog-and-hievent-buffer-management-drive.patch"
+SRC_URI:append:df-openharmony = " file://driver-add-hilog-and-hievent-buffer-management-drive.cfg"
+SRC_URI:append:df-openharmony = " file://android_binder_ipc.cfg"
 
 #
 # QEMU ARM Cortex-A7
