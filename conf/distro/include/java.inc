@@ -4,5 +4,5 @@
 
 # Configuration needed by meta-java layer
 
-PREFERRED_PROVIDER_virtual/java-initial-native = "cacao-initial-native"
-PREFERRED_PROVIDER_virtual/java-native = "cacao-native"
+PREFERRED_PROVIDER_virtual/java-initial-native ?= "cacao-initial-native"
+PREFERRED_PROVIDER_virtual/java-native ?= "cacao-native"
