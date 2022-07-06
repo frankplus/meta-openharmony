@@ -6,12 +6,12 @@ SPDX-FileCopyrightText: Huawei Inc.
 <manifest>
   <include name="manifests/branch.xml" />
 
-  <extend-project name="oniro" revision="ab7d94c98db300b0b2010d6eb53b053d082640e0" />
+  <extend-project name="oniro" revision="3258864533369a3a01d65934d0aefe582cb56c47" />
 
-  <extend-project name="bitbake" revision="c212b0f3b542efa19f15782421196b7f4b64b0b9" />
-  <extend-project name="openembedded-core" revision="ca1c990df62f1b3d53b2114a387f192efe7e38e8" />
-  <extend-project name="meta-openembedded" revision="6fbe7f748706229f43a2e06b08b6e1e729942314" />
-  <extend-project name="meta-clang" revision="cd7b2f8c90962bef4e8b272ce6863a57b73f20fc" />
+  <extend-project name="bitbake" revision="b8fd6f5d9959d27176ea016c249cf6d35ac8ba03" />
+  <extend-project name="openembedded-core" revision="eea52e0c3d24c79464f4afdbc3c397e1cb982231" />
+  <extend-project name="meta-openembedded" revision="fcc7d7eae82be4c180f2e8fa3db90a8ab3be07b7" />
+  <extend-project name="meta-clang" revision="d669d873edf68dc7440bb07096737203bb7ec505" />
   <extend-project name="meta-java" revision="1a8059f6b257ebe6fcae6416e499784d976afd24" />
 
 </manifest>
