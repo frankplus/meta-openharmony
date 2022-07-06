@@ -25,6 +25,9 @@ PREFERRED_VERSION_openharmony-standard = "${OPENHARMONY_VERSION}"
 # clang_rt.profile library is used in openharmony-standard build
 PACKAGECONFIG:pn-compiler-rt:append:df-openharmony = " profile"
 
+# libfts.a is used in openharmony-standard build
+DISABLE_STATIC:pn-fts:df-openharmony = ""
+
 require openssl.inc
 require java.inc
 require musl-ldso-paths.inc
