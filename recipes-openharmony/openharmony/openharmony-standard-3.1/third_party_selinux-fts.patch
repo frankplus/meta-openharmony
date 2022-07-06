@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Apply to //third_party/selinux of OpenHarmony 3.1 codebase.
+
+This removes the file fts.c from //third_party/FreeBSD and statically
+links with musl-fts library when building with the target toolchain
+(i.e. musl). When it builds with the native sysroot, it uses the fts
+APIs already supported by glibc.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/BUILD.gn b/BUILD.gn
+index a8fb10db..cd3d3cdd 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -137,7 +137,6 @@ ohos_executable("chkcon") {
+ ohos_shared_library("libselinux") {
+   output_name = "libselinux"
+   sources = [
+-    "$LIBFTS_ROOT_DIR/lib/libc/gen/fts.c",
+     "$LIBSELINUX_ROOT_DIR/src/avc.c",
+     "$LIBSELINUX_ROOT_DIR/src/avc_internal.c",
+     "$LIBSELINUX_ROOT_DIR/src/avc_sidtab.c",
+@@ -214,6 +213,11 @@ ohos_shared_library("libselinux") {
+     "ramdisk",
+     "updater",
+   ]
++
++  if (current_toolchain != host_toolchain) {
++    ldflags = [ "../../oniro/sysroots/target/usr/lib/libfts.a" ]
++  }
++
+   license_file = "$LIBSELINUX_ROOT_DIR/LICENSE"
+   part_name = "selinux"
+   subsystem_name = "security"
+diff --git a/libselinux/src/selinux_restorecon.c b/libselinux/src/selinux_restorecon.c
+index e2553cda..099cf4e8 100644
+--- a/libselinux/src/selinux_restorecon.c
++++ b/libselinux/src/selinux_restorecon.c
+@@ -14,7 +14,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-#include <include/fts.h>
++#include <fts.h>
+ #include <inttypes.h>
+ #include <limits.h>
+ #include <stdint.h>
+diff --git a/BUILD.gn b/BUILD.gn
+index a8fb10db..c7ece203 100644

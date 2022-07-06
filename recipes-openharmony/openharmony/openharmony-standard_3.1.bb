@@ -18,6 +18,8 @@ DEPENDS += "ruby-native"
 DEPENDS += "hapsigner-native"
 DEPENDS += "packing-tool-native"
 
+DEPENDS += "fts"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
 
@@ -68,6 +70,8 @@ SRC_URI += "file://third_party_weston-hdi-display-layer.patch;patchdir=${S}/thir
 SRC_URI += "file://third_party_selinux-flex-bison-path.patch;patchdir=${S}/third_party/selinux"
 SRC_URI += "file://foundation_graphic_standard-flexlexer-h.patch;patchdir=${S}/foundation/graphic/standard"
 SRC_URI += "file://features.json;subdir=${OHOS_BUILD_CONFIGS_DIR}"
+SRC_URI += "file://third_party_selinux-fts.patch;patchdir=${S}/third_party/selinux"
+SRC_URI += "file://base_security_selinux-fts.patch;patchdir=${S}/base/security/selinux"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
@@ -202,6 +206,8 @@ do_install () {
     # Workaround! Build system does not install libcrypto.z.so (boringssl), so
     # we install it manually for now
     cp ${B}/developtools/profiler/libcrypto.z.so ${D}${libdir}/
+    # Same for libusb_shared.z.so
+    cp ${B}/common/common/libusb_shared.z.so ${D}${libdir}/
 }
 
 inherit update-alternatives
@@ -307,6 +313,8 @@ OPENHARMONY_PARTS += "developtools:bytrace_standard"
 OPENHARMONY_PARTS += "developtools:hdc_standard"
 OPENHARMONY_PARTS += "deviceprofile:device_profile_core"
 OPENHARMONY_PARTS += "distributeddatamgr:distributeddatamgr"
+OPENHARMONY_PARTS += "distributeddatamgr:distributedfilejs"
+OPENHARMONY_PARTS += "distributeddatamgr:e2fsprogs"
 OPENHARMONY_PARTS += "distributeddatamgr:native_appdatamgr"
 OPENHARMONY_PARTS += "distributedhardware:device_manager_base"
 OPENHARMONY_PARTS += "distributedschedule:dmsfwk_standard"
@@ -316,6 +324,8 @@ OPENHARMONY_PARTS += "filemanagement:storage_service"
 OPENHARMONY_PARTS += "global:i18n_standard"
 OPENHARMONY_PARTS += "global:resmgr_standard"
 OPENHARMONY_PARTS += "graphic:graphic_standard"
+OPENHARMONY_PARTS += "hdf:audio_device_driver"
+OPENHARMONY_PARTS += "hdf:battery_device_driver"
 OPENHARMONY_PARTS += "hdf:device_driver_framework"
 OPENHARMONY_PARTS += "hdf:hdf"
 OPENHARMONY_PARTS += "hdf:mocks"
@@ -337,6 +347,7 @@ OPENHARMONY_PARTS += "hiviewdfx:hitrace_native"
 OPENHARMONY_PARTS += "hiviewdfx:hiviewdfx_hilog_native"
 OPENHARMONY_PARTS += "miscservices:inputmethod_native"
 OPENHARMONY_PARTS += "miscservices:time_native"
+OPENHARMONY_PARTS += "msdp:device_status"
 OPENHARMONY_PARTS += "multimedia:multimedia_audio_standard"
 OPENHARMONY_PARTS += "multimedia:multimedia_camera_standard"
 OPENHARMONY_PARTS += "multimedia:multimedia_histreamer"
@@ -357,15 +368,22 @@ OPENHARMONY_PARTS += "security:deviceauth_standard"
 OPENHARMONY_PARTS += "security:device_security_level"
 OPENHARMONY_PARTS += "security:huks"
 OPENHARMONY_PARTS += "security:permission_standard"
+OPENHARMONY_PARTS += "security:selinux"
 OPENHARMONY_PARTS += "sensors:sensor"
 OPENHARMONY_PARTS += "startup:appspawn"
 OPENHARMONY_PARTS += "startup:init"
 OPENHARMONY_PARTS += "startup:startup_l2"
 OPENHARMONY_PARTS += "telephony:core_service"
 OPENHARMONY_PARTS += "telephony:ril_adapter"
+OPENHARMONY_PARTS += "usb:libusb_shared"
+OPENHARMONY_PARTS += "useriam:auth_executor_mgr"
+OPENHARMONY_PARTS += "useriam:pin_auth"
+OPENHARMONY_PARTS += "useriam:user_auth"
 OPENHARMONY_PARTS += "useriam:user_idm"
+OPENHARMONY_PARTS += "useriam:useriam_common"
 OPENHARMONY_PARTS += "utils:utils_base"
 OPENHARMONY_PARTS += "window:window_manager"
+OPENHARMONY_PARTS += "wpa_supplicant-2.9:wpa_supplicant-2.9"
 
 python generate_parts_json() {
     # parts.json file is used by the loader.py tool to generate BUILD.gn files
@@ -811,13 +829,6 @@ do_install_ptest:append() {
 }
 
 EXCLUDE_FROM_SHLIBS = "1"
-
-# FIXME: this is a dirty workaround for a bunch of missing *.z.so files, either
-# from parts we need to install, or some problems with "inner kits" not being
-# installed to our image. These are most likely real problems that we need to
-# fix, as the components needing these will most likely fail in all kinds of
-# wonderful ways.
-INSANE_SKIP:${PN} = "file-rdeps"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
 INSANE_SKIP:${PN} += "already-stripped"

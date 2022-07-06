@@ -20,4 +20,5 @@ MUSL_LDSO_PATHS:append:openharmony-3.1 = " \
 	module/multimodalinput \
 	module/net \
 	module/security \
+	module/useriam \
 "

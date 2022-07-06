@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Apply to //base/security/selinux of OpenHarmony 3.1 codebase.
+
+This makes use of the fts.h header file from //third_party/selinux instead
+of //third_party/FreeBSD that we avoid to use.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/BUILD.gn b/BUILD.gn
+index 2badcfc..95f74fb 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -97,6 +97,7 @@ ohos_shared_library("libhap_restorecon") {
+     "-D_GNU_SOURCE",
+     "-Wall",
+     "-Werror",
++    "-Wno-error=#warnings",
+   ]
+   install_enable = true
+   license_file = "$SELINUX_ROOT_DIR/LICENSE"
+diff --git a/interfaces/policycoreutils/src/hap_restorecon.cpp b/interfaces/policycoreutils/src/hap_restorecon.cpp
+index eca095a..8333562 100644
+--- a/interfaces/policycoreutils/src/hap_restorecon.cpp
++++ b/interfaces/policycoreutils/src/hap_restorecon.cpp
+@@ -15,7 +15,8 @@
+ 
+ #include "hap_restorecon.h"
+ #include <fstream>
+-#include <include/fts.h>
++#include <fts.h>
++#include <sys/stat.h>
+ #include <regex>
+ #include <selinux/label.h>
+ #include <selinux/restorecon.h>
