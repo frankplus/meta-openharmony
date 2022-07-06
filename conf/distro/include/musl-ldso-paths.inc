@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-MUSL_LDSO_PATHS = " \
+MUSL_LDSO_PATHS:df-openharmony = " \
 	module \
 	module/ability \
 	module/account \

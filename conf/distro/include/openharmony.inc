@@ -23,7 +23,7 @@ DISTROOVERRIDES:append = "${OPENHARMONY_OVERRIDES}"
 PREFERRED_VERSION_openharmony-standard = "${OPENHARMONY_VERSION}"
 
 # clang_rt.profile library is used in openharmony-standard build
-PACKAGECONFIG:pn-compiler-rt = "profile"
+PACKAGECONFIG:pn-compiler-rt:append:df-openharmony = " profile"
 
 require openssl.inc
 require java.inc
