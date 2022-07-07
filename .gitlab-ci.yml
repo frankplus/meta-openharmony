@@ -346,16 +346,8 @@ build_ch:
       allow_failure: true
   before_script:
     - if [ "${OPENHARMONY_VERSION}" = "3.0" ]; then
-        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0/code-v3.0-LTS.tar.gz";
-      elif [ "${OPENHARMONY_VERSION}" = "3.0.1" ]; then
         TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.1/code-v3.0.1-LTS.tar.gz";
-      elif [ "${OPENHARMONY_VERSION}" = "3.0.2" ]; then
-        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.2/code-v3.0.2-LTS.tar.gz";
-      elif [ "${OPENHARMONY_VERSION}" = "3.0.3" ]; then
-        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.0.3/code-v3.0.3-LTS.tar.gz";
       elif [ "${OPENHARMONY_VERSION}" = "3.1" ]; then
-        TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.1-Release/code-v3.1-Release.tar.gz";
-      elif [ "${OPENHARMONY_VERSION}" = "3.1.1" ]; then
         TARBALL_URL="https://repo.huaweicloud.com/harmonyos/os/3.1.1/code-v3.1.1-Release.tar.gz";
       else
         echo "OPENHARMONY_VERSION=${OPENHARMONY_VERSION} is not supported";
