@@ -6,6 +6,8 @@ SUMMARY = "Target specific integration of Oniro toolchain into OpenHarmony"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM += "file://BUILD_target.gn;beginline=1;endline=3;md5=a1537856660cf2c8e36079c007b35bec"
 
+require sanity-check.inc
+
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 

@@ -13,6 +13,8 @@ with bitbake. Recipes building OpenHarmony with bitbake should depend on this \
 recipe, and will need to hook in the recipe-sysroot and recipe-sysroot-native \
 folders before building."
 
+require sanity-check.inc
+
 inherit populate_sdk
 
 TOOLCHAIN_OUTPUTNAME = "${PN}-${OPENHARMONY_VERSION}-${TUNE_PKGARCH}-${SDK_VERSION}"

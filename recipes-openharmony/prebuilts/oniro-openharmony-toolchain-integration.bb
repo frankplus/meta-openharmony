@@ -6,6 +6,8 @@ SUMMARY = "Integration of Oniro toolchain into OpenHarmony"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://setup.sh;beginline=3;endline=15;md5=306e15e328d14d4055327f82b55064a0"
 
+require sanity-check.inc
+
 BBCLASSEXTEND = "native nativesdk"
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -43,7 +45,8 @@ SRC_URI += "file://build/common/musl/BUILD.gn;subdir=src/overlay"
 
 SRC_URI += "file://BUILD_host.gn"
 
-require oniro-openharmony-toolchain-integration-${OPENHARMONY_VERSION}.inc
+# Note: Using include instead of require to avoid parser error skipping recipe
+include oniro-openharmony-toolchain-integration-${OPENHARMONY_VERSION}.inc
 
 SDK_DYNAMIC_LINKER:x86-64  = "ld-linux-x86-64.so.2"
 SDK_DYNAMIC_LINKER:x86     = "ld-linux.so.2"
