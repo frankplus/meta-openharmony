@@ -22,6 +22,8 @@ require musl-ldso-paths-sanity-check.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
 
+SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
+
 # TODO: we probably want these
 SRC_URI += "file://hilog-Add-tests.patch"
 
@@ -31,23 +33,6 @@ SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
 # Native node hacks
 SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsframework"
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
-
-# Should be covered by Oniro prebuilts
-# TODO: Cleanup prebuilts recipe with these component specific patches instead
-#       of adding arguments in toolchain definition.
-#SRC_URI += "file://toolchain-compiler-path.patch;patchdir=${S}/build"
-#SRC_URI += "file://ark-runtime_core-compiler-option.patch;patchdir=${S}/ark/runtime_core"
-#SRC_URI += "file://ark-runtime_core-libpandabase.patch;patchdir=${S}/ark/runtime_core"
-#SRC_URI += "file://libweston_config-Add-Wno-unused-but-set-variable-com.patch;patchdir=${S}/third_party/weston"
-#SRC_URI += "file://libunwind-compiler-option.patch;patchdir=${S}/third_party/libunwind"
-#SRC_URI += "file://protobuf-compiler-option.patch;patchdir=${S}/third_party/protobuf"
-#SRC_URI += "file://multimedia-audio-compiler-option.patch;patchdir=${S}/foundation/multimedia/audio_standard"
-#SRC_URI += "file://quickjs-compiler-option.patch;patchdir=${S}/third_party/quickjs"
-#SRC_URI += "file://ace_engine-clang-config.patch;patchdir=${S}/foundation/ace/ace_engine"
-#SRC_URI += "file://icu-compile-option.patch;patchdir=${S}/third_party/icu"
-#SRC_URI += "file://ark-js_runtime-compile-option.patch;patchdir=${S}/ark/js_runtime"
-#SRC_URI += "file://ts2abc_host-toolchain.patch;patchdir=${S}/ark/ts2abc"
-#SRC_URI += "file://hc-gen-compiler.patch;patchdir=${S}/drivers/framework"
 
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
 
@@ -63,6 +48,10 @@ SRC_URI += "file://ivi-input-controller.c-Fix-g_ctx-declaration-causing-segfault
 SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_party/libdrm"
 
 SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;patchdir=${S}/foundation/graphic/standard"
+
+SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://base_startup_appspawn_standard-app-spawn-server-override-007-fix.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://base_startup_appspawn_standard-setprocessname-buffer-overflow.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 inherit python3native gn_base ptest
 
@@ -216,6 +205,8 @@ do_install_ptest () {
     do
         install -D -m 755 "${B}/tests/$f" "${D}${PTEST_PATH}/$f"
     done
+    # undo the default installation of ptest done by ptest.bbclass
+    rm -f ${D}${PTEST_PATH}/run-ptest
 }
 
 generate_platforms_build_file() {
@@ -326,22 +317,24 @@ RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
+# //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog ${PN}-hilog-ptest"
 SYSTEMD_PACKAGES = "${PN}-hilog"
 SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
 SRC_URI += "file://hilogd.service"
-SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://hilog.run-ptest', '', d)}"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
-    rm -f ${D}${sysconfdir}/init/hilogd.cfg
+    rm -f ${D}${sysconfdir}/openharmony/init/hilogd.cfg
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
 }
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hilog/ptest"
 do_install_ptest:append() {
-    install -D ${WORKDIR}/hilog.run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
-    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog/* ${D}${libdir}/${BPN}-hilog/ptest/
-    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog ${D}${libdir}/${BPN}-hilog/ptest/moduletest
+    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx
+    echo "hilogd.service" > ${D}${libdir}/${BPN}-hilog/ptest/systemd-units
 }
 FILES:${PN}-hilog = "\
     ${bindir}/hilog* \
@@ -350,12 +343,59 @@ FILES:${PN}-hilog = "\
     ${systemd_unitdir}/hilogd.service \
 "
 FILES:${PN}-hilog-ptest = "${libdir}/${BPN}-hilog/ptest"
-RDEPENDS:${PN}-hilog += "musl libcxx ${PN}-libutilsecurec"
-RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog musl libcxx"
 RDEPENDS:${PN} += "${PN}-hilog"
 RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest ${PN}-hilog"
+RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog"
+RDEPENDS:${PN}-hilog       += "musl libcxx"
+RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
+RDEPENDS:${PN}-hilog       += "${PN}-libutilsecurec"
 
-INSANE_SKIP:${PN} = "already-stripped"
+# //base/startup/appspawn_standard component
+PACKAGES =+ "${PN}-appspawn ${PN}-appspawn-ptest"
+SYSTEMD_PACKAGES += "${PN}-appspawn"
+SYSTEMD_SERVICE:${PN}-appspawn = "appspawn.service"
+SRC_URI += "file://appspawn.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/appspawn.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/appspawn.cfg
+}
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appspawn/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appspawn/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/startup_l2/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/startup_l2/appspawn_l2 ${D}${libdir}/${BPN}-appspawn/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/*/startup_l2
+    echo "appspawn.service" > ${D}${libdir}/${BPN}-appspawn/ptest/systemd-units
+}
+OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
+FILES:${PN}-appspawn = "\
+    ${bindir}/appspawn* \
+    ${libdir}/libappspawn* \
+    ${systemd_unitdir}/appspawnd.service \
+"
+FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
+RDEPENDS:${PN} += "${PN}-appspawn"
+RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest ${PN}-appspawn"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
+RDEPENDS:${PN}-appspawn       += "musl libcxx"
+RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
+RDEPENDS:${PN}-appspawn       += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog"
+# TODO: remove when needed parts are split out
+RDEPENDS:${PN}-appspawn       += "${PN}"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}"
+
+# Disable all ptest suites that are know to not work for now. When the x-bit is
+# not set, the ptest is visible (using `ptest-runner -l`), but no test cases
+# will be run when executing it.
+# TODO: Fix all components and tests and remove all of this
+do_install_ptest:append() {
+    for component in ${OPENHARMONY_PTEST_IS_BROKEN} ; do
+        chmod -x ${D}${libdir}/${BPN}-$component/ptest/run-ptest
+    done
+}
+
 EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
