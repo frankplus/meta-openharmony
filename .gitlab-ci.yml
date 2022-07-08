@@ -209,7 +209,7 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
-    - mkdir -pv mirror-updates-ch
+    - mkdir -pv build/mirror-updates-ch
     - rm -f build/downloads/*.done build/downloads/npm2/*.{done,resolved}
     - for f in build/downloads/* build/downloads/npm2/* ; do if test -f "$f" -a ! -L "$f" ; then
         fname=$(basename "$f") ;
