@@ -12,11 +12,15 @@ PD & OFL-1.1 & OpenSSL & MulanPSL-2.0 & bzip2-1.0.6 & ISC & ICU & IJG & Libpng &
 MPL-1.1 & MPL-2.0 & FTL"
 LIC_FILES_CHKSUM = "file://build/LICENSE;md5=cfba563cea4ce607306f8a392f19bf6c"
 
+require sanity-check.inc
+
 DEPENDS += "nodejs-native"
 DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
 
-require ${PN}-sources-${OPENHARMONY_VERSION}.inc
+# Note: Using include instead of require to avoid parser error skipping recipe
+include ${PN}-sources-${OPENHARMONY_VERSION}.inc
+
 require musl-ldso-paths-sanity-check.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
