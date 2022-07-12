@@ -145,10 +145,11 @@ stages:
         echo "SSTATE_MIRRORS = \"file://.* file://$SSTATE_MIRROR_PATH/PATH\""
           >> conf/auto.conf ;
       fi
-    - if [ -n "$CI_ONIRO_NUM_CPUS" ] ; then
-        echo "BB_NUMBER_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
-        echo "BB_NUMBER_PARSE_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
-      fi >> conf/auto.conf
+    - NUM_CPUS="${CI_ONIRO_NUM_CPUS:-$(nproc)}"
+    - echo "BB_NUMBER_PARSE_THREADS = \"$NUM_CPUS\"" >> conf/auto.conf
+    - echo "BB_NUMBER_THREADS = \"$((NUM_CPUS/2))\"" >> conf/auto.conf
+    - echo "PARALLEL_MAKE = \"-j$NUM_CPUS\"" >> conf/auto.conf
+    - echo "NINJA_ARGS:append = \" -j$NUM_CPUS\"" >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
