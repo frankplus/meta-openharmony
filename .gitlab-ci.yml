@@ -427,7 +427,9 @@ ohos:
     - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony
     - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-*.sh -y -d oniro
     - ./oniro/setup.sh
-    - ./build.sh --product-name Hi3516DV300
+    - NUM_CPUS="${CI_ONIRO_NUM_CPUS:-$(nproc)}"
+    - NINJA_ARGS="--ninja-args -j$NUM_CPUS"
+    - ./build.sh --product-name Hi3516DV300 $NINJA_ARGS
 
 # Job for triggering a prune of the sstate-cache mirror in runner persistent
 # storage.  This should be done periodically, but as I believe it removes a
