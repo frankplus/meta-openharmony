@@ -77,6 +77,10 @@ stages:
     # something like that... Without this we get errors like
     #     fatal: couldn't find remote ref refs/heads/master
     - git checkout -b master
+    # The repo command does not like shallow repos
+    - if [ "$(git rev-parse --is-shallow-repository)" = "true" ] ; then
+        git fetch --unshallow ;
+      fi
     # Create/maintain a mirror of all manifest repositories in runner
     # persistent storage, and use that as reference when initializing the
     # build repo, effectively reducing the time spent fetching git repos to
