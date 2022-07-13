@@ -42,6 +42,7 @@ SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;pat
 
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
 SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"
+SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"

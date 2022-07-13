@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Backport patch for //build git repository of OpenHarmony 3.1 to
+OpenHarmony 3.0 codebase.
+
+This tricks rebase_path() to point to the Yocto native node.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/ohos_var.gni b/ohos_var.gni
+index c215f12..813f214 100755
+--- a/ohos_var.gni
++++ b/ohos_var.gni
+@@ -189,7 +189,7 @@ hap_unpacking_tool =
+ hap_packing_tool = "//../recipe-sysroot-native/usr/lib/app_packing_tool.jar"
+ ace_loader_home = "//prebuilts/sdk/js-loader/build-tools/ace-loader"
+ nodejs_version = "v12.18.4"
+-nodejs = "//prebuilts/build-tools/common/nodejs/node-${nodejs_version}-${host_os}-x64/bin/node"
++nodejs = "//../recipe-sysroot-native/usr/bin/node"
+ ace_loader_home = "//prebuilts/sdk/js-loader/build-tools/ace-loader/"
+ webpack_js = "${ace_loader_home}/node_modules/webpack/bin/webpack.js"
+ webpack_config_js = "${ace_loader_home}/webpack.rich.config.js"
