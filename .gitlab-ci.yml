@@ -154,6 +154,11 @@ stages:
     - echo "BB_NUMBER_THREADS = \"$MAX_JOBS\"" >> conf/auto.conf
     - echo "PARALLEL_MAKE = \"-j$MAX_JOBS\"" >> conf/auto.conf
     - echo "NINJA_ARGS:append = \" -j$MAX_JOBS\"" >> conf/auto.conf
+    - MAX_LOADAVG="${CI_ONIRO_PARALLEL_BUILD_MAX_LOADAVG}"
+    - if [ -n "$MAX_LOADAVG" ] ; then
+        echo "PARALLEL_MAKE += \"-l$MAX_LOADAVG\"" ;
+        echo "NINJA_ARGS:append = \" -l$MAX_LOADAVG\"" ;
+      fi >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
@@ -433,6 +438,10 @@ ohos:
     - ./oniro/setup.sh
     - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
     - NINJA_ARGS="--ninja-args -j$MAX_JOBS"
+    - MAX_LOADAVG="${CI_ONIRO_PARALLEL_BUILD_MAX_LOADAVG}"
+    - if [ -n "$MAX_LOADAVG" ] ; then
+        NINJA_ARGS+=" --ninja-args -l$MAX_LOADAVG" ;
+      fi
     - ./build.sh --product-name Hi3516DV300 $NINJA_ARGS
 
 # Job for triggering a prune of the sstate-cache mirror in runner persistent
