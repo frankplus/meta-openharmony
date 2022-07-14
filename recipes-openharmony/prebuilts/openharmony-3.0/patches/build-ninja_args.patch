@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.0 codebase.
+
+This fixes support for using --ninja-args argument multiple times with build.sh
+script.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Pending
+
+diff --git a/build/core/build_scripts/parse_cmdline.sh b/build/core/build_scripts/parse_cmdline.sh
+index d8e351ede111..b7a49a2d04ca 100755
+--- a/build/core/build_scripts/parse_cmdline.sh
++++ b/build/core/build_scripts/parse_cmdline.sh
+@@ -33,7 +33,7 @@ parse_cmdline()
+         variant)          BUILD_VARIANT="$PARAM" ;;
+         out_dir)          OUT_DIR="$PARAM" ;;
+         gn_args)          GN_ARGS="$GN_ARGS $PARAM" ;;
+-        ninja_args)       NINJA_ARGS="$PARAM" ;;
++        ninja_args)       NINJA_ARGS="$NINJA_ARGS $PARAM" ;;
+         versionmode)      TARGET_VERSION_MODE="$PARAM" ;;
+         coverage)         COVERAGE="$PARAM" ;;
+         custom_clang)     CUSTOM_CLANG="$PARAM" ;;
