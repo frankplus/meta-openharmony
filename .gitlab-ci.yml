@@ -149,11 +149,11 @@ stages:
         echo "SSTATE_MIRRORS = \"file://.* file://$SSTATE_MIRROR_PATH/PATH\""
           >> conf/auto.conf ;
       fi
-    - NUM_CPUS="${CI_ONIRO_NUM_CPUS:-$(nproc)}"
-    - echo "BB_NUMBER_PARSE_THREADS = \"$NUM_CPUS\"" >> conf/auto.conf
-    - echo "BB_NUMBER_THREADS = \"$((NUM_CPUS/2))\"" >> conf/auto.conf
-    - echo "PARALLEL_MAKE = \"-j$NUM_CPUS\"" >> conf/auto.conf
-    - echo "NINJA_ARGS:append = \" -j$NUM_CPUS\"" >> conf/auto.conf
+    - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
+    - echo "BB_NUMBER_PARSE_THREADS = \"$MAX_JOBS\"" >> conf/auto.conf
+    - echo "BB_NUMBER_THREADS = \"$MAX_JOBS\"" >> conf/auto.conf
+    - echo "PARALLEL_MAKE = \"-j$MAX_JOBS\"" >> conf/auto.conf
+    - echo "NINJA_ARGS:append = \" -j$MAX_JOBS\"" >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
@@ -431,8 +431,8 @@ ohos:
     - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony
     - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-*.sh -y -d oniro
     - ./oniro/setup.sh
-    - NUM_CPUS="${CI_ONIRO_NUM_CPUS:-$(nproc)}"
-    - NINJA_ARGS="--ninja-args -j$NUM_CPUS"
+    - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
+    - NINJA_ARGS="--ninja-args -j$MAX_JOBS"
     - ./build.sh --product-name Hi3516DV300 $NINJA_ARGS
 
 # Job for triggering a prune of the sstate-cache mirror in runner persistent
