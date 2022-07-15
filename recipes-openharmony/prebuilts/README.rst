@@ -1,10 +1,11 @@
-<!--
-SPDX-FileCopyrightText: Huawei Inc.
+.. SPDX-FileCopyrightText: Huawei Inc.
+..
+.. SPDX-License-Identifier: CC-BY-4.0
 
-SPDX-License-Identifier: CC-BY-4.0
--->
+.. _OpenHarmony prebuilts:
 
-# OpenHarmony prebuilts
+OpenHarmony prebuilts
+#####################
 
 There are two different recipes providing a prebuilts for the OpenHarmony build system.
 
@@ -19,7 +20,8 @@ The `oniro-openharmony-bundle` recipe is a superset of
 Using one of these images will replace OpenHarmony versions of the included
 OpenSource toolchain and third-party components with Oniro versions.
 
-## Usage
+Usage
+*****
 
 To use one of the images produced with these recipes, you need to install it to
 an OpenHarmony source repository.
@@ -29,7 +31,7 @@ upstream OpenHarmony source repsitories, as the installation will remove files
 and entire git repositories!
 
 To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0-LTS
-repository, you should do something like this:
+repository, you should do something like this::
 
     tar xfz $DOWNLOADS/code-v3.1-Release.tar.gz
     cd code-v3.1-Relase/OpenHarmony
@@ -37,12 +39,13 @@ repository, you should do something like this:
     ./oniro/setup.sh
 
 After this, you can use normal OpenHarmony build system procedures to build as
-usual.  To build image for HiSilicon Hi3516DV300 (taurus) board:
+usual.  To build image for HiSilicon Hi3516DV300 (taurus) board::
 
     ./build.sh --product-name Hi3516DV300
 
 
-## Use inside BitBake
+Use inside BitBake
+******************
 
 **meta-openharmony** is a bitbake layer, containing recipes for building
 OpenHarmony software components.
