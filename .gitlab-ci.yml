@@ -158,6 +158,7 @@ stages:
     - if [ -n "$MAX_LOADAVG" ] ; then
         echo "PARALLEL_MAKE += \"-l$MAX_LOADAVG\"" ;
         echo "NINJA_ARGS:append = \" -l$MAX_LOADAVG\"" ;
+        echo "MAXLOAD_NINJA = \"$MAX_LOADAVG\"" ;
       fi >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
