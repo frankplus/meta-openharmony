@@ -77,6 +77,10 @@ stages:
     # something like that... Without this we get errors like
     #     fatal: couldn't find remote ref refs/heads/master
     - git checkout -b master
+    # The repo command does not like shallow repos
+    - if [ "$(git rev-parse --is-shallow-repository)" = "true" ] ; then
+        git fetch --unshallow ;
+      fi
     # Create/maintain a mirror of all manifest repositories in runner
     # persistent storage, and use that as reference when initializing the
     # build repo, effectively reducing the time spent fetching git repos to
@@ -145,9 +149,16 @@ stages:
         echo "SSTATE_MIRRORS = \"file://.* file://$SSTATE_MIRROR_PATH/PATH\""
           >> conf/auto.conf ;
       fi
-    - if [ -n "$CI_ONIRO_NUM_CPUS" ] ; then
-        echo "BB_NUMBER_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
-        echo "BB_NUMBER_PARSE_THREADS = \"$CI_ONIRO_NUM_CPUS\"" ;
+    - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
+    - echo "BB_NUMBER_PARSE_THREADS = \"$MAX_JOBS\"" >> conf/auto.conf
+    - echo "BB_NUMBER_THREADS = \"$MAX_JOBS\"" >> conf/auto.conf
+    - echo "PARALLEL_MAKE = \"-j$MAX_JOBS\"" >> conf/auto.conf
+    - echo "NINJA_ARGS:append = \" -j$MAX_JOBS\"" >> conf/auto.conf
+    - MAX_LOADAVG="${CI_ONIRO_PARALLEL_BUILD_MAX_LOADAVG}"
+    - if [ -n "$MAX_LOADAVG" ] ; then
+        echo "PARALLEL_MAKE += \"-l$MAX_LOADAVG\"" ;
+        echo "NINJA_ARGS:append = \" -l$MAX_LOADAVG\"" ;
+        echo "MAXLOAD_NINJA = \"$MAX_LOADAVG\"" ;
       fi >> conf/auto.conf
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
@@ -209,7 +220,7 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
-    - mkdir -pv mirror-updates-ch
+    - mkdir -pv build/mirror-updates-ch
     - rm -f build/downloads/*.done build/downloads/npm2/*.{done,resolved}
     - for f in build/downloads/* build/downloads/npm2/* ; do if test -f "$f" -a ! -L "$f" ; then
         fname=$(basename "$f") ;
@@ -426,7 +437,13 @@ ohos:
     - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony
     - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-*.sh -y -d oniro
     - ./oniro/setup.sh
-    - ./build.sh --product-name Hi3516DV300
+    - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
+    - NINJA_ARGS="--ninja-args -j$MAX_JOBS"
+    - MAX_LOADAVG="${CI_ONIRO_PARALLEL_BUILD_MAX_LOADAVG}"
+    - if [ -n "$MAX_LOADAVG" ] ; then
+        NINJA_ARGS+=" --ninja-args -l$MAX_LOADAVG" ;
+      fi
+    - ./build.sh --product-name Hi3516DV300 $NINJA_ARGS
 
 # Job for triggering a prune of the sstate-cache mirror in runner persistent
 # storage.  This should be done periodically, but as I believe it removes a
