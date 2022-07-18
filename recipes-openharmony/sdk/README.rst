@@ -2,10 +2,10 @@
 ..
 .. SPDX-License-Identifier: CC-BY-4.0
 
-.. _OpenHarmony prebuilts:
+.. _OpenHarmony SDK:
 
-OpenHarmony prebuilts
-#####################
+OpenHarmony SDK
+###############
 
 There are two different recipes providing a prebuilts for the OpenHarmony build system.
 
