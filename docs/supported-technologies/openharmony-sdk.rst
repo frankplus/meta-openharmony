@@ -1,0 +1,1 @@
+../../recipes-openharmony/sdk/README.rst
