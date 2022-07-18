@@ -7,18 +7,50 @@
 OpenHarmony SDK
 ###############
 
-There are two different recipes providing a prebuilts for the OpenHarmony build system.
+Oniro Project provides support for building an alternative open-source toolchain
+for use with the OpenHarmony reference implementation. This allows using an
+updated Clang/LLVM compiler built from the meta-clang Yocto layer instead of the
+default prebuilt Clang/LLVM compiler provided by OpenHarmony project.
 
-The `oniro-openharmony-toolchain` recipe builds an image containing the Oniro
-Clang version and a musl libc version. The musl libc version is same upstream
-version as currently used in OpenHarmony, and is patched to be mostly identical
-to the musl libc version included in OpenHarmony build system.
+There are two different Yocto recipes providing prebuilt SDK images for the
+OpenHarmony build system.
 
-The `oniro-openharmony-bundle` recipe is a superset of
-`oniro-openharmony-toolchain`, adding Oniro third-party components on top.
+``oniro-openharmony-toolchain``
+  The `oniro-openharmony-toolchain` recipe builds an image containing the Oniro
+  Clang version and a musl libc version. The musl libc version is same upstream
+  version as currently used in OpenHarmony, and is patched to exhibit the same
+  runtime behavior to the musl libc version included in OpenHarmony build
+  system.
 
-Using one of these images will replace OpenHarmony versions of the included
-OpenSource toolchain and third-party components with Oniro versions.
+``oniro-openharmony-bundle``
+  The `oniro-openharmony-bundle` recipe is a superset of
+  `oniro-openharmony-toolchain`, adding third-party components on top using
+  Oniro (Yocto) recipes, replacing the corresponding third-party components
+  included in OpenHarmony repository.
+
+Using one of these images replaces then OpenHarmony versions of the included
+OpenSource toolchain and third-party components with newer Oniro versions.
+
+
+Building
+********
+
+To build `oniro-openharmony-bundle` for OpenHarmony 3.1.1, the `bitbake` command
+is simply::
+
+    DISTRO=oniro-openharmony-linux MACHINE=qemuarma7 bitbake oniro-openharmony-bundle
+
+In order to build for OpenHarmony 3.0.1 instead, you need to add the following
+line to the `build/conf/local.conf` file::
+
+    OPENHARMONY_VERSION = "3.0"
+
+And then use the same command as shown above for 3.1.1.
+
+To build `oniro-openharmony-toolchain` instead, simply use::
+
+    DISTRO=oniro-openharmony-linux MACHINE=qemuarma7 bitbake oniro-openharmony-toolchain
+
 
 Usage
 *****
@@ -30,10 +62,10 @@ Warning! It is recommended to only install OpenHarmony prebuilts to clean
 upstream OpenHarmony source repsitories, as the installation will remove files
 and entire git repositories!
 
-To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0-LTS
+To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.1.1
 repository, you should do something like this::
 
-    tar xfz $DOWNLOADS/code-v3.1-Release.tar.gz
+    tar xfz $DOWNLOADS/code-v3.1.1-Release.tar.gz
     cd code-v3.1-Relase/OpenHarmony
     $DOWNLOADS/oniro-openharmony-bundle-3.1-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
     ./oniro/setup.sh
