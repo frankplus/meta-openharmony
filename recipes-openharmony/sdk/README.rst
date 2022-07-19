@@ -35,17 +35,17 @@ OpenSource toolchain and third-party components with newer Oniro versions.
 Building
 ********
 
-To build `oniro-openharmony-bundle` for OpenHarmony 3.1.1, the `bitbake` command
+To build `oniro-openharmony-bundle` for OpenHarmony 3.0.1, the `bitbake` command
 is simply::
 
     DISTRO=oniro-openharmony-linux MACHINE=qemuarma7 bitbake oniro-openharmony-bundle
 
-In order to build for OpenHarmony 3.0.1 instead, you need to add the following
+In order to build for OpenHarmony 3.1.1 instead, you need to add the following
 line to the `build/conf/local.conf` file::
 
-    OPENHARMONY_VERSION = "3.0"
+    OPENHARMONY_VERSION = "3.1"
 
-And then use the same command as shown above for 3.1.1.
+And then use the same command as shown above for 3.0.1.
 
 To build `oniro-openharmony-toolchain` instead, simply use::
 
@@ -62,12 +62,12 @@ Warning! It is recommended to only install OpenHarmony prebuilts to clean
 upstream OpenHarmony source repsitories, as the installation will remove files
 and entire git repositories!
 
-To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.1.1
+To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0.1
 repository, you should do something like this::
 
-    tar xfz $DOWNLOADS/code-v3.1.1-Release.tar.gz
-    cd code-v3.1-Relase/OpenHarmony
-    $DOWNLOADS/oniro-openharmony-bundle-3.1-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
+    tar xfz $DOWNLOADS/code-v3.0.1-LTS.tar.gz
+    cd code-v3.0.1-LTS/OpenHarmony
+    $DOWNLOADS/oniro-openharmony-bundle-3.0-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
     ./oniro/setup.sh
 
 After this, you can use normal OpenHarmony build system procedures to build as

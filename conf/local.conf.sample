@@ -110,7 +110,7 @@ MIRRORS:prepend = "git://gitee.com/openharmony/ git://github.com/openharmony/ \n
 #
 # Choose OpenHarmony version
 #
-# Uncomment to overwrite the variable OPENHARMONY_VERSION set in the
+# Uncomment to override the variable OPENHARMONY_VERSION set in the
 # distro configuration file.
 #
-#OPENHARMONY_VERSION = "3.0"
+#OPENHARMONY_VERSION = "3.1"
