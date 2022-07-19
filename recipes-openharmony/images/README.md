@@ -17,7 +17,15 @@ To build the image, run:
 
     bitbake openharmony-standard-image
 
-To run it, run the this commands after successfully completing the above build command:
+
+You may encounter error `RPC failed` during fetching files from gitee.com. In order to fix it, run following commands:
+
+    git config --global http.postBuffer 1048576000
+    git config --global https.postBuffer 1048576000
+    
+and rebuild the image.
+
+To run the image, run this command after successfully completing the above build command:
 
     runqemu serialstdio nographic slirp
 
