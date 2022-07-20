@@ -64,6 +64,8 @@ projects for building OpenHarmony reference implementation.
 
 ## General usage
 
+### Prerequisites
+
 In order to build with this layer, you need to use a compatible host OS. See
 https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 for details on this. Sections
@@ -75,6 +77,8 @@ in particular.
 Make sure to update as well as install git-lfs which wasn't required in yocto docs:
 
 	sudo apt-get update && sudo apt-get install git-lfs
+
+### Setting-up
 
 To use the meta-openharmony layer, you need a build setup with BitBake and all
 needed Yocto layers.
