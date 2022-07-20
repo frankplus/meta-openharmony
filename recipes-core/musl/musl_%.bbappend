@@ -5,7 +5,7 @@
 BASEVER:df-openharmony = "1.2.0"
 SRCREV:df-openharmony = "040c1d16b468c50c04fc94edff521f1637708328"
 LIC_FILES_CHKSUM:df-openharmony = "file://COPYRIGHT;md5=f95ee848a08ad253c04723da00cedb01"
-FILESEXTRAPATHS:prepend:df-openharmony := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+FILESEXTRAPATHS:prepend:df-openharmony := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:${THISDIR}/musl-${BASEVER}:"
 SRC_URI:append:df-openharmony = " file://openharmony-common.patch"
 SRC_URI:append:df-openharmony = " file://openharmony-linux-user.patch"
 # This conflicts with libcap, so we have to go with libcap instead
