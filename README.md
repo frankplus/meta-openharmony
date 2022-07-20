@@ -66,13 +66,7 @@ projects for building OpenHarmony reference implementation.
 
 ### Prerequisites
 
-In order to build with this layer, you need to use a compatible host OS. See
-https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html
-for details on this. Sections
-https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html#compatible-linux-distribution
-and
-https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html#build-host-packages
-in particular.
+In order to build with this layer, you need to use a compatible host OS. See [yocto brief](https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html) for details on this. Sections [yocto for linux](https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html#compatible-linux-distribution) and [yocto host packages](https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html#build-host-packages) in particular.
 
 Make sure to update as well as install git-lfs which wasn't required in yocto docs:
 
