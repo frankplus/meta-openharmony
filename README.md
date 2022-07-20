@@ -72,6 +72,10 @@ and
 https://docs.yoctoproject.org/3.1.8/brief-yoctoprojectqs/brief-yoctoprojectqs.html#build-host-packages
 in particular.
 
+Make sure to update as well as install git-lfs which wasn't required in yocto docs:
+
+	sudo apt-get update && sudo apt-get install git-lfs
+
 To use the meta-openharmony layer, you need a build setup with BitBake and all
 needed Yocto layers.
 
