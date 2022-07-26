@@ -93,17 +93,3 @@ usual.  To build image for HiSilicon Hi3516DV300 (taurus) board:
 .. code-block:: console
 
     $ ./build.sh --product-name Hi3516DV300
-
-
-Use inside BitBake
-******************
-
-**meta-openharmony** is a bitbake layer, containing recipes for building
-OpenHarmony software components.
-
-The meta-openharmony layer enables building of prebuilts for use with the
-OpenHarmony build system. A toolchain-only image, making it possible to use the
-Oniro Clang version instead of the default Clang version included, and a bundle
-image which contains both the Oniro Clang compiler and Oniro versions of various
-third-party components, replacing the corresponding default third-party
-versions.
