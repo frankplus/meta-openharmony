@@ -35,8 +35,12 @@ OpenSource toolchain and third-party components with newer Oniro versions.
 Building
 ********
 
-To build `oniro-openharmony-bundle` for OpenHarmony 3.0.1, the `bitbake` command
-is simply::
+To build `oniro-openharmony-bundle` for OpenHarmony 3.0.1, an initialized build
+environment is required::
+
+    TEMPLATECONF=../meta-openharmony/conf source oe-core/oe-init-build-env
+
+Once that is in place, the `bitbake` command is simply::
 
     DISTRO=oniro-openharmony-linux MACHINE=qemuarma7 bitbake oniro-openharmony-bundle
 
