@@ -62,18 +62,33 @@ Warning! It is recommended to only install OpenHarmony prebuilts to clean
 upstream OpenHarmony source repsitories, as the installation will remove files
 and entire git repositories!
 
-To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0.1
-repository, you should do something like this::
+Firstly, you need to download an OpenHarmony archive. As an example, the next
+steps will use OpenHarmony 3.0.1. You are to download this archive from
+https://repo.huaweicloud.com/harmonyos/os/3.0.1/code-v3.0.1-LTS.tar.gz and
+dearchive it:
 
-    tar xfz $DOWNLOADS/code-v3.0.1-LTS.tar.gz
-    cd code-v3.0.1-LTS/OpenHarmony
-    $DOWNLOADS/oniro-openharmony-bundle-3.0-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
-    ./oniro/setup.sh
+.. code-block:: console
+
+    $ tar xfz $DOWNLOADS/code-v3.0.1-LTS.tar.gz
+
+Note that the `$DOWNLOADS` variable needs to point to the location where the
+archive resides.
+
+To install the `oniro-openharmony-bundle` to a clean OpenHarmony 3.0.1
+repository, you should do something like this:
+
+.. code-block:: console
+
+    $ cd code-v3.0.1-LTS/OpenHarmony
+    $ $DOWNLOADS/oniro-openharmony-bundle-3.0-cortexa7-neon-vfpv4-1.99.99.sh -y -d oniro
+    $ ./oniro/setup.sh
 
 After this, you can use normal OpenHarmony build system procedures to build as
-usual.  To build image for HiSilicon Hi3516DV300 (taurus) board::
+usual.  To build image for HiSilicon Hi3516DV300 (taurus) board:
 
-    ./build.sh --product-name Hi3516DV300
+.. code-block:: console
+
+    $ ./build.sh --product-name Hi3516DV300
 
 
 Use inside BitBake
