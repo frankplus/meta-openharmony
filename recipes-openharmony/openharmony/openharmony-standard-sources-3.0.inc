@@ -60,7 +60,7 @@ SRC_URI += "${GITEE_URL}/update_updater.git;protocol=https;nobranch=1;branch=Ope
 SRC_URI += "${GITEE_URL}/update_updateservice.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=593ca7b5e2b1288b808ef49790214c393a330f41;destsuffix=${OH_SRCDIR}/base/update/updateservice"
 SRC_URI += "${GITEE_URL}/build.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=873eab755ec27523e6b3a21a276eacfbdc6abc39;destsuffix=${OH_SRCDIR}/build"
 SRC_URI += "${GITEE_URL}/developtools_bytrace_standard.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=b83852080c7d68e13b013deda64b3dab69554080;destsuffix=${OH_SRCDIR}/developtools/bytrace_standard"
-SRC_URI += "${GITEE_URL}/developtools_hdc_standard.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=5304e6ff48d783362d577b8cf1fb1b34e3e451d4;destsuffix=${OH_SRCDIR}/developtools/hdc_standard"
+SRC_URI += "${GITEE_URL}/developtools_hdc_standard.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=5304e6ff48d783362d577b8cf1fb1b34e3e451d4;destsuffix=${OH_SRCDIR}/developtools/hdc_standard;lfs=0"
 SRC_URI += "${GITEE_URL}/developtools_profiler.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=2d75f87399240e900bdfc5b57f7abe6a72c4f6d1;destsuffix=${OH_SRCDIR}/developtools/profiler;lfs=0"
 SRC_URI += "${GITEE_URL}/device_qemu.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=2e51e55852f785ef2a3f96ad414274874ac06c46;destsuffix=${OH_SRCDIR}/device/qemu"
 SRC_URI += "${GITEE_URL}/drivers_adapter.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=7f68bf048bb3c4008ba313786bf357428bad3c24;destsuffix=${OH_SRCDIR}/drivers/adapter"
@@ -161,7 +161,7 @@ SRC_URI += "${GITEE_URL}/resources.git;protocol=https;nobranch=1;branch=OpenHarm
 # repository, from which only necessary files will be copied to the OH_SRCDIR
 # and the rest will be removed in the do_unpack stage postfunc.
 OH_GRALLOC_TMP_DIR = "tmp_hihope"
-SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf;destsuffix=${OH_GRALLOC_TMP_DIR}"
+SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf;destsuffix=${OH_GRALLOC_TMP_DIR};lfs=0"
 
 # These premirrors are used to fetch npm packages that are usually
 # downloaded with 'npm install' from the 'build/prebuilts_download.sh'
