@@ -7,6 +7,21 @@
 OpenHarmony SDK
 ###############
 
+.. warning::
+
+    This entire support is under active development and is currently deemed as
+    EXPERIMENTAL/EARLY ACCESS.
+
+    As part of the project's effort to improve integration with OpenHarmony
+    using a Yocto/OE/Oniro SDK, the team started to work on supporting SDK
+    builds that can be used directly in OpenHarmony builds. The current known
+    limitation is that at the current stage, this support was only validated
+    with the distro configuration, machine and layers setup provided by the
+    `meta-openharmony repository/layer <https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony>`_.
+
+    For more information checkout the
+    `meta-openharmony README file <https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony/-/blob/kirkstone/README.md>`_.
+
 Oniro Project provides support for building an alternative open-source toolchain
 for use with the OpenHarmony reference implementation. This allows using an
 updated Clang/LLVM compiler built from the meta-clang Yocto layer instead of the
