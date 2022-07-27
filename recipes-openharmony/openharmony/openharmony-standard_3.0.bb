@@ -17,10 +17,12 @@ require sanity-check.inc
 DEPENDS += "nodejs-native"
 DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
+DEPENDS += "packing-tool-native"
 
 # Note: Using include instead of require to avoid parser error skipping recipe
 include ${PN}-sources-${OPENHARMONY_VERSION}.inc
 
+require java-tools.inc
 require musl-ldso-paths-sanity-check.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
@@ -39,6 +41,7 @@ SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsf
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
+SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
