@@ -162,6 +162,8 @@ SRC_URI += "${GITEE_URL}/resources.git;protocol=https;nobranch=1;branch=OpenHarm
 # and the rest will be removed in the do_unpack stage postfunc.
 OH_GRALLOC_TMP_DIR = "tmp_hihope"
 SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf;destsuffix=${OH_GRALLOC_TMP_DIR};lfs=0"
+SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/restool/1.023-d/restool.tar.gz;name=restool;subdir=${OH_SRCDIR}/prebuilts/build-tools/common"
+SRC_URI[restool.sha256sum] = "c76d2277a9c746240339ae4b4ea7f62da57f0ed1254cd7e3742a679464fd8fc5"
 
 # These premirrors are used to fetch npm packages that are usually
 # downloaded with 'npm install' from the 'build/prebuilts_download.sh'
