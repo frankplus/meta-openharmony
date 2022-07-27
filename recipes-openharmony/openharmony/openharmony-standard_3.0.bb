@@ -58,6 +58,7 @@ SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_pa
 SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;patchdir=${S}/foundation/graphic/standard"
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 inherit python3native gn_base ptest
 
