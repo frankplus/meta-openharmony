@@ -153,6 +153,7 @@ SRC_URI += "${GITEE_URL}/third_party_zlib.git;protocol=https;nobranch=1;branch=O
 SRC_URI += "${GITEE_URL}/utils.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=061ca56baf4817fb43d1e151734ac0903ed66b02;destsuffix=${OH_SRCDIR}/utils"
 SRC_URI += "${GITEE_URL}/utils_native.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=182f938ddc964629a43838eed425f736a2ad9b6f;destsuffix=${OH_SRCDIR}/utils/native"
 SRC_URI += "${GITEE_URL}/resources.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=b2263816741a1d612b91d0a5cc64ec1500a3ac2b;destsuffix=${OH_SRCDIR}/utils/resources"
+SRC_URI += "${GITEE_URL}/signcenter_tool.git;protocol=https;nobranch=1;branch=OpenHarmony-v3.0.1-LTS;rev=3e26d612c8beeb7d9ac6ff2348b3e981b3b75979;destsuffix=${OH_SRCDIR}/prebuilts/signcenter"
 
 # TODO: This should be removed whenever upstream OpenHarmony provides qemu
 # compatible gralloc implementation. Currently we have to use OpenHarmony 3.1
