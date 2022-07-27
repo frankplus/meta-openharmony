@@ -84,8 +84,6 @@ SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.pat
 SRC_URI += "file://foundation_distributedschedule_samgr-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/samgr"
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
-SRC_URI += "file://base_startup_appspawn_standard-app-spawn-server-override-007-fix.patch;patchdir=${S}/base/startup/appspawn_standard"
-SRC_URI += "file://base_startup_appspawn_standard-setprocessname-buffer-overflow.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 # Workaround for problem with nodejs 17:
 # error:0308010C:digital envelope routines::unsupported
