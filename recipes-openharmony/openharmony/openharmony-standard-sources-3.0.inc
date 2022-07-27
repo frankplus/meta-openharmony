@@ -164,6 +164,8 @@ OH_GRALLOC_TMP_DIR = "tmp_hihope"
 SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;rev=baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf;destsuffix=${OH_GRALLOC_TMP_DIR};lfs=0"
 SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/restool/1.023-d/restool.tar.gz;name=restool;subdir=${OH_SRCDIR}/prebuilts/build-tools/common"
 SRC_URI[restool.sha256sum] = "c76d2277a9c746240339ae4b4ea7f62da57f0ed1254cd7e3742a679464fd8fc5"
+SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/ace-loader/1.0/ace-loader-1.0.tar.gz;name=jsloader;subdir=${OH_SRCDIR}/prebuilts/sdk/js-loader/build-tools"
+SRC_URI[jsloader.sha256sum] = "88dfe71c534adf48e9196abe3fcddae5f35b96dc6f7a8b871d83d0308f583cfe"
 
 # These premirrors are used to fetch npm packages that are usually
 # downloaded with 'npm install' from the 'build/prebuilts_download.sh'
@@ -184,6 +186,7 @@ SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap
 SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-ets2bundle-compiler.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-ets2bundle/compiler"
 SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-js2bundle-ace-loader.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace-js2bundle/ace-loader"
 SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ts2panda.json;dev=1;destsuffix=${OH_SRCDIR}/ark/ts2abc/ts2panda"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_sdk-ace-loader.json;dev=1;destsuffix=${OH_SRCDIR}/prebuilts/sdk/js-loader/build-tools/ace-loader"
 
 # Allow network connectivity from do_unpack() task. This is needed for
 # git lfs operations that are executed within do_unpack()
@@ -205,6 +208,9 @@ npm_rebuild() {
     npm rebuild
     mkdir -p ${S}/prebuilts/build-tools/common/ts2abc
     cp -rf ${S}/ark/ts2abc/ts2panda/node_modules ${S}/prebuilts/build-tools/common/ts2abc/
+
+    cd ${S}/prebuilts/sdk/js-loader/build-tools/ace-loader
+    npm rebuild
 }
 
 do_configure[prefuncs] += "npm_rebuild"
