@@ -59,6 +59,7 @@ SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;pa
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 

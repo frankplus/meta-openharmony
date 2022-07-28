@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+test_xts_acts: Align tests list with mandatory set
+
+ACTS are built for all the components used in the given target build. To be
+able to compile OpenHarmony 3.0 we need to include more components than
+the mandatory list specifies. As a result we have ACTS test suites built
+for components we don't use. Moreover, some tests for mandatory components
+are missing. This patch aligns the actual set of ACTS test suites with the
+mandatory list.
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/test_packages.gni b/test_packages.gni
+index a495343d..300aec75 100755
+--- a/test_packages.gni
++++ b/test_packages.gni
+@@ -14,31 +14,31 @@
+ import("//test/xts/tools/build/suite.gni")
+ 
+ _all_test_packages = [
+-  "${ACTS_ROOT}/global:global",
+-  "${ACTS_ROOT}/security:security",
+-  "${ACTS_ROOT}/multimedia:multimedia",
++  # "${ACTS_ROOT}/global:global",
++  # "${ACTS_ROOT}/security:security",
++  # "${ACTS_ROOT}/multimedia:multimedia",
+   "${ACTS_ROOT}/hiviewdfx:hiviewdfxtestacts",
+-  "${ACTS_ROOT}/barrierfree:barrierfree",
++  # "${ACTS_ROOT}/barrierfree:barrierfree",
+ 
+   # "${ACTS_ROOT}/telephony:telephony",
+-  "${ACTS_ROOT}/appexecfwk:appexecfwk",
++  # "${ACTS_ROOT}/appexecfwk:appexecfwk",
+   "${ACTS_ROOT}/account:account",
+ 
+   "${ACTS_ROOT}/communication:communication",
+-  "${ACTS_ROOT}/notification:notification",
++  # "${ACTS_ROOT}/notification:notification",
+   "${ACTS_ROOT}/aafwk:aafwk",
+-  "${ACTS_ROOT}/location:location",
+-  "${ACTS_ROOT}/miscservices:miscservices",
++  # "${ACTS_ROOT}/location:location",
++  # "${ACTS_ROOT}/miscservices:miscservices",
+   "${ACTS_ROOT}/powermgr:powermgr",
+   "${ACTS_ROOT}/startup:startup",
+   "${ACTS_ROOT}/distributeddatamgr:distributeddatamgr",
+ 
+   # "${ACTS_ROOT}/distributedschedule:distributedschedule",
+-  "${ACTS_ROOT}/updater:update",
+-  "${ACTS_ROOT}/graphic:graphic",
+-  "${ACTS_ROOT}/ace:ace",
+-  "${ACTS_ROOT}/storage:storage",
+-  "${ACTS_ROOT}/distributedhardware:distributedhardware",
++  # "${ACTS_ROOT}/updater:update",
++  # "${ACTS_ROOT}/graphic:graphic",
++  # "${ACTS_ROOT}/ace:ace",
++  # "${ACTS_ROOT}/storage:storage",
++  # "${ACTS_ROOT}/distributedhardware:distributedhardware",
+ ]
+ 
+ _all_test_packages_ivi = [
+@@ -82,6 +82,9 @@ if (build_xts == true && XTS_SUITENAME == "acts") {
+   }
+ 
+   selected_packages = exec_script(_select_script, _select_args, "list lines")
++  # compileruntime is not being found as the part name is ccruntime
++  # therefore it has to be added manually
++  selected_packages += [ "${ACTS_ROOT}/compileruntime:compileruntime" ]
+ 
+   selected_packages_ivi =
+       exec_script(_select_script, _select_args_ivi, "list lines")
