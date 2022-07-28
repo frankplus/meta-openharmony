@@ -104,6 +104,9 @@ GN_ARGS += 'musl_arch="${MUSL_LDSO_ARCH}"'
 GN_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'remove_unstripped_execs=true', '', d)}"
 GN_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'remove_unstripped_so=true', '', d)}"
 
+# Build ACTS only when acts DISTRO_FEATURE is set
+GN_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'build_xts=true', '', d)}"
+
 #BUILD_CXXFLAGS:prepend = "-Wno-error=pedantic -Uunix "
 #TARGET_CXXFLAGS:prepend = "-D__MUSL__ -Wno-unused-but-set-variable "
 #TARGET_CFLAGS:prepend = "-D__MUSL__ -DHAVE_VERSIONSORT -Wno-unused-but-set-variable "
@@ -112,6 +115,9 @@ GN_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'remove_unstripped_
 # target is build with ninja in the end
 NINJA_ARGS = "packages"
 NINJA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'make_test', '', d)}"
+
+# Build ACTS only when acts DISTRO_FEATURE is set
+NINJA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'acts deploy_testtools', '', d)}"
 
 # Copy FlexLexer.h from recipe sysroot
 do_copy_to_srcdir() {
@@ -292,6 +298,9 @@ OPENHARMONY_PARTS += "startup:startup_l2"
 OPENHARMONY_PARTS += "telephony:core_service"
 OPENHARMONY_PARTS += "telephony:ril_adapter"
 OPENHARMONY_PARTS += "utils:utils_base"
+
+OPENHARMONY_PARTS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'xts:phone_tests', '', d)}"
+export XTS_SUITENAME = "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'acts', '', d)}"
 
 python generate_parts_json() {
     # parts.json file is used by the loader.py tool to generate BUILD.gn files
