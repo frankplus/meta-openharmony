@@ -33,8 +33,7 @@ index a495343d..300aec75 100755
 +  # "${ACTS_ROOT}/barrierfree:barrierfree",
  
    # "${ACTS_ROOT}/telephony:telephony",
--  "${ACTS_ROOT}/appexecfwk:appexecfwk",
-+  # "${ACTS_ROOT}/appexecfwk:appexecfwk",
+   "${ACTS_ROOT}/appexecfwk:appexecfwk",
    "${ACTS_ROOT}/account:account",
  
    "${ACTS_ROOT}/communication:communication",
