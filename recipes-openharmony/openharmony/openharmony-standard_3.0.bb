@@ -353,6 +353,19 @@ RDEPENDS:${PN}-libutilsecurec += "musl libcxx"
 RDEPENDS:${PN}-libutils += "musl libcxx ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 
+PACKAGES =+ "${PN}-libutils-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "libutils"
+FILES:${PN}-libutils-ptest = "${libdir}/${BPN}-libutils/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-libutils/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-libutils/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/utils/base ${D}${libdir}/${BPN}-libutils/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/utils
+}
+RDEPENDS:${PN}-libutils-ptest += "musl libcxx"
+RDEPENDS:${PN}-libutils-ptest += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-libutils-ptest"
+
 # //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog"
 SYSTEMD_PACKAGES = "${PN}-hilog"
@@ -374,7 +387,6 @@ FILES:${PN}-hilog = " \
 RDEPENDS:${PN}-hilog += "musl libcxx"
 RDEPENDS:${PN}-hilog += "${PN}-libutilsecurec"
 RDEPENDS:${PN} += "${PN}-hilog"
-RDEPENDS:${PN}-ptest += "${PN}-hilog"
 
 PACKAGES =+ "${PN}-hilog-ptest"
 do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hilog/ptest"
@@ -407,7 +419,6 @@ FILES:${PN}-appspawn = " \
 RDEPENDS:${PN}-appspawn += "musl libcxx"
 RDEPENDS:${PN}-appspawn += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN} += "${PN}-appspawn"
-RDEPENDS:${PN}-ptest += "${PN}-appspawn"
 
 PACKAGES =+ "${PN}-appspawn-ptest"
 OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
@@ -448,7 +459,6 @@ RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc $
 RDEPENDS:${PN}-appexecfwk += "${PN}-security-permission ${PN}-appspawn ${PN}-safwk ${PN}-timeservice ${PN}-powermgr ${PN}-dmsfwk ${PN}-resmgr"
 RDEPENDS:${PN}-appexecfwk += "${PN}-aafwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-appexecfwk"
-RDEPENDS:${PN}-ptest += "${PN}-appexecfwk"
 
 PACKAGES =+ "${PN}-appexecfwk-ptest"
 OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
@@ -473,6 +483,17 @@ FILES:${PN}-appverify = "${libdir}/libhapverify*${SOLIBS}"
 RDEPENDS:${PN}-appverify += "musl libcxx libcrypto ${PN}-libutils ${PN}-hilog ${PN}-syspara"
 RDEPENDS:${PN} += "${PN}-appverify"
 
+PACKAGES =+ "${PN}-appverify-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appverify/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appverify/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/appverify ${D}${libdir}/${BPN}-appverify/ptest/unittest
+}
+FILES:${PN}-appverify-ptest = "${libdir}/${BPN}-appverify/ptest"
+RDEPENDS:${PN}-appverify-ptest += "musl libcxx libcrypto"
+RDEPENDS:${PN}-appverify-ptest += "${PN}-appverify ${PN}-libutils ${PN}-hilog ${PN}-syspara"
+RDEPENDS:${PN}-ptest += "${PN}-appverify-ptest"
+
 # //base/startup/syspara_lite
 PACKAGES =+ "${PN}-syspara"
 FILES:${PN}-syspara = " \
@@ -482,7 +503,6 @@ FILES:${PN}-syspara = " \
 "
 RDEPENDS:${PN}-syspara += "musl libcxx libcrypto ${PN}-libutils ${PN}-hilog ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-syspara"
-RDEPENDS:${PN}-ptest += "${PN}-syspara"
 
 # //foundation/aafwk
 PACKAGES =+ "${PN}-aafwk"
@@ -503,7 +523,22 @@ RDEPENDS:${PN}-aafwk += "musl libcxx"
 RDEPENDS:${PN}-aafwk += "${PN}-appexecfwk ${PN}-samgr ${PN}-libutils ${PN}-ipc ${PN}-appdatamgr ${PN}-dmsfwk ${PN}-resmgr ${PN}-security-permission"
 RDEPENDS:${PN}-aafwk += "${PN}-safwk ${PN}-notification-ces ${PN}-multimodalinput ${PN}-thirdparty-jsoncpp ${PN}-graphic ${PN}-hilog ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-aafwk"
-RDEPENDS:${PN}-ptest += "${PN}-aafwk"
+
+PACKAGES =+ "${PN}-aafwk-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "aafwk"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-aafwk/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-aafwk/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/aafwk_standard ${D}${libdir}/${BPN}-aafwk/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/aafwk_standard ${D}${libdir}/${BPN}-aafwk/ptest/unittest
+    mv ${D}${PTEST_PATH}/systemtest/aafwk_standard ${D}${libdir}/${BPN}-aafwk/ptest/systemtest
+}
+FILES:${PN}-aafwk-ptest = "${libdir}/${BPN}-aafwk/ptest"
+RDEPENDS:${PN}-aafwk-ptest += "musl libcxx"
+RDEPENDS:${PN}-aafwk-ptest += "${PN}-aafwk ${PN}-appexecfwk ${PN}-samgr ${PN}-thirdparty-jsoncpp ${PN}-libutils ${PN}-hilog ${PN}-ipc"
+RDEPENDS:${PN}-aafwk-ptest += "${PN}-appdatamgr ${PN}-dmsfwk ${PN}-notification-ces ${PN}-multimodalinput ${PN}-resmgr ${PN}-ace-napi"
+RDEPENDS:${PN}-aafwk-ptest += "${PN}-security-permission"
+RDEPENDS:${PN}-ptest += "${PN}-aafwk-ptest"
 
 # //base/notification/ans_standard - Advanced Notification Service
 PACKAGES =+ "${PN}-notification-ans"
@@ -518,7 +553,26 @@ RDEPENDS:${PN}-notification-ans += "musl libcxx"
 RDEPENDS:${PN}-notification-ans += "${PN}-dmsfwk ${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-distributeddatamgr ${PN}-appexecfwk"
 RDEPENDS:${PN}-notification-ans += "${PN}-notification-ces ${PN}-safwk ${PN}-aafwk ${PN}-dmsfwk ${PN}-multimedia-image ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-notification-ans"
-RDEPENDS:${PN}-ptest += "${PN}-notification-ans"
+
+PACKAGES =+ "${PN}-notification-ans-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "notification-ans"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-notification-ans/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-notification-ans/ptest/run-ptest
+
+    mv ${D}${PTEST_PATH}/moduletest/ans_standard/moduletest ${D}${libdir}/${BPN}-notification-ans/ptest/moduletest
+    rmdir ${D}${PTEST_PATH}/moduletest/ans_standard
+
+    mv ${D}${PTEST_PATH}/unittest/ans_standard/unittest ${D}${libdir}/${BPN}-notification-ans/ptest/unittest
+    mv ${D}${PTEST_PATH}/unittest/ans_standard/wantagent ${D}${libdir}/${BPN}-notification-ans/ptest/unittest/
+    rmdir ${D}${PTEST_PATH}/unittest/ans_standard
+}
+FILES:${PN}-notification-ans-ptest = "${libdir}/${BPN}-notification-ans/ptest"
+RDEPENDS:${PN}-notification-ans-ptest += "musl libcxx"
+RDEPENDS:${PN}-notification-ans-ptest += "${PN}-notification-ans ${PN}-appexecfwk ${PN}-dmsfwk ${PN}-samgr ${PN}-multimedia-image ${PN}-libutils"
+RDEPENDS:${PN}-notification-ans-ptest += "${PN}-hilog ${PN}-thirdparty-jsoncpp ${PN}-aafwk ${PN}-ipc ${PN}-safwk ${PN}-notification-ces"
+RDEPENDS:${PN}-notification-ans-ptest += "${PN}-resmgr ${PN}-multimodalinput ${PN}-appdatamgr"
+RDEPENDS:${PN}-ptest += "${PN}-notification-ans-ptest"
 
 # //base/notification/ces_standard - Common Event Service
 PACKAGES =+ "${PN}-notification-ces"
@@ -532,7 +586,29 @@ RDEPENDS:${PN}-notification-ces += "musl libcxx"
 RDEPENDS:${PN}-notification-ces += "${PN}-ipc ${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-ipc"
 RDEPENDS:${PN}-notification-ces += "${PN}-samgr ${PN}-appexecfwk ${PN}-safwk ${PN}-aafwk ${PN}-dmsfwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-notification-ces"
-RDEPENDS:${PN}-ptest += "${PN}-notification-ces"
+
+PACKAGES =+ "${PN}-notification-ces-ptest"
+# Sometimes passes, sometimes fails...
+OPENHARMONY_PTEST_IS_BROKEN += "notification-ces"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-notification-ces/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-notification-ces/ptest/run-ptest
+
+    mv ${D}${PTEST_PATH}/moduletest/ces_standard/mouduletest ${D}${libdir}/${BPN}-notification-ces/ptest/moduletest
+    mv ${D}${PTEST_PATH}/moduletest/ces_standard/tools ${D}${libdir}/${BPN}-notification-ces/ptest/moduletest/
+    rmdir ${D}${PTEST_PATH}/moduletest/ces_standard
+
+    mv ${D}${PTEST_PATH}/unittest/ces_standard ${D}${libdir}/${BPN}-notification-ces/ptest/unittest
+
+    mv ${D}${PTEST_PATH}/systemtest/ces_standard/systemtest ${D}${libdir}/${BPN}-notification-ans/ptest/systemtest
+    mv ${D}${PTEST_PATH}/systemtest/ces_standard/tools ${D}${libdir}/${BPN}-notification-ans/ptest/systemtest/
+    rmdir ${D}${PTEST_PATH}/systemtest/ces_standard
+}
+FILES:${PN}-notification-ces-ptest = "${libdir}/${BPN}-notification-ces/ptest"
+RDEPENDS:${PN}-notification-ces-ptest += "musl libcxx"
+RDEPENDS:${PN}-notification-ces-ptest += "${PN}-notification-ces ${PN}-appexecfwk ${PN}-libutils ${PN}-aafwk ${PN}-hilog ${PN}-ipc ${PN}-resmgr"
+RDEPENDS:${PN}-notification-ces-ptest += "${PN}-multimodalinput ${PN}-distributeddatamgr"
+RDEPENDS:${PN}-ptest += "${PN}-notification-ces-ptest"
 
 # //foundation/communication/ipc
 PACKAGES =+ "${PN}-ipc"
@@ -544,7 +620,21 @@ FILES:${PN}-ipc = "\
 RDEPENDS:${PN}-ipc += "musl libcxx"
 RDEPENDS:${PN}-ipc += "${PN}-libutils ${PN}-hilog ${PN}-dsoftbus ${PN}-samgr ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-ipc"
-RDEPENDS:${PN}-ptest += "${PN}-ipc"
+
+PACKAGES =+ "${PN}-ipc-ptest"
+# Missing binary and library paths to openharmony-standard-ipc/ptest/*/resource/communication/ipc
+# for the tests to be executed
+OPENHARMONY_PTEST_IS_BROKEN += "ipc"
+FILES:${PN}-ipc-ptest = "${libdir}/${BPN}-ipc/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-ipc/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-ipc/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/ipc ${D}${libdir}/${BPN}-ipc/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/ipc ${D}${libdir}/${BPN}-ipc/ptest/unittest
+}
+RDEPENDS:${PN}-ipc-ptest += "musl libcxx"
+RDEPENDS:${PN}-ipc-ptest += "${PN}-libutils ${PN}-hilog ${PN}-dsoftbus ${PN}-ipc ${PN}-samgr"
+RDEPENDS:${PN}-ptest += "${PN}-ipc-ptest"
 
 # //foundation/communication/dsoftbus
 PACKAGES =+ "${PN}-dsoftbus"
@@ -558,7 +648,19 @@ RDEPENDS:${PN} += "${PN}-dsoftbus"
 RDEPENDS:${PN}-dsoftbus += "musl libcxx"
 RDEPENDS:${PN}-dsoftbus += "${PN}-samgr ${PN}-syspara ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-thirdparty-libcoap"
 RDEPENDS:${PN}-dsoftbus += "${PN}-security-deviceauth ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk ${PN}-libutilsecurec"
-RDEPENDS:${PN}-ptest += "${PN}-dsoftbus"
+
+PACKAGES =+ "${PN}-dsoftbus-ptest"
+# Test discovery/DiscSdkTest segfaults
+OPENHARMONY_PTEST_IS_BROKEN += "dsoftbus"
+FILES:${PN}-dsoftbus-ptest = "${libdir}/${BPN}-dsoftbus/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-dsoftbus/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-dsoftbus/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/dsoftbus_standard ${D}${libdir}/${BPN}-dsoftbus/ptest/unittest
+}
+RDEPENDS:${PN}-dsoftbus-ptest += "musl libcxx"
+RDEPENDS:${PN}-dsoftbus-ptest += "${PN}-dsoftbus ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-dsoftbus-ptest"
 
 # //foundation/distributedschedule/samgr
 PACKAGES =+ "${PN}-samgr"
@@ -569,8 +671,21 @@ FILES:${PN}-samgr = " \
 "
 RDEPENDS:${PN}-samgr += "musl libcxx"
 RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
-RDEPENDS:${PN}-ptest += "${PN}-samgr"
 RDEPENDS:${PN} += "${PN}-samgr"
+
+PACKAGES =+ "${PN}-samgr-ptest"
+# Test unittest/SystemAbilityMgrTest segfaults
+OPENHARMONY_PTEST_IS_BROKEN += "samgr"
+FILES:${PN}-samgr-ptest = "${libdir}/${BPN}-samgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-samgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-samgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/samgr/samgr ${D}${libdir}/${BPN}-samgr/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/samgr
+}
+RDEPENDS:${PN}-samgr-ptest += "musl libcxx"
+RDEPENDS:${PN}-samgr-ptest += "${PN}-samgr ${PN}-libutils ${PN}-hilog ${PN}-ipc"
+RDEPENDS:${PN}-ptest += "${PN}-samgr-ptest"
 
 # //foundation/distributedschedule/safwk
 PACKAGES =+ "${PN}-safwk"
@@ -582,7 +697,6 @@ RDEPENDS:${PN}-safwk += "musl libcxx"
 RDEPENDS:${PN}-safwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
 RDEPENDS:${PN}-safwk += "${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-safwk"
-RDEPENDS:${PN}-ptest += "${PN}-safwk"
 
 # //base/global/resmgr_standard
 PACKAGES =+ "${PN}-resmgr"
@@ -592,7 +706,19 @@ FILES:${PN}-resmgr = " \
 "
 RDEPENDS:${PN}-resmgr += "musl libcxx ${PN}-thirdparty-icu ${PN}-hilog ${PN}-aafwk ${PN}-ipc ${PN}-dmsfwk ${PN}-libutils ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-resmgr"
-RDEPENDS:${PN}-ptest += "${PN}-resmgr"
+
+PACKAGES =+ "${PN}-resmgr-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "resmgr"
+FILES:${PN}-resmgr-ptest = "${libdir}/${BPN}-resmgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-resmgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-resmgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/resmgr_standard/test ${D}${libdir}/${BPN}-resmgr/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/resmgr_standard
+}
+RDEPENDS:${PN}-resmgr-ptest += "musl libcxx"
+RDEPENDS:${PN}-resmgr-ptest += "${PN}-resmgr ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-resmgr-ptest"
 
 # //foundation/distributeddatamgr/appdatamgr
 PACKAGES =+ "${PN}-appdatamgr"
@@ -605,7 +731,21 @@ FILES:${PN}-appdatamgr = " \
 RDEPENDS:${PN}-appdatamgr += "musl libcxx libcrypto"
 RDEPENDS:${PN}-appdatamgr += "${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-thirdparty-icu ${PN}-thirdparty-sqlite"
 RDEPENDS:${PN} += "${PN}-appdatamgr"
-RDEPENDS:${PN}-ptest += "${PN}-appdatamgr"
+
+PACKAGES =+ "${PN}-appdatamgr-ptest"
+# Test NativeRdbTest segfaults
+OPENHARMONY_PTEST_IS_BROKEN += "appdatamgr"
+FILES:${PN}-appdatamgr-ptest = "${libdir}/${BPN}-appdatamgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appdatamgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appdatamgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/appdatamgr ${D}${libdir}/${BPN}-appdatamgr/ptest/unittest
+    mv ${D}${PTEST_PATH}/unittest/native_appdatamgr/* ${D}${libdir}/${BPN}-appdatamgr/ptest/unittest/
+    rmdir ${D}${PTEST_PATH}/unittest/native_appdatamgr
+}
+RDEPENDS:${PN}-appdatamgr-ptest += "musl libcxx"
+RDEPENDS:${PN}-appdatamgr-ptest += "${PN}-appdatamgr ${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-thirdparty-icu"
+RDEPENDS:${PN}-ptest += "${PN}-appdatamgr-ptest"
 
 # //foundation/distributeddatamgr/distributeddatamgr
 PACKAGES =+ "${PN}-distributeddatamgr"
@@ -622,7 +762,22 @@ RDEPENDS:${PN}-distributeddatamgr += "${PN}-ipc ${PN}-samgr ${PN}-aafwk ${PN}-po
 RDEPENDS:${PN}-distributeddatamgr += "${PN}-security-huks ${PN}-aafwk ${PN}-notification-ces ${PN}-dmsfwk ${PN}-thirdparty-sqlite ${PN}-ace-napi"
 RDEPENDS:${PN}-distributeddatamgr += "${PN}-security-dataclassification ${PN}-os-account ${PN}-power-batterymgr ${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-distributeddatamgr"
-RDEPENDS:${PN}-ptest += "${PN}-distributeddatamgr"
+
+PACKAGES =+ "${PN}-distributeddatamgr-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "distributeddatamgr"
+FILES:${PN}-distributeddatamgr-ptest = "${libdir}/${BPN}-distributeddatamgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-distributeddatamgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-distributeddatamgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/distributeddatamgr ${D}${libdir}/${BPN}-distributeddatamgr/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/distributeddatamgr ${D}${libdir}/${BPN}-distributeddatamgr/ptest/unittest
+}
+RDEPENDS:${PN}-distributeddatamgr-ptest += "musl libcxx libcrypto"
+RDEPENDS:${PN}-distributeddatamgr-ptest += "${PN}-distributeddatamgr ${PN}-libutils ${PN}-hilog ${PN}-thirdparty-sqlite ${PN}-dsoftbus"
+RDEPENDS:${PN}-distributeddatamgr-ptest += "${PN}-bytrace ${PN}-hisysevent ${PN}-aafwk ${PN}-notification-ces ${PN}-os-account"
+RDEPENDS:${PN}-distributeddatamgr-ptest += "${PN}-power-batterymgr ${PN}-security-huks ${PN}-ipc ${PN}-safwk ${PN}-samgr ${PN}-aafwk"
+RDEPENDS:${PN}-distributeddatamgr-ptest += "${PN}-dmsfwk ${PN}-thirdparty-jsoncpp ${PN}-security-permission ${PN}-powermgr"
+RDEPENDS:${PN}-ptest += "${PN}-distributeddatamgr-ptest"
 
 # //base/account/os_account
 PACKAGES =+ "${PN}-os-account"
@@ -635,7 +790,20 @@ RDEPENDS:${PN}-os-account += "musl libcxx"
 RDEPENDS:${PN}-os-account += "${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-aafwk ${PN}-notification-ces"
 RDEPENDS:${PN}-os-account += "${PN}-hisysevent ${PN}-security-permission ${PN}-safwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-os-account"
-RDEPENDS:${PN}-ptest += "${PN}-os-account"
+
+PACKAGES =+ "${PN}-os-account-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "os-account"
+FILES:${PN}-os-account-ptest = "${libdir}/${BPN}-os-account/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-os-account/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-os-account/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/os_account_standard ${D}${libdir}/${BPN}-os-account/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/os_account_standard ${D}${libdir}/${BPN}-os-account/ptest/unittest
+}
+RDEPENDS:${PN}-os-account-ptest += "musl libcxx"
+RDEPENDS:${PN}-os-account-ptest += "${PN}-os-account ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-aafwk"
+RDEPENDS:${PN}-os-account-ptest += "${PN}-notification-ces ${PN}-hisysevent ${PN}-security-permission ${PN}-safwk"
+RDEPENDS:${PN}-ptest += "${PN}-os-account-ptest"
 
 # //base/security/dataclassification
 PACKAGES =+ "${PN}-security-dataclassification"
@@ -659,7 +827,19 @@ RDEPENDS:${PN}-dmsfwk += "${PN}-appexecfwk ${PN}-safwk"
 RDEPENDS:${PN}-dmsfwk += "${PN}-samgr ${PN}-libutils"
 RDEPENDS:${PN}-dmsfwk += "${PN}-dsoftbus ${PN}-ipc"
 RDEPENDS:${PN} += "${PN}-dmsfwk"
-RDEPENDS:${PN}-ptest += "${PN}-dmsfwk"
+
+PACKAGES =+ "${PN}-dmsfwk-ptest"
+# Test doesn't produce any output
+OPENHARMONY_PTEST_IS_BROKEN += "dmsfwk"
+FILES:${PN}-dmsfwk-ptest = "${libdir}/${BPN}-dmsfwk/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-dmsfwk/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-dmsfwk/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/dmsfwk ${D}${libdir}/${BPN}-dmsfwk/ptest/unittest
+}
+RDEPENDS:${PN}-dmsfwk-ptest += "musl libcxx"
+RDEPENDS:${PN}-dmsfwk-ptest += "${PN}-dmsfwk ${PN}-hilog ${PN}-aafwk ${PN}-appexecfwk ${PN}-safwk ${PN}-samgr ${PN}-dsoftbus ${PN}-ipc ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-dmsfwk-ptest"
 
 # //base/security/permission
 PACKAGES =+ "${PN}-security-permission"
@@ -668,7 +848,19 @@ RDEPENDS:${PN}-security-permission += "musl libcxx"
 RDEPENDS:${PN}-security-permission += "${PN}-thirdparty-sqlite ${PN}-libutils"
 RDEPENDS:${PN}-security-permission += "${PN}-hilog ${PN}-ipc ${PN}-safwk ${PN}-samgr"
 RDEPENDS:${PN} += "${PN}-security-permission"
-RDEPENDS:${PN}-ptest += "${PN}-security-permission"
+
+PACKAGES =+ "${PN}-security-permission-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "security-permission"
+FILES:${PN}-security-permission-ptest = "${libdir}/${BPN}-security-permission/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-security-permission/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-security-permission/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/permission_standard/permission_standard ${D}${libdir}/${BPN}-security-permission/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/permission_standard
+}
+RDEPENDS:${PN}-security-permission-ptest += "musl libcxx"
+RDEPENDS:${PN}-security-permission-ptest += "${PN}-security-permission ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-security-permission-ptest"
 
 # //base/security/huks
 PACKAGES =+ "${PN}-security-huks"
@@ -679,7 +871,19 @@ FILES:${PN}-security-huks = " \
 RDEPENDS:${PN}-security-huks += "musl libcxx libcrypto"
 RDEPENDS:${PN}-security-huks += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk"
 RDEPENDS:${PN} += "${PN}-security-huks"
-RDEPENDS:${PN}-ptest += "${PN}-security-huks"
+
+PACKAGES =+ "${PN}-security-huks-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "security-huks"
+FILES:${PN}-security-huks-ptest = "${libdir}/${BPN}-security-huks/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-security-huks/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-security-huks/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/huks_standard/huks_standard_test ${D}${libdir}/${BPN}-security-huks/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/huks_standard
+}
+RDEPENDS:${PN}-security-huks-ptest += "musl libcxx"
+RDEPENDS:${PN}-security-huks-ptest += "${PN}-security-huks"
+RDEPENDS:${PN}-ptest += "${PN}-security-huks-ptest"
 
 # //base/security/deviceauth
 PACKAGES =+ "${PN}-security-deviceauth"
@@ -691,6 +895,18 @@ RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-security-huks ${PN}-syspara ${PN}-dsoftbus"
 RDEPENDS:${PN} += "${PN}-security-deviceauth"
+
+PACKAGES =+ "${PN}-security-deviceauth-ptest"
+FILES:${PN}-security-deviceauth-ptest = "${libdir}/${BPN}-security-deviceauth/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-security-deviceauth/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-security-deviceauth/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/deviceauth_standard/deviceauth_test ${D}${libdir}/${BPN}-security-deviceauth/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/deviceauth_standard
+}
+RDEPENDS:${PN}-security-deviceauth-ptest += "musl libcxx libcrypto libssl"
+RDEPENDS:${PN}-security-deviceauth-ptest += "${PN}-security-deviceauth ${PN}-security-huks ${PN}-libutils ${PN}-dsoftbus"
+RDEPENDS:${PN}-ptest += "${PN}-security-deviceauth-ptest"
 
 # //foundation/multimodalinput/input
 PACKAGES =+ "${PN}-multimodalinput"
@@ -704,7 +920,17 @@ FILES:${PN}-multimodalinput = " \
 RDEPENDS:${PN}-multimodalinput += "musl libcxx"
 RDEPENDS:${PN}-multimodalinput += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-peripheral-input ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-multimodalinput"
-RDEPENDS:${PN}-ptest += "${PN}-multimodalinput"
+
+PACKAGES =+ "${PN}-multimodalinput-ptest"
+FILES:${PN}-multimodalinput-ptest = "${libdir}/${BPN}-multimodalinput/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-multimodalinput/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-multimodalinput/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/multimodalinput_base ${D}${libdir}/${BPN}-multimodalinput/ptest/unittest
+}
+RDEPENDS:${PN}-multimodalinput-ptest += "musl libcxx"
+RDEPENDS:${PN}-multimodalinput-ptest += "${PN}-multimodalinput ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-multimodalinput-ptest"
 
 # //drivers/adapter/uhdf2
 PACKAGES =+ "${PN}-uhdf2"
@@ -715,7 +941,17 @@ FILES:${PN}-uhdf2 = " \
 RDEPENDS:${PN}-uhdf2 += "musl libcxx"
 RDEPENDS:${PN}-uhdf2 += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
 RDEPENDS:${PN} += "${PN}-uhdf2"
-RDEPENDS:${PN}-ptest += "${PN}-uhdf2"
+
+PACKAGES =+ "${PN}-uhdf2-ptest"
+FILES:${PN}-uhdf2-ptest = "${libdir}/${BPN}-uhdf2/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-uhdf2/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-uhdf2/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hdf ${D}${libdir}/${BPN}-uhdf2/ptest/unittest
+}
+RDEPENDS:${PN}-uhdf2-ptest += "musl libcxx"
+RDEPENDS:${PN}-uhdf2-ptest += "${PN}-uhdf2"
+RDEPENDS:${PN}-ptest += "${PN}-uhdf2-ptest"
 
 # //drivers/peripheral/camera
 PACKAGES =+ "${PN}-peripheral-camera"
@@ -730,7 +966,6 @@ FILES:${PN}-peripheral-display = "${libdir}/libhdi_display_*${SOLIBS}"
 RDEPENDS:${PN}-peripheral-display += "musl libcxx"
 RDEPENDS:${PN}-peripheral-display += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2 ${PN}-ipc"
 RDEPENDS:${PN} += "${PN}-peripheral-display"
-RDEPENDS:${PN}-ptest += "${PN}-peripheral-display"
 
 # //drivers/peripheral/input
 PACKAGES =+ "${PN}-peripheral-input"
@@ -738,7 +973,6 @@ FILES:${PN}-peripheral-input = "${libdir}/libhdi_input*${SOLIBS}"
 RDEPENDS:${PN}-peripheral-input += "musl libcxx"
 RDEPENDS:${PN}-peripheral-input += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2"
 RDEPENDS:${PN} += "${PN}-peripheral-input"
-RDEPENDS:${PN}-ptest += "${PN}-peripheral-input"
 
 # //base/miscservices/time
 PACKAGES =+ "${PN}-timeservice"
@@ -751,7 +985,19 @@ RDEPENDS:${PN}-timeservice += "musl libcxx"
 RDEPENDS:${PN}-timeservice += "${PN}-appexecfwk ${PN}-aafwk ${PN}-thirdparty-jsoncpp ${PN}-libutils ${PN}-notification-ans"
 RDEPENDS:${PN}-timeservice += "${PN}-notification-ces ${PN}-hilog ${PN}-ipc ${PN}-safwk ${PN}-samgr ${PN}-dmsfwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-timeservice"
-RDEPENDS:${PN}-ptest += "${PN}-timeservice"
+
+PACKAGES =+ "${PN}-timeservice-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "timeservice"
+FILES:${PN}-timeservice-ptest = "${libdir}/${BPN}-timeservice/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-timeservice/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-timeservice/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/time_native/time_service ${D}${libdir}/${BPN}-timeservice/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/time_native
+}
+RDEPENDS:${PN}-timeservice-ptest += "musl libcxx"
+RDEPENDS:${PN}-timeservice-ptest += "${PN}-timeservice ${PN}-dmsfwk ${PN}-libutils ${PN}-hilog ${PN}-ipc"
+RDEPENDS:${PN}-ptest += "${PN}-timeservice-ptest"
 
 # //base/hiviewdfx/hisysevent
 PACKAGES =+ "${PN}-hisysevent"
@@ -759,7 +1005,19 @@ FILES:${PN}-hisysevent = "${libdir}/libhisysevent*${SOLIBS}"
 RDEPENDS:${PN}-hisysevent += "musl libcxx"
 RDEPENDS:${PN}-hisysevent += "${PN}-libutilsecurec ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-hisysevent"
-RDEPENDS:${PN}-ptest += "${PN}-hisysevent"
+
+PACKAGES =+ "${PN}-hisysevent-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "hisysevent"
+FILES:${PN}-hisysevent-ptest = "${libdir}/${BPN}-hisysevent/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hisysevent/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hisysevent/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hisysevent_native/hisysevent_native ${D}${libdir}/${BPN}-hisysevent/ptest/moduletest
+    rmdir ${D}${PTEST_PATH}/moduletest/hisysevent_native
+}
+RDEPENDS:${PN}-hisysevent-ptest += "musl libcxx"
+RDEPENDS:${PN}-hisysevent-ptest += "${PN}-hisysevent ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-hisysevent-ptest"
 
 # //base/powermgr/power_manager
 PACKAGES =+ "${PN}-powermgr"
@@ -772,7 +1030,19 @@ RDEPENDS:${PN}-powermgr += "musl libcxx"
 RDEPENDS:${PN}-powermgr += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-syspara ${PN}-aafwk ${PN}-ace-napi"
 RDEPENDS:${PN}-powermgr += "${PN}-appexecfwk ${PN}-notification-ces ${PN}-safwk ${PN}-hisysevent ${PN}-power-displaymgr"
 RDEPENDS:${PN} += "${PN}-powermgr"
-RDEPENDS:${PN}-ptest += "${PN}-powermgr"
+
+PACKAGES =+ "${PN}-powermgr-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "powermgr"
+FILES:${PN}-powermgr-ptest = "${libdir}/${BPN}-powermgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-powermgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-powermgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/power_manager_native/powermgr_native ${D}${libdir}/${BPN}-powermgr/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/power_manager_native
+}
+RDEPENDS:${PN}-powermgr-ptest += "musl libcxx"
+RDEPENDS:${PN}-powermgr-ptest += "${PN}-powermgr ${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-samgr ${PN}-power-displaymgr ${PN}-syspara"
+RDEPENDS:${PN}-ptest += "${PN}-powermgr-ptest"
 
 # //base/powermgr/battery_manager
 PACKAGES =+ "${PN}-power-batterymgr"
@@ -784,7 +1054,6 @@ RDEPENDS:${PN}-power-batterymgr += "musl libcxx"
 RDEPENDS:${PN}-power-batterymgr += "${PN}-appexecfwk ${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-uhdf2"
 RDEPENDS:${PN}-power-batterymgr += "${PN}-aafwk ${PN}-notification-ces ${PN}-safwk ${PN}-samgr ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-power-batterymgr"
-RDEPENDS:${PN}-ptest += "${PN}-power-batterymgr"
 
 # //base/powermgr/display_manager
 PACKAGES =+ "${PN}-power-displaymgr"
@@ -795,7 +1064,19 @@ FILES:${PN}-power-displaymgr = " \
 RDEPENDS:${PN}-power-displaymgr += "musl libcxx"
 RDEPENDS:${PN}-power-displaymgr += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-peripheral-display ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-power-displaymgr"
-RDEPENDS:${PN}-ptest += "${PN}-power-displaymgr"
+
+PACKAGES =+ "${PN}-power-displaymgr-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "power-displaymgr"
+FILES:${PN}-power-displaymgr-ptest = "${libdir}/${BPN}-power-displaymgr/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-power-displaymgr/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-power-displaymgr/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/display_manager_native/displaymgr_native ${D}${libdir}/${BPN}-power-displaymgr/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/display_manager_native
+}
+RDEPENDS:${PN}-power-displaymgr-ptest += "musl libcxx libcrypto libssl"
+RDEPENDS:${PN}-power-displaymgr-ptest += "${PN}-power-displaymgr ${PN}-libutils ${PN}-samgr"
+RDEPENDS:${PN}-ptest += "${PN}-power-displaymgr-ptest"
 
 # //foundation/ace/ace_engine
 PACKAGES =+ "${PN}-ace-engine"
@@ -817,13 +1098,27 @@ RDEPENDS:${PN}-ace-engine += "${PN}-ark-runtime-core ${PN}-hilog ${PN}-js-worker
 RDEPENDS:${PN}-ace-engine += "${PN}-ark-js-runtime ${PN}-inputmethod ${PN}-multimedia-media ${PN}-multimedia-camera"
 RDEPENDS:${PN} += "${PN}-ace-engine"
 
+PACKAGES =+ "${PN}-ace-engine-ptest"
+# Test doesn't produce any output
+OPENHARMONY_PTEST_IS_BROKEN += "ace-engine"
+FILES:${PN}-ace-engine-ptest = "${libdir}/${BPN}-ace-engine/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-ace-engine/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-ace-engine/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/ace_engine_standard ${D}${libdir}/${BPN}-ace-engine/ptest/unittest
+}
+RDEPENDS:${PN}-ace-engine-ptest += "musl libcxx libcrypto libssl"
+RDEPENDS:${PN}-ace-engine-ptest += "${PN}-ace-engine ${PN}-libutils ${PN}-multimodalinput ${PN}-appexecfwk ${PN}-ipc ${PN}-resmgr ${PN}-hilog"
+RDEPENDS:${PN}-ace-engine-ptest += "${PN}-aafwk ${PN}-dmsfwk ${PN}-graphic ${PN}-appdatamgr ${PN}-bytrace ${PN}-syspara ${PN}-hisysevent"
+RDEPENDS:${PN}-ace-engine-ptest += "${PN}-multimedia-camera ${PN}-thirdparty-icu ${PN}-ace-napi ${PN}-inputmethod ${PN}-multimedia-media"
+RDEPENDS:${PN}-ptest += "${PN}-ace-engine-ptest"
+
 # //foundation/ace/napi
 PACKAGES =+ "${PN}-ace-napi"
 FILES:${PN}-ace-napi = "${libdir}/libace_napi*${SOLIBS}"
 RDEPENDS:${PN}-ace-napi += "musl libcxx"
 RDEPENDS:${PN}-ace-napi += "${PN}-ark-js-runtime ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-ace-napi"
-RDEPENDS:${PN}-ptest += "${PN}-ace-napi"
 
 # //base/miscservices/inputmethod
 PACKAGES =+ "${PN}-inputmethod"
@@ -836,7 +1131,20 @@ RDEPENDS:${PN}-inputmethod += "musl libcxx"
 RDEPENDS:${PN}-inputmethod += "${PN}-resmgr ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN}-inputmethod += "${PN}-appexecfwk ${PN}-aafwk ${PN}-safwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-inputmethod"
-RDEPENDS:${PN}-ptest += "${PN}-inputmethod"
+
+PACKAGES =+ "${PN}-inputmethod-ptest"
+# Test unittest/InputMethodControllerTest segfaults
+OPENHARMONY_PTEST_IS_BROKEN += "inputmethod"
+FILES:${PN}-inputmethod-ptest = "${libdir}/${BPN}-inputmethod/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-inputmethod/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-inputmethod/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/inputmethod_native/inputmethod_service ${D}${libdir}/${BPN}-inputmethod/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/inputmethod_native
+}
+RDEPENDS:${PN}-inputmethod-ptest += "musl libcxx"
+RDEPENDS:${PN}-inputmethod-ptest += "${PN}-inputmethod ${PN}-ipc ${PN}-libutils ${PN}-hilog ${PN}-samgr"
+RDEPENDS:${PN}-ptest += "${PN}-inputmethod-ptest"
 
 # //foundation/graphic/standard
 PACKAGES =+ "${PN}-graphic"
@@ -854,7 +1162,20 @@ RDEPENDS:${PN}-graphic += "${PN}-multimodalinput ${PN}-hilog ${PN}-libutils ${PN
 RDEPENDS:${PN}-graphic += "${PN}-graphic ${PN}-multimedia-media ${PN}-ipc ${PN}-display-gralloc ${PN}-samgr ${PN}-thirdparty-libdrm ${PN}-thirdparty-libevdev"
 RDEPENDS:${PN}-graphic += "${PN}-appexecfwk ${PN}-distributeddatamgr ${PN}-dmsfwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-graphic"
-RDEPENDS:${PN}-ptest += "${PN}-graphic"
+
+PACKAGES =+ "${PN}-graphic-ptest"
+# Test stalls with message: "binder: 3751:3751 transaction failed"
+OPENHARMONY_PTEST_IS_BROKEN += "graphic"
+FILES:${PN}-graphic-ptest = "${libdir}/${BPN}-graphic/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-graphic/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-graphic/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/graphic_standard ${D}${libdir}/${BPN}-graphic/ptest/unittest
+    mv ${D}${PTEST_PATH}/systemtest/graphic_standard ${D}${libdir}/${BPN}-graphic/ptest/systemtest
+}
+RDEPENDS:${PN}-graphic-ptest += "musl libcxx"
+RDEPENDS:${PN}-graphic-ptest += "${PN}-graphic ${PN}-samgr ${PN}-ipc ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-graphic-ptest"
 
 # //developtools/bytrace_standard
 PACKAGES =+ "${PN}-bytrace"
@@ -866,7 +1187,19 @@ FILES:${PN}-bytrace = " \
 RDEPENDS:${PN}-bytrace += "musl libcxx"
 RDEPENDS:${PN}-bytrace += "${PN}-syspara ${PN}-libutils ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-bytrace"
-RDEPENDS:${PN}-ptest += "${PN}-bytrace"
+
+PACKAGES =+ "${PN}-bytrace-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "bytrace"
+FILES:${PN}-bytrace-ptest = "${libdir}/${BPN}-bytrace/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-bytrace/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-bytrace/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/bytrace_standard/bytrace ${D}${libdir}/${BPN}-bytrace/ptest/moduletest
+    rmdir ${D}${PTEST_PATH}/moduletest/bytrace_standard
+}
+RDEPENDS:${PN}-bytrace-ptest += "musl libcxx"
+RDEPENDS:${PN}-bytrace-ptest += "${PN}-bytrace ${PN}-syspara ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-bytrace-ptest"
 
 # //foundation/multimedia/media_standard
 PACKAGES =+ "${PN}-multimedia-media"
@@ -886,7 +1219,6 @@ RDEPENDS:${PN}-multimedia-media += "musl libcxx"
 RDEPENDS:${PN}-multimedia-media += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-graphic ${PN}-peripheral-display"
 RDEPENDS:${PN}-multimedia-media += "${PN}-multimedia-audio ${PN}-thirdparty-gstreamer ${PN}-thirdparty-glib ${PN}-syspara ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-multimedia-media"
-RDEPENDS:${PN}-ptest += "${PN}-multimedia-media"
 
 # //foundation/multimedia/audio_standard
 PACKAGES =+ "${PN}-multimedia-audio"
@@ -918,7 +1250,18 @@ RDEPENDS:${PN}-multimedia-audio += "musl libcxx"
 RDEPENDS:${PN}-multimedia-audio += "${PN}-thirdparty-gstreamer ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-distributeddatamgr"
 RDEPENDS:${PN}-multimedia-audio += "${PN}-thirdparty-libxml2 ${PN}-thirdparty-glib ${PN}-safwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-multimedia-audio"
-RDEPENDS:${PN}-ptest += "${PN}-multimedia-audio"
+
+PACKAGES =+ "${PN}-audio-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "audio"
+FILES:${PN}-audio-ptest = "${libdir}/${BPN}-audio/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-audio/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-audio/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/audio_standard ${D}${libdir}/${BPN}-audio/ptest/moduletest
+}
+RDEPENDS:${PN}-audio-ptest += "musl libcxx"
+RDEPENDS:${PN}-audio-ptest += "${PN}-multimedia-audio ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-audio-ptest"
 
 # //foundation/multimedia/camera_standard
 PACKAGES =+ "${PN}-multimedia-camera"
@@ -932,7 +1275,18 @@ FILES:${PN}-multimedia-camera = " \
 RDEPENDS:${PN}-multimedia-camera += "musl libcxx"
 RDEPENDS:${PN}-multimedia-camera += "${PN}-peripheral-camera ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-graphic ${PN}-samgr ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-multimedia-camera"
-RDEPENDS:${PN}-ptest += "${PN}-multimedia-camera"
+
+PACKAGES =+ "${PN}-camera-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "camera"
+FILES:${PN}-camera-ptest = "${libdir}/${BPN}-camera/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-camera/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-camera/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/camera_standard ${D}${libdir}/${BPN}-camera/ptest/moduletest
+}
+RDEPENDS:${PN}-camera-ptest += "musl libcxx"
+RDEPENDS:${PN}-camera-ptest += "${PN}-multimedia-camera ${PN}-hilog ${PN}-ipc ${PN}-graphic ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-camera-ptest"
 
 # //foundation/multimedia/image_standard
 PACKAGES =+ "${PN}-multimedia-image"
@@ -950,7 +1304,6 @@ FILES:${PN}-multimedia-image = " \
 RDEPENDS:${PN}-multimedia-image += "musl libcxx"
 RDEPENDS:${PN}-multimedia-image += "${PN}-hilog ${PN}-hilog ${PN}-libutils ${PN}-bytrace ${PN}-ipc"
 RDEPENDS:${PN} += "${PN}-multimedia-image"
-RDEPENDS:${PN}-ptest += "${PN}-multimedia-image"
 
 # //device/hihope/hardware/display
 PACKAGES =+ "${PN}-display-gralloc"
@@ -971,7 +1324,19 @@ RDEPENDS:${PN}-i18n += "musl libcxx"
 RDEPENDS:${PN}-i18n += "${PN}-syspara ${PN}-thirdparty-icu ${PN}-thirdparty-libxml2 ${PN}-libutils ${PN}-telephony-core"
 RDEPENDS:${PN}-i18n += "${PN}-thirdparty-libphonenumber ${PN}-hilog ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-i18n"
-RDEPENDS:${PN}-ptest += "${PN}-i18n"
+
+PACKAGES =+ "${PN}-i18n-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "i18n"
+FILES:${PN}-i18n-ptest = "${libdir}/${BPN}-i18n/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-i18n/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-i18n/ptest/run-ptest
+    # This folder also contains unitest for libphonenumber
+    mv ${D}${PTEST_PATH}/unittest/i18n_standard ${D}${libdir}/${BPN}-i18n/ptest/unittest
+}
+RDEPENDS:${PN}-i18n-ptest += "musl libcxx"
+RDEPENDS:${PN}-i18n-ptest += "${PN}-i18n ${PN}-syspara ${PN}-thirdparty-icu ${PN}-thirdparty-libphonenumber ${PN}-thirdparty-protobuf"
+RDEPENDS:${PN}-ptest += "${PN}-i18n-ptest"
 
 # //base/telephony/core_service
 PACKAGES =+ "${PN}-telephony-core"
@@ -986,7 +1351,20 @@ RDEPENDS:${PN}-telephony-core += "musl libcxx"
 RDEPENDS:${PN}-telephony-core += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-aafwk ${PN}-uhdf2 ${PN}-ace-napi"
 RDEPENDS:${PN}-telephony-core += "${PN}-appexecfwk ${PN}-notification-ces ${PN}-safwk ${PN}-appdatamgr ${PN}-telephony-ril-adapter"
 RDEPENDS:${PN} += "${PN}-telephony-core"
-RDEPENDS:${PN}-ptest += "${PN}-telephony-core"
+
+PACKAGES =+ "${PN}-telephony-core-ptest"
+# Test stalls with message: "binder: 4296:4296 transaction failed"
+OPENHARMONY_PTEST_IS_BROKEN += "telephony-core"
+FILES:${PN}-telephony-core-ptest = "${libdir}/${BPN}-telephony-core/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-telephony-core/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-telephony-core/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/core_service/tel_core_service_gtest ${D}${libdir}/${BPN}-telephony-core/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/core_service
+}
+RDEPENDS:${PN}-telephony-core-ptest += "musl libcxx"
+RDEPENDS:${PN}-telephony-core-ptest += "${PN}-telephony-core ${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-samgr ${PN}-appexecfwk"
+RDEPENDS:${PN}-ptest += "${PN}-telephony-core-ptest"
 
 # //base/telephony/ril_adapter
 PACKAGES =+ "${PN}-telephony-ril-adapter"
@@ -997,7 +1375,20 @@ FILES:${PN}-telephony-ril-adapter = " \
 RDEPENDS:${PN}-telephony-ril-adapter += "musl libcxx"
 RDEPENDS:${PN}-telephony-ril-adapter += "${PN}-uhdf2 ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-faultloggerd"
 RDEPENDS:${PN} += "${PN}-telephony-ril-adapter"
-RDEPENDS:${PN}-ptest += "${PN}-telephony-ril-adapter"
+
+PACKAGES =+ "${PN}-telephony-ril-adapter-ptest"
+# Test unittest/tel_ril_adapter_gtest segfaults
+OPENHARMONY_PTEST_IS_BROKEN += "telephony-ril-adapter"
+FILES:${PN}-telephony-ril-adapter-ptest = "${libdir}/${BPN}-telephony-ril-adapter/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-telephony-ril-adapter/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-telephony-ril-adapter/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/ril_adapter/tel_ril_adapter_gtest ${D}${libdir}/${BPN}-telephony-ril-adapter/ptest/unittest
+    rmdir ${D}${PTEST_PATH}/unittest/ril_adapter
+}
+RDEPENDS:${PN}-telephony-ril-adapter-ptest += "musl libcxx"
+RDEPENDS:${PN}-telephony-ril-adapter-ptest += "${PN}-telephony-ril-adapter ${PN}-libutils ${PN}-uhdf2 ${PN}-appexecfwk ${PN}-ipc ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-telephony-ril-adapter-ptest"
 
 # //base/hiviewdfx/faultloggerd
 PACKAGES =+ "${PN}-faultloggerd"
@@ -1021,7 +1412,6 @@ FILES:${PN}-ark-runtime-core = " \
 RDEPENDS:${PN}-ark-runtime-core += "musl libcxx"
 RDEPENDS:${PN}-ark-runtime-core += "${PN}-libutilsecurec ${PN}-thirdparty-icu"
 RDEPENDS:${PN} += "${PN}-ark-runtime-core"
-RDEPENDS:${PN}-ptest += "${PN}-ark-runtime-core"
 
 # //ark/js_runtime
 PACKAGES =+ "${PN}-ark-js-runtime"
@@ -1032,6 +1422,19 @@ FILES:${PN}-ark-js-runtime = " \
 RDEPENDS:${PN}-ark-js-runtime += "musl libcxx"
 RDEPENDS:${PN}-ark-js-runtime += "${PN}-ark-runtime-core ${PN}-libutilsecurec ${PN}-thirdparty-icu"
 RDEPENDS:${PN} += "${PN}-ark-js-runtime"
+
+PACKAGES =+ "${PN}-ark-ptest"
+# First tests pass but then stalls on HProfTest.GenerateFileForManualCheck
+OPENHARMONY_PTEST_IS_BROKEN += "ark"
+FILES:${PN}-ark-ptest = "${libdir}/${BPN}-ark/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-ark/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-ark/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/ark ${D}${libdir}/${BPN}-ark/ptest/unittest
+}
+RDEPENDS:${PN}-ark-ptest += "musl libcxx"
+RDEPENDS:${PN}-ark-ptest += "${PN}-ark-runtime-core ${PN}-thirdparty-icu"
+RDEPENDS:${PN}-ptest += "${PN}-ark-ptest"
 
 # //base/compileruntime/js_worker_module
 PACKAGES =+ "${PN}-js-worker"
@@ -1053,7 +1456,17 @@ RDEPENDS:${PN}-distributedhardware-devicemanager += "musl libcxx"
 RDEPENDS:${PN}-distributedhardware-devicemanager += "${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-security-deviceauth ${PN}-aafwk ${PN}-appexecfwk"
 RDEPENDS:${PN}-distributedhardware-devicemanager += "${PN}-dsoftbus ${PN}-safwk ${PN}-syspara ${PN}-hilog ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-distributedhardware-devicemanager"
-RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager"
+
+PACKAGES =+ "${PN}-distributedhardware-devicemanager-ptest"
+FILES:${PN}-distributedhardware-devicemanager-ptest = "${libdir}/${BPN}-distributedhardware-devicemanager/ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-distributedhardware-devicemanager/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-distributedhardware-devicemanager/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/deviceManager_stander ${D}${libdir}/${BPN}-distributedhardware-devicemanager/ptest/unittest
+}
+RDEPENDS:${PN}-distributedhardware-devicemanager-ptest += "musl libcxx"
+RDEPENDS:${PN}-distributedhardware-devicemanager-ptest += "${PN}-distributedhardware-devicemanager ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager-ptest"
 
 # //developtools/hdc_standard
 PACKAGES =+ "${PN}-hdc"
@@ -1077,19 +1490,16 @@ PACKAGES =+ "${PN}-thirdparty-jsoncpp"
 FILES:${PN}-thirdparty-jsoncpp = "${libdir}/libjsoncpp*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-jsoncpp += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-jsoncpp"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-jsoncpp"
 
 PACKAGES =+ "${PN}-thirdparty-mtdev"
 FILES:${PN}-thirdparty-mtdev = "${libdir}/libmtdev*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-mtdev += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-mtdev"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-mtdev"
 
 PACKAGES =+ "${PN}-thirdparty-sqlite"
 FILES:${PN}-thirdparty-sqlite = "${libdir}/libsqlite*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-sqlite += "musl libcxx libcrypto ${PN}-libutils"
 RDEPENDS:${PN} += "${PN}-thirdparty-sqlite"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-sqlite"
 
 PACKAGES =+ "${PN}-thirdparty-libxml2"
 FILES:${PN}-thirdparty-libxml2 = "${libdir}/libxml2*${SOLIBS}"
@@ -1100,7 +1510,6 @@ PACKAGES =+ "${PN}-thirdparty-icu"
 FILES:${PN}-thirdparty-icu = "${libdir}/libhmicu*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-icu += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-icu"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-icu"
 
 PACKAGES =+ "${PN}-thirdparty-gstreamer"
 FILES:${PN}-thirdparty-gstreamer = " \
@@ -1167,7 +1576,6 @@ FILES:${PN}-thirdparty-libinput = "${libdir}/libinput-third*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-libinput += "musl libcxx"
 RDEPENDS:${PN}-thirdparty-libinput += "${PN}-thirdparty-libevdev ${PN}-thirdparty-eudev ${PN}-thirdparty-mtdev"
 RDEPENDS:${PN} += "${PN}-thirdparty-libinput"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-libinput"
 
 PACKAGES =+ "${PN}-thirdparty-libevdev"
 FILES:${PN}-thirdparty-libevdev = "${libdir}/libevdev*${SOLIBS}"
@@ -1203,13 +1611,11 @@ FILES:${PN}-thirdparty-libphonenumber = "${libdir}/libphonenumber_standard*${SOL
 RDEPENDS:${PN}-thirdparty-libphonenumber += "musl libcxx"
 RDEPENDS:${PN}-thirdparty-libphonenumber += "${PN}-thirdparty-icu ${PN}-thirdparty-protobuf"
 RDEPENDS:${PN} += "${PN}-thirdparty-libphonenumber"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-libphonenumber"
 
 PACKAGES =+ "${PN}-thirdparty-protobuf"
 FILES:${PN}-thirdparty-protobuf = "${libdir}/libprotobuf_standard*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-protobuf += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-protobuf"
-RDEPENDS:${PN}-ptest += "${PN}-thirdparty-protobuf"
 
 PACKAGES =+ "${PN}-thirdparty-libunwind"
 FILES:${PN}-thirdparty-libunwind = "${libdir}/libunwind*${SOLIBS}"
