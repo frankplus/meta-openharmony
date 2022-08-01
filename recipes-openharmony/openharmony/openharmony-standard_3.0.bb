@@ -337,6 +337,9 @@ copy_subsystem_config_json_file() {
     cp "${S}/build/subsystem_config.json" "${OHOS_BUILD_CONFIGS_DIR}/"
 }
 
+inherit systemd
+SYSTEMD_AUTO_ENABLE = "enable"
+
 # //utils/native component
 PACKAGES =+ "${PN}-libutilsecurec ${PN}-libutils"
 FILES:${PN}-libutilsecurec = "${libdir}/libutilsecurec*${SOLIBS}"
@@ -345,11 +348,8 @@ RDEPENDS:${PN}-libutilsecurec += "musl libcxx"
 RDEPENDS:${PN}-libutils += "musl libcxx ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-libutilsecurec ${PN}-libutils"
 
-inherit systemd
-SYSTEMD_AUTO_ENABLE = "enable"
-
 # //base/hiviewdfx/hilog component
-PACKAGES =+ "${PN}-hilog ${PN}-hilog-ptest"
+PACKAGES =+ "${PN}-hilog"
 SYSTEMD_PACKAGES = "${PN}-hilog"
 SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
 SRC_URI += "file://hilogd.service"
@@ -360,6 +360,18 @@ do_install:append() {
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
 }
+FILES:${PN}-hilog = " \
+    ${bindir}/hilog* \
+    ${libdir}/libhilog*${SOLIBS} \
+    ${sysconfdir}/openharmony/hilog*.conf \
+    ${systemd_unitdir}/hilogd.service \
+"
+RDEPENDS:${PN}-hilog += "musl libcxx"
+RDEPENDS:${PN}-hilog += "${PN}-libutilsecurec"
+RDEPENDS:${PN} += "${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-hilog"
+
+PACKAGES =+ "${PN}-hilog-ptest"
 do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hilog/ptest"
 do_install_ptest:append() {
     install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
@@ -367,22 +379,13 @@ do_install_ptest:append() {
     rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx
     echo "hilogd.service" > ${D}${libdir}/${BPN}-hilog/ptest/systemd-units
 }
-FILES:${PN}-hilog = "\
-    ${bindir}/hilog* \
-    ${libdir}/libhilog* \
-    ${sysconfdir}/openharmony/hilog*.conf \
-    ${systemd_unitdir}/hilogd.service \
-"
 FILES:${PN}-hilog-ptest = "${libdir}/${BPN}-hilog/ptest"
-RDEPENDS:${PN} += "${PN}-hilog"
-RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest ${PN}-hilog"
-RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog"
-RDEPENDS:${PN}-hilog       += "musl libcxx"
 RDEPENDS:${PN}-hilog-ptest += "musl libcxx"
-RDEPENDS:${PN}-hilog       += "${PN}-libutilsecurec"
+RDEPENDS:${PN}-hilog-ptest += "${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-hilog-ptest"
 
 # //base/startup/appspawn_standard component
-PACKAGES =+ "${PN}-appspawn ${PN}-appspawn-ptest"
+PACKAGES =+ "${PN}-appspawn"
 SYSTEMD_PACKAGES += "${PN}-appspawn"
 SYSTEMD_SERVICE:${PN}-appspawn = "appspawn.service"
 SRC_URI += "file://appspawn.service"
@@ -391,6 +394,18 @@ do_install:append() {
     install -m 644 ${WORKDIR}/appspawn.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/appspawn.cfg
 }
+FILES:${PN}-appspawn = " \
+    ${bindir}/appspawn \
+    ${libdir}/libappspawn*${SOLIBS} \
+    ${systemd_unitdir}/appspawnd.service \
+"
+RDEPENDS:${PN}-appspawn += "musl libcxx"
+RDEPENDS:${PN}-appspawn += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
+RDEPENDS:${PN} += "${PN}-appspawn"
+RDEPENDS:${PN}-ptest += "${PN}-appspawn"
+
+PACKAGES =+ "${PN}-appspawn-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
 do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appspawn/ptest"
 do_install_ptest:append() {
     install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appspawn/ptest/run-ptest
@@ -399,26 +414,27 @@ do_install_ptest:append() {
     rmdir ${D}${PTEST_PATH}/*/startup_l2
     echo "appspawn.service" > ${D}${libdir}/${BPN}-appspawn/ptest/systemd-units
 }
-OPENHARMONY_PTEST_IS_BROKEN += "appspawn"
-FILES:${PN}-appspawn = "\
-    ${bindir}/appspawn* \
-    ${libdir}/libappspawn* \
-    ${systemd_unitdir}/appspawnd.service \
-"
 FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
-RDEPENDS:${PN} += "${PN}-appspawn"
-RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest ${PN}-appspawn"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
-RDEPENDS:${PN}-appspawn       += "musl libcxx"
 RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
-RDEPENDS:${PN}-appspawn       += "${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
 # TODO: remove when needed parts are split out
 RDEPENDS:${PN}-appspawn       += "${PN}"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}"
 
 # //foundation/appexecfwk/standard component
-PACKAGES =+ "${PN}-appexecfwk ${PN}-appexecfwk-ptest"
+PACKAGES =+ "${PN}-appexecfwk"
+FILES:${PN}-appexecfwk = "\
+    ${libdir}/libappexecfwk*${SOLIBS} \
+"
+RDEPENDS:${PN}-appexecfwk += "musl libcxx"
+#RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-appexecfwk"
+
+PACKAGES =+ "${PN}-appexecfwk-ptest"
+OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
 do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-appexecfwk/ptest"
 do_install_ptest:append() {
     install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-appexecfwk/ptest/run-ptest
@@ -426,18 +442,10 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/unittest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/unittest
     mv ${D}${PTEST_PATH}/systemtest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/systemtest
 }
-OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
-FILES:${PN}-appexecfwk = "\
-    ${libdir}/libappexecfwk*${SOLIBS} \
-"
 FILES:${PN}-appexecfwk-ptest = "${libdir}/${BPN}-appexecfwk/ptest"
-RDEPENDS:${PN} += "${PN}-appexecfwk"
 RDEPENDS:${PN}-ptest += "${PN}-appexecfwk-ptest ${PN}-appexecfwk"
 RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-appexecfwk"
-RDEPENDS:${PN}-appexecfwk       += "musl libcxx"
 RDEPENDS:${PN}-appexecfwk-ptest += "musl libcxx"
-#RDEPENDS:${PN}-appexecfwk       += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
-RDEPENDS:${PN}-appexecfwk       += "${PN}-libutils ${PN}-hilog"
 #RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-libeventhandler ${PN}-hichecker ${PN}-hitrace"
 RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appspawn"
 # TODO: remove when needed parts are split out
