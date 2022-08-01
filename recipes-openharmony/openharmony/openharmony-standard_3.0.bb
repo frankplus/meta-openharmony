@@ -417,21 +417,33 @@ do_install_ptest:append() {
 FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
 RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
-RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
-# TODO: remove when needed parts are split out
-RDEPENDS:${PN}-appspawn       += "${PN}"
-RDEPENDS:${PN}-appspawn-ptest += "${PN}"
 
 # //foundation/appexecfwk/standard component
 PACKAGES =+ "${PN}-appexecfwk"
 FILES:${PN}-appexecfwk = "\
+    ${bindir}/appexec \
+    ${bindir}/bm \
+    ${bindir}/fm \
+    ${bindir}/installs \
+    ${bindir}/lmks \
     ${libdir}/libappexecfwk*${SOLIBS} \
+    ${libdir}/libappkit_*${SOLIBS} \
+    ${libdir}/libeventhandler*${SOLIBS} \
+    ${libdir}/libams*${SOLIBS} \
+    ${libdir}/libbms*${SOLIBS} \
+    ${libdir}/libfms*${SOLIBS} \
+    ${libdir}/module/libbundle*${SOLIBS} \
+    ${libdir}/module/libnapi_app_mgr*${SOLIBS} \
+    ${libdir}/openharmony/profile/foundation.xml \
 "
 RDEPENDS:${PN}-appexecfwk += "musl libcxx"
-#RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
-RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-appverify ${PN}-distributeddatamgr ${PN}-notification-ces"
+RDEPENDS:${PN}-appexecfwk += "${PN}-security-permission ${PN}-appspawn ${PN}-safwk ${PN}-timeservice ${PN}-powermgr ${PN}-dmsfwk ${PN}-resmgr"
+RDEPENDS:${PN}-appexecfwk += "${PN}-aafwk ${PN}-ace-napi"
 RDEPENDS:${PN} += "${PN}-appexecfwk"
+RDEPENDS:${PN}-ptest += "${PN}-appexecfwk"
 
 PACKAGES =+ "${PN}-appexecfwk-ptest"
 OPENHARMONY_PTEST_IS_BROKEN += "appexecfwk"
@@ -443,14 +455,800 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/systemtest/appexecfwk_standard ${D}${libdir}/${BPN}-appexecfwk/ptest/systemtest
 }
 FILES:${PN}-appexecfwk-ptest = "${libdir}/${BPN}-appexecfwk/ptest"
-RDEPENDS:${PN}-ptest += "${PN}-appexecfwk-ptest ${PN}-appexecfwk"
-RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-appexecfwk"
 RDEPENDS:${PN}-appexecfwk-ptest += "musl libcxx"
-#RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-libeventhandler ${PN}-hichecker ${PN}-hitrace"
-RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appspawn"
-# TODO: remove when needed parts are split out
-RDEPENDS:${PN}-appexecfwk += "${PN}"
-RDEPENDS:${PN}-appexecfwk-ptest += "${PN}"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-appexecfwk ${PN}-libutils ${PN}-hilog ${PN}-appspawn ${PN}-appverify ${PN}-distributeddatamgr"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-thirdparty-jsoncpp ${PN}-samgr ${PN}-ipc ${PN}-safwk ${PN}-aafwk"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-samgr ${PN}-notification-ces ${PN}-dmsfwk ${PN}-security-permission"
+RDEPENDS:${PN}-appexecfwk-ptest += "${PN}-thirdparty-libxml2"
+RDEPENDS:${PN}-ptest += "${PN}-appexecfwk-ptest"
+
+# //base/security/appverify
+PACKAGES =+ "${PN}-appverify"
+FILES:${PN}-appverify = "${libdir}/libhapverify*${SOLIBS}"
+RDEPENDS:${PN}-appverify += "musl libcxx libcrypto ${PN}-libutils ${PN}-hilog ${PN}-syspara"
+RDEPENDS:${PN} += "${PN}-appverify"
+
+# //base/startup/syspara_lite
+PACKAGES =+ "${PN}-syspara"
+FILES:${PN}-syspara = " \
+    ${libdir}/libsyspara*${SOLIBS} \
+    ${libdir}/module/libdeviceinfo*${SOLIBS} \
+    ${libdir}/module/libsystemparameter*${SOLIBS} \
+"
+RDEPENDS:${PN}-syspara += "musl libcxx libcrypto ${PN}-libutils ${PN}-hilog ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-syspara"
+RDEPENDS:${PN}-ptest += "${PN}-syspara"
+
+# //foundation/aafwk
+PACKAGES =+ "${PN}-aafwk"
+FILES:${PN}-aafwk = " \
+    ${bindir}/aa \
+    ${libdir}/libability*${SOLIBS} \
+    ${libdir}/libbase*${SOLIBS} \
+    ${libdir}/libdataobs*${SOLIBS} \
+    ${libdir}/libdummy_classes*${SOLIBS} \
+    ${libdir}/libintent*${SOLIBS} \
+    ${libdir}/libnapi_common*${SOLIBS} \
+    ${libdir}/libwant.z${SOLIBS} \
+    ${libdir}/module/ability/*${SOLIBS} \
+    ${libdir}/module/app/libabilitymanager*${SOLIBS} \
+    ${libdir}/module/libzlib*${SOLIBS} \
+"
+RDEPENDS:${PN}-aafwk += "musl libcxx"
+RDEPENDS:${PN}-aafwk += "${PN}-appexecfwk ${PN}-samgr ${PN}-libutils ${PN}-ipc ${PN}-appdatamgr ${PN}-dmsfwk ${PN}-resmgr ${PN}-security-permission"
+RDEPENDS:${PN}-aafwk += "${PN}-safwk ${PN}-notification-ces ${PN}-multimodalinput ${PN}-thirdparty-jsoncpp ${PN}-graphic ${PN}-hilog ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-aafwk"
+RDEPENDS:${PN}-ptest += "${PN}-aafwk"
+
+# //base/notification/ans_standard - Advanced Notification Service
+PACKAGES =+ "${PN}-notification-ans"
+FILES:${PN}-notification-ans = " \
+    ${bindir}/anm \
+    ${libdir}/libans*${SOLIBS} \
+    ${libdir}/libwantagent_innerkits*${SOLIBS} \
+    ${libdir}/module/libnotification*${SOLIBS} \
+    ${libdir}/module/libwantagent*${SOLIBS} \
+"
+RDEPENDS:${PN}-notification-ans += "musl libcxx"
+RDEPENDS:${PN}-notification-ans += "${PN}-dmsfwk ${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-distributeddatamgr ${PN}-appexecfwk"
+RDEPENDS:${PN}-notification-ans += "${PN}-notification-ces ${PN}-safwk ${PN}-aafwk ${PN}-dmsfwk ${PN}-multimedia-image ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-notification-ans"
+RDEPENDS:${PN}-ptest += "${PN}-notification-ans"
+
+# //base/notification/ces_standard - Common Event Service
+PACKAGES =+ "${PN}-notification-ces"
+FILES:${PN}-notification-ces = " \
+    ${bindir}/cem \
+    ${libdir}/libcesfwk_*${SOLIBS} \
+    ${libdir}/libevent_common*${SOLIBS} \
+    ${libdir}/module/libcommonevent*${SOLIBS} \
+"
+RDEPENDS:${PN}-notification-ces += "musl libcxx"
+RDEPENDS:${PN}-notification-ces += "${PN}-ipc ${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-ipc"
+RDEPENDS:${PN}-notification-ces += "${PN}-samgr ${PN}-appexecfwk ${PN}-safwk ${PN}-aafwk ${PN}-dmsfwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-notification-ces"
+RDEPENDS:${PN}-ptest += "${PN}-notification-ces"
+
+# //foundation/communication/ipc
+PACKAGES =+ "${PN}-ipc"
+FILES:${PN}-ipc = "\
+    ${libdir}/libipc*${SOLIBS} \
+    ${libdir}/module/librpc*${SOLIBS} \
+    ${libdir}/libdbinder*${SOLIBS} \
+"
+RDEPENDS:${PN}-ipc += "musl libcxx"
+RDEPENDS:${PN}-ipc += "${PN}-libutils ${PN}-hilog ${PN}-dsoftbus ${PN}-samgr ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-ipc"
+RDEPENDS:${PN}-ptest += "${PN}-ipc"
+
+# //foundation/communication/dsoftbus
+PACKAGES =+ "${PN}-dsoftbus"
+FILES:${PN}-dsoftbus = " \
+    ${libdir}/libsoftbus*${SOLIBS} \
+    ${libdir}/libnstackx*${SOLIBS} \
+    ${libdir}/libmbedtls*${SOLIBS} \
+    ${libdir}/openharmony/profile/softbus_server.xml \
+"
+RDEPENDS:${PN} += "${PN}-dsoftbus"
+RDEPENDS:${PN}-dsoftbus += "musl libcxx"
+RDEPENDS:${PN}-dsoftbus += "${PN}-samgr ${PN}-syspara ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-thirdparty-libcoap"
+RDEPENDS:${PN}-dsoftbus += "${PN}-security-deviceauth ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk ${PN}-libutilsecurec"
+RDEPENDS:${PN}-ptest += "${PN}-dsoftbus"
+
+# //foundation/distributedschedule/samgr
+PACKAGES =+ "${PN}-samgr"
+FILES:${PN}-samgr = " \
+    ${bindir}/samgr \
+    ${libdir}/libsamgr*${SOLIBS} \
+    ${libdir}/liblsamgr*${SOLIBS} \
+"
+RDEPENDS:${PN}-samgr += "musl libcxx"
+RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
+RDEPENDS:${PN}-ptest += "${PN}-samgr"
+RDEPENDS:${PN} += "${PN}-samgr"
+
+# //foundation/distributedschedule/safwk
+PACKAGES =+ "${PN}-safwk"
+FILES:${PN}-safwk = "\
+    ${bindir}/sa_main \
+    ${libdir}/libsystem_ability_fwk*${SOLIBS} \
+"
+RDEPENDS:${PN}-safwk += "musl libcxx"
+RDEPENDS:${PN}-safwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
+RDEPENDS:${PN}-safwk += "${PN}-thirdparty-libxml2"
+RDEPENDS:${PN} += "${PN}-safwk"
+RDEPENDS:${PN}-ptest += "${PN}-safwk"
+
+# //base/global/resmgr_standard
+PACKAGES =+ "${PN}-resmgr"
+FILES:${PN}-resmgr = " \
+    ${libdir}/libglobal_resmgr*${SOLIBS} \
+    ${libdir}/module/libresourcemanager*${SOLIBS} \
+"
+RDEPENDS:${PN}-resmgr += "musl libcxx ${PN}-thirdparty-icu ${PN}-hilog ${PN}-aafwk ${PN}-ipc ${PN}-dmsfwk ${PN}-libutils ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-resmgr"
+RDEPENDS:${PN}-ptest += "${PN}-resmgr"
+
+# //foundation/distributeddatamgr/appdatamgr
+PACKAGES =+ "${PN}-appdatamgr"
+FILES:${PN}-appdatamgr = " \
+    ${libdir}/libnative_rdb*${SOLIBS} \
+    ${libdir}/libnative_preferences*${SOLIBS} \
+    ${libdir}/libnative_dataability*${SOLIBS} \
+    ${libdir}/libnative_appdatafwk*${SOLIBS} \
+"
+RDEPENDS:${PN}-appdatamgr += "musl libcxx libcrypto"
+RDEPENDS:${PN}-appdatamgr += "${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-thirdparty-icu ${PN}-thirdparty-sqlite"
+RDEPENDS:${PN} += "${PN}-appdatamgr"
+RDEPENDS:${PN}-ptest += "${PN}-appdatamgr"
+
+# //foundation/distributeddatamgr/distributeddatamgr
+PACKAGES =+ "${PN}-distributeddatamgr"
+FILES:${PN}-distributeddatamgr = " \
+    ${libdir}/libdistributeddata*${SOLIBS} \
+    ${libdir}/libapp_distributeddata*${SOLIBS} \
+    ${libdir}/libdistributeddb*${SOLIBS} \
+    ${libdir}/module/data/libdistributeddata*${SOLIBS} \
+    ${libdir}/openharmony/profile/distributeddata.xml \
+"
+RDEPENDS:${PN}-distributeddatamgr += "musl libcxx libcrypto"
+RDEPENDS:${PN}-distributeddatamgr += "${PN}-hilog ${PN}-bytrace ${PN}-hisysevent ${PN}-dsoftbus ${PN}-thirdparty-jsoncpp ${PN}-libutils"
+RDEPENDS:${PN}-distributeddatamgr += "${PN}-ipc ${PN}-samgr ${PN}-aafwk ${PN}-powermgr ${PN}-safwk ${PN}-security-permission ${PN}-thirdparty-icu"
+RDEPENDS:${PN}-distributeddatamgr += "${PN}-security-huks ${PN}-aafwk ${PN}-notification-ces ${PN}-dmsfwk ${PN}-thirdparty-sqlite ${PN}-ace-napi"
+RDEPENDS:${PN}-distributeddatamgr += "${PN}-security-dataclassification ${PN}-os-account ${PN}-power-batterymgr ${PN}-thirdparty-libxml2"
+RDEPENDS:${PN} += "${PN}-distributeddatamgr"
+RDEPENDS:${PN}-ptest += "${PN}-distributeddatamgr"
+
+# //base/account/os_account
+PACKAGES =+ "${PN}-os-account"
+FILES:${PN}-os-account = " \
+    ${libdir}/libaccount*${SOLIBS} \
+    ${libdir}/module/account/*${SOLIBS} \
+    ${libdir}/openharmony/profile/accountmgr.xml \
+"
+RDEPENDS:${PN}-os-account += "musl libcxx"
+RDEPENDS:${PN}-os-account += "${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-aafwk ${PN}-notification-ces"
+RDEPENDS:${PN}-os-account += "${PN}-hisysevent ${PN}-security-permission ${PN}-safwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-os-account"
+RDEPENDS:${PN}-ptest += "${PN}-os-account"
+
+# //base/security/dataclassification
+PACKAGES =+ "${PN}-security-dataclassification"
+FILES:${PN}-security-dataclassification = " \
+    ${libdir}/libfbe_iudf_xattr*${SOLIBS} \
+    ${libdir}/libhwdsl*${SOLIBS} \
+"
+RDEPENDS:${PN}-security-dataclassification += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-security-dataclassification"
+
+# //foundation/distributedschedule/dmsfwk
+PACKAGES =+ "${PN}-dmsfwk"
+FILES:${PN}-dmsfwk = " \
+    ${libdir}/libdistributedschedsvr*${SOLIBS} \
+    ${libdir}/libzuri*${SOLIBS} \
+    ${libdir}/openharmony/profile/distributedsched.xml \
+"
+RDEPENDS:${PN}-dmsfwk += "musl libcxx"
+RDEPENDS:${PN}-dmsfwk += "${PN}-hilog ${PN}-aafwk"
+RDEPENDS:${PN}-dmsfwk += "${PN}-appexecfwk ${PN}-safwk"
+RDEPENDS:${PN}-dmsfwk += "${PN}-samgr ${PN}-libutils"
+RDEPENDS:${PN}-dmsfwk += "${PN}-dsoftbus ${PN}-ipc"
+RDEPENDS:${PN} += "${PN}-dmsfwk"
+RDEPENDS:${PN}-ptest += "${PN}-dmsfwk"
+
+# //base/security/permission
+PACKAGES =+ "${PN}-security-permission"
+FILES:${PN}-security-permission = "${libdir}/libpermission*${SOLIBS}"
+RDEPENDS:${PN}-security-permission += "musl libcxx"
+RDEPENDS:${PN}-security-permission += "${PN}-thirdparty-sqlite ${PN}-libutils"
+RDEPENDS:${PN}-security-permission += "${PN}-hilog ${PN}-ipc ${PN}-safwk ${PN}-samgr"
+RDEPENDS:${PN} += "${PN}-security-permission"
+RDEPENDS:${PN}-ptest += "${PN}-security-permission"
+
+# //base/security/huks
+PACKAGES =+ "${PN}-security-huks"
+FILES:${PN}-security-huks = " \
+    ${libdir}/libhuks*${SOLIBS} \
+    ${libdir}/openharmony/profile/huks_service.xml \
+"
+RDEPENDS:${PN}-security-huks += "musl libcxx libcrypto"
+RDEPENDS:${PN}-security-huks += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk"
+RDEPENDS:${PN} += "${PN}-security-huks"
+RDEPENDS:${PN}-ptest += "${PN}-security-huks"
+
+# //base/security/deviceauth
+PACKAGES =+ "${PN}-security-deviceauth"
+FILES:${PN}-security-deviceauth = " \
+    ${bindir}/deviceauth_service \
+    ${libdir}/libdeviceauth*${SOLIBS} \
+"
+RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto"
+RDEPENDS:${PN}-security-deviceauth += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
+RDEPENDS:${PN}-security-deviceauth += "${PN}-security-huks ${PN}-syspara ${PN}-dsoftbus"
+RDEPENDS:${PN} += "${PN}-security-deviceauth"
+
+# //foundation/multimodalinput/input
+PACKAGES =+ "${PN}-multimodalinput"
+FILES:${PN}-multimodalinput = " \
+    ${bindir}/uinput_inject \
+    ${libdir}/libmmi_*${SOLIBS} \
+    ${libdir}/libmultimodalinput_*${SOLIBS} \
+    ${libdir}/module/libinjecteventhandler*${SOLIBS} \
+    ${libdir}/openharmony/profile/multimodalinputservice.xml \
+"
+RDEPENDS:${PN}-multimodalinput += "musl libcxx"
+RDEPENDS:${PN}-multimodalinput += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-peripheral-input ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-multimodalinput"
+RDEPENDS:${PN}-ptest += "${PN}-multimodalinput"
+
+# //drivers/adapter/uhdf2
+PACKAGES =+ "${PN}-uhdf2"
+FILES:${PN}-uhdf2 = " \
+    ${libdir}/libhdi.z*${SOLIBS} \
+    ${libdir}/libhdf_*${SOLIBS} \
+"
+RDEPENDS:${PN}-uhdf2 += "musl libcxx"
+RDEPENDS:${PN}-uhdf2 += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
+RDEPENDS:${PN} += "${PN}-uhdf2"
+RDEPENDS:${PN}-ptest += "${PN}-uhdf2"
+
+# //drivers/peripheral/camera
+PACKAGES =+ "${PN}-peripheral-camera"
+FILES:${PN}-peripheral-camera = "${libdir}/libcamera_client*${SOLIBS}"
+RDEPENDS:${PN}-peripheral-camera += "musl libcxx"
+RDEPENDS:${PN}-peripheral-camera += "${PN}-uhdf2 ${PN}-ipc ${PN}-multimedia-camera ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-peripheral-camera"
+
+# //drivers/peripheral/display
+PACKAGES =+ "${PN}-peripheral-display"
+FILES:${PN}-peripheral-display = "${libdir}/libhdi_display_*${SOLIBS}"
+RDEPENDS:${PN}-peripheral-display += "musl libcxx"
+RDEPENDS:${PN}-peripheral-display += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2 ${PN}-ipc"
+RDEPENDS:${PN} += "${PN}-peripheral-display"
+RDEPENDS:${PN}-ptest += "${PN}-peripheral-display"
+
+# //drivers/peripheral/input
+PACKAGES =+ "${PN}-peripheral-input"
+FILES:${PN}-peripheral-input = "${libdir}/libhdi_input*${SOLIBS}"
+RDEPENDS:${PN}-peripheral-input += "musl libcxx"
+RDEPENDS:${PN}-peripheral-input += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2"
+RDEPENDS:${PN} += "${PN}-peripheral-input"
+RDEPENDS:${PN}-ptest += "${PN}-peripheral-input"
+
+# //base/miscservices/time
+PACKAGES =+ "${PN}-timeservice"
+FILES:${PN}-timeservice = " \
+    ${libdir}/libtime_service*${SOLIBS} \
+    ${libdir}/module/libsystemtime*${SOLIBS} \
+    ${libdir}/openharmony/profile/time_service.xml \
+"
+RDEPENDS:${PN}-timeservice += "musl libcxx"
+RDEPENDS:${PN}-timeservice += "${PN}-appexecfwk ${PN}-aafwk ${PN}-thirdparty-jsoncpp ${PN}-libutils ${PN}-notification-ans"
+RDEPENDS:${PN}-timeservice += "${PN}-notification-ces ${PN}-hilog ${PN}-ipc ${PN}-safwk ${PN}-samgr ${PN}-dmsfwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-timeservice"
+RDEPENDS:${PN}-ptest += "${PN}-timeservice"
+
+# //base/hiviewdfx/hisysevent
+PACKAGES =+ "${PN}-hisysevent"
+FILES:${PN}-hisysevent = "${libdir}/libhisysevent*${SOLIBS}"
+RDEPENDS:${PN}-hisysevent += "musl libcxx"
+RDEPENDS:${PN}-hisysevent += "${PN}-libutilsecurec ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-hisysevent"
+RDEPENDS:${PN}-ptest += "${PN}-hisysevent"
+
+# //base/powermgr/power_manager
+PACKAGES =+ "${PN}-powermgr"
+FILES:${PN}-powermgr = " \
+    ${libdir}/libpowermgr*${SOLIBS} \
+    ${libdir}/module/libpower*${SOLIBS} \
+    ${libdir}/module/librunninglock*${SOLIBS} \
+"
+RDEPENDS:${PN}-powermgr += "musl libcxx"
+RDEPENDS:${PN}-powermgr += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-syspara ${PN}-aafwk ${PN}-ace-napi"
+RDEPENDS:${PN}-powermgr += "${PN}-appexecfwk ${PN}-notification-ces ${PN}-safwk ${PN}-hisysevent ${PN}-power-displaymgr"
+RDEPENDS:${PN} += "${PN}-powermgr"
+RDEPENDS:${PN}-ptest += "${PN}-powermgr"
+
+# //base/powermgr/battery_manager
+PACKAGES =+ "${PN}-power-batterymgr"
+FILES:${PN}-power-batterymgr = " \
+    ${libdir}/libbattery*${SOLIBS} \
+    ${libdir}/module/libbatteryinfo*${SOLIBS} \
+"
+RDEPENDS:${PN}-power-batterymgr += "musl libcxx"
+RDEPENDS:${PN}-power-batterymgr += "${PN}-appexecfwk ${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-uhdf2"
+RDEPENDS:${PN}-power-batterymgr += "${PN}-aafwk ${PN}-notification-ces ${PN}-safwk ${PN}-samgr ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-power-batterymgr"
+RDEPENDS:${PN}-ptest += "${PN}-power-batterymgr"
+
+# //base/powermgr/display_manager
+PACKAGES =+ "${PN}-power-displaymgr"
+FILES:${PN}-power-displaymgr = " \
+    ${libdir}/libdisplaymgr*${SOLIBS} \
+    ${libdir}/module/libbrightness*${SOLIBS} \
+"
+RDEPENDS:${PN}-power-displaymgr += "musl libcxx"
+RDEPENDS:${PN}-power-displaymgr += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-peripheral-display ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-power-displaymgr"
+RDEPENDS:${PN}-ptest += "${PN}-power-displaymgr"
+
+# //foundation/ace/ace_engine
+PACKAGES =+ "${PN}-ace-engine"
+FILES:${PN}-ace-engine = " \
+    ${libdir}/libace.z*${SOLIBS} \
+    ${libdir}/libace_engine*${SOLIBS} \
+    ${libdir}/libintl_qjs*${SOLIBS} \
+    ${libdir}/module/libgrid*${SOLIBS} \
+    ${libdir}/module/libprompt*${SOLIBS} \
+    ${libdir}/module/libconfiguration*${SOLIBS} \
+    ${libdir}/module/libdevice*${SOLIBS} \
+    ${libdir}/module/libmediaquery*${SOLIBS} \
+    ${libdir}/module/librouter*${SOLIBS} \
+"
+RDEPENDS:${PN}-ace-engine += "musl libcxx libcrypto libssl"
+RDEPENDS:${PN}-ace-engine += "${PN}-ace-napi ${PN}-dmsfwk ${PN}-ipc ${PN}-libutils ${PN}-appexecfwk ${PN}-appdatamgr"
+RDEPENDS:${PN}-ace-engine += "${PN}-thirdparty-icu ${PN}-resmgr ${PN}-aafwk ${PN}-multimodalinput ${PN}-syspara ${PN}-hisysevent"
+RDEPENDS:${PN}-ace-engine += "${PN}-ark-runtime-core ${PN}-hilog ${PN}-js-worker ${PN}-i18n ${PN}-graphic ${PN}-bytrace"
+RDEPENDS:${PN}-ace-engine += "${PN}-ark-js-runtime ${PN}-inputmethod ${PN}-multimedia-media ${PN}-multimedia-camera"
+RDEPENDS:${PN} += "${PN}-ace-engine"
+
+# //foundation/ace/napi
+PACKAGES =+ "${PN}-ace-napi"
+FILES:${PN}-ace-napi = "${libdir}/libace_napi*${SOLIBS}"
+RDEPENDS:${PN}-ace-napi += "musl libcxx"
+RDEPENDS:${PN}-ace-napi += "${PN}-ark-js-runtime ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-ace-napi"
+RDEPENDS:${PN}-ptest += "${PN}-ace-napi"
+
+# //base/miscservices/inputmethod
+PACKAGES =+ "${PN}-inputmethod"
+FILES:${PN}-inputmethod = " \
+    ${libdir}/libinputmethod_*${SOLIBS} \
+    ${libdir}/module/libinputmethodengine*${SOLIBS} \
+    ${libdir}/openharmony/profile/inputmethod_service.xml \
+"
+RDEPENDS:${PN}-inputmethod += "musl libcxx"
+RDEPENDS:${PN}-inputmethod += "${PN}-resmgr ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-inputmethod += "${PN}-appexecfwk ${PN}-aafwk ${PN}-safwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-inputmethod"
+RDEPENDS:${PN}-ptest += "${PN}-inputmethod"
+
+# //foundation/graphic/standard
+PACKAGES =+ "${PN}-graphic"
+FILES:${PN}-graphic = " \
+    ${libdir}/libwm*${SOLIBS} \
+    ${libdir}/libsurface*${SOLIBS} \
+    ${libdir}/libvsync*${SOLIBS} \
+    ${libdir}/libsemaphore*${SOLIBS} \
+    ${libdir}/module/libdisplay*${SOLIBS} \
+    ${libdir}/module/libwindow*${SOLIBS} \
+    ${bindir}/bootanimation \
+"
+RDEPENDS:${PN}-graphic += "musl libcxx"
+RDEPENDS:${PN}-graphic += "${PN}-multimodalinput ${PN}-hilog ${PN}-libutils ${PN}-thirdparty-weston ${PN}-thirdparty-wayland ${PN}-thirdparty-libffi ${PN}-thirdparty-libinput"
+RDEPENDS:${PN}-graphic += "${PN}-graphic ${PN}-multimedia-media ${PN}-ipc ${PN}-display-gralloc ${PN}-samgr ${PN}-thirdparty-libdrm ${PN}-thirdparty-libevdev"
+RDEPENDS:${PN}-graphic += "${PN}-appexecfwk ${PN}-distributeddatamgr ${PN}-dmsfwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-graphic"
+RDEPENDS:${PN}-ptest += "${PN}-graphic"
+
+# //developtools/bytrace_standard
+PACKAGES =+ "${PN}-bytrace"
+FILES:${PN}-bytrace = " \
+    ${bindir}/bytrace \
+    ${libdir}/libbytrace_core*${SOLIBS} \
+    ${libdir}/module/libbytrace*${SOLIBS} \
+"
+RDEPENDS:${PN}-bytrace += "musl libcxx"
+RDEPENDS:${PN}-bytrace += "${PN}-syspara ${PN}-libutils ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-bytrace"
+RDEPENDS:${PN}-ptest += "${PN}-bytrace"
+
+# //foundation/multimedia/media_standard
+PACKAGES =+ "${PN}-multimedia-media"
+FILES:${PN}-multimedia-media = " \
+    ${libdir}/libmedia_client*${SOLIBS} \
+    ${libdir}/libmedia_local*${SOLIBS} \
+    ${libdir}/libmedia_service*${SOLIBS} \
+    ${libdir}/libvideodisplaymanager*${SOLIBS} \
+    ${libdir}/media/libmedia_engine_gst*${SOLIBS} \
+    ${libdir}/media/plugins/libgst_audio_server_sink*${SOLIBS} \
+    ${libdir}/media/plugins/libgst_audio_capture_src*${SOLIBS} \
+    ${libdir}/media/plugins/libgst_surface_video_src*${SOLIBS} \
+    ${libdir}/module/multimedia/libmedia*${SOLIBS} \
+    ${libdir}/openharmony/profile/media_service.xml \
+"
+RDEPENDS:${PN}-multimedia-media += "musl libcxx"
+RDEPENDS:${PN}-multimedia-media += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-graphic ${PN}-peripheral-display"
+RDEPENDS:${PN}-multimedia-media += "${PN}-multimedia-audio ${PN}-thirdparty-gstreamer ${PN}-thirdparty-glib ${PN}-syspara ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-multimedia-media"
+RDEPENDS:${PN}-ptest += "${PN}-multimedia-media"
+
+# //foundation/multimedia/audio_standard
+PACKAGES =+ "${PN}-multimedia-audio"
+FILES:${PN}-multimedia-audio = " \
+    ${bindir}/pacat \
+    ${bindir}/pacmd \
+    ${bindir}/pactl \
+    ${libdir}/libaudio_capturer*${SOLIBS} \
+    ${libdir}/libaudio_client*${SOLIBS} \
+    ${libdir}/libaudio_policy_*${SOLIBS} \
+    ${libdir}/libaudio_renderer*${SOLIBS} \
+    ${libdir}/libaudio_service*${SOLIBS} \
+    ${libdir}/libaudio_capturer_source*${SOLIBS} \
+    ${libdir}/libsndfile*${SOLIBS} \
+    ${libdir}/libpulse*${SOLIBS} \
+    ${libdir}/libcli*${SOLIBS} \
+    ${libdir}/libprotocol-cli*${SOLIBS} \
+    ${libdir}/libprotocol-native*${SOLIBS} \
+    ${libdir}/libmodule-hdi-*${SOLIBS} \
+    ${libdir}/libmodule-native-protocol-*${SOLIBS} \
+    ${libdir}/libmodule-cli-protocol-unix*${SOLIBS} \
+    ${libdir}/libmodule-pipe-*${SOLIBS} \
+    ${libdir}/libmodule-suspend-on-idle*${SOLIBS} \
+    ${libdir}/module/multimedia/libaudio*${SOLIBS} \
+    ${libdir}/openharmony/profile/audio_policy.xml \
+    ${libdir}/openharmony/profile/pulseaudio.xml \
+"
+RDEPENDS:${PN}-multimedia-audio += "musl libcxx"
+RDEPENDS:${PN}-multimedia-audio += "${PN}-thirdparty-gstreamer ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-distributeddatamgr"
+RDEPENDS:${PN}-multimedia-audio += "${PN}-thirdparty-libxml2 ${PN}-thirdparty-glib ${PN}-safwk ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-multimedia-audio"
+RDEPENDS:${PN}-ptest += "${PN}-multimedia-audio"
+
+# //foundation/multimedia/camera_standard
+PACKAGES =+ "${PN}-multimedia-camera"
+FILES:${PN}-multimedia-camera = " \
+    ${libdir}/libcamera_service*${SOLIBS} \
+    ${libdir}/libcamera_framework*${SOLIBS} \
+    ${libdir}/libmetada*${SOLIBS} \
+    ${libdir}/module/multimedia/libcamera_napi*${SOLIBS} \
+    ${libdir}/openharmony/profile/camera_service.xml \
+"
+RDEPENDS:${PN}-multimedia-camera += "musl libcxx"
+RDEPENDS:${PN}-multimedia-camera += "${PN}-peripheral-camera ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-graphic ${PN}-samgr ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-multimedia-camera"
+RDEPENDS:${PN}-ptest += "${PN}-multimedia-camera"
+
+# //foundation/multimedia/image_standard
+PACKAGES =+ "${PN}-multimedia-image"
+FILES:${PN}-multimedia-image = " \
+    ${libdir}/libimage*${SOLIBS} \
+    ${libdir}/libimageformatagent*${SOLIBS} \
+    ${libdir}/libpixelconvertadapter*${SOLIBS} \
+    ${libdir}/libpluginmanager*${SOLIBS} \
+    ${libdir}/libjpegplugin*${SOLIBS} \
+    ${libdir}/libgifplugin*${SOLIBS} \
+    ${libdir}/libwebpplugin*${SOLIBS} \
+    ${libdir}/libpngplugin*${SOLIBS} \
+    ${libdir}/module/multimedia/libimage*${SOLIBS} \
+"
+RDEPENDS:${PN}-multimedia-image += "musl libcxx"
+RDEPENDS:${PN}-multimedia-image += "${PN}-hilog ${PN}-hilog ${PN}-libutils ${PN}-bytrace ${PN}-ipc"
+RDEPENDS:${PN} += "${PN}-multimedia-image"
+RDEPENDS:${PN}-ptest += "${PN}-multimedia-image"
+
+# //device/hihope/hardware/display
+PACKAGES =+ "${PN}-display-gralloc"
+FILES:${PN}-display-gralloc = "${libdir}/libdisplay_gralloc*${SOLIBS}"
+RDEPENDS:${PN}-display-gralloc += "musl libcxx"
+RDEPENDS:${PN}-display-gralloc += "${PN}-thirdparty-libdrm ${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libffi"
+RDEPENDS:${PN} += "${PN}-display-gralloc"
+
+# //base/global/i18n_standard
+PACKAGES =+ "${PN}-i18n"
+FILES:${PN}-i18n = " \
+    ${libdir}/libintl_util*${SOLIBS} \
+    ${libdir}/libzone_util*${SOLIBS} \
+    ${libdir}/module/libi18n*${SOLIBS} \
+    ${libdir}/module/libintl*${SOLIBS} \
+"
+RDEPENDS:${PN}-i18n += "musl libcxx"
+RDEPENDS:${PN}-i18n += "${PN}-syspara ${PN}-thirdparty-icu ${PN}-thirdparty-libxml2 ${PN}-libutils ${PN}-telephony-core"
+RDEPENDS:${PN}-i18n += "${PN}-thirdparty-libphonenumber ${PN}-hilog ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-i18n"
+RDEPENDS:${PN}-ptest += "${PN}-i18n"
+
+# //base/telephony/core_service
+PACKAGES =+ "${PN}-telephony-core"
+FILES:${PN}-telephony-core = " \
+    ${libdir}/libtel_core_*${SOLIBS} \
+    ${libdir}/libtelephony_common*${SOLIBS} \
+    ${libdir}/libsim*${SOLIBS} \
+    ${libdir}/module/telephony/*${SOLIBS} \
+    ${libdir}/openharmony/profile/telephony.xml \
+"
+RDEPENDS:${PN}-telephony-core += "musl libcxx"
+RDEPENDS:${PN}-telephony-core += "${PN}-libutils ${PN}-hilog ${PN}-ipc ${PN}-samgr ${PN}-aafwk ${PN}-uhdf2 ${PN}-ace-napi"
+RDEPENDS:${PN}-telephony-core += "${PN}-appexecfwk ${PN}-notification-ces ${PN}-safwk ${PN}-appdatamgr ${PN}-telephony-ril-adapter"
+RDEPENDS:${PN} += "${PN}-telephony-core"
+RDEPENDS:${PN}-ptest += "${PN}-telephony-core"
+
+# //base/telephony/ril_adapter
+PACKAGES =+ "${PN}-telephony-ril-adapter"
+FILES:${PN}-telephony-ril-adapter = " \
+    ${libdir}/libhril*${SOLIBS} \
+    ${libdir}/libril_vendor*${SOLIBS} \
+"
+RDEPENDS:${PN}-telephony-ril-adapter += "musl libcxx"
+RDEPENDS:${PN}-telephony-ril-adapter += "${PN}-uhdf2 ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-faultloggerd"
+RDEPENDS:${PN} += "${PN}-telephony-ril-adapter"
+RDEPENDS:${PN}-ptest += "${PN}-telephony-ril-adapter"
+
+# //base/hiviewdfx/faultloggerd
+PACKAGES =+ "${PN}-faultloggerd"
+FILES:${PN}-faultloggerd = " \
+    ${bindir}/faultloggerd \
+    ${bindir}/processdump \
+    ${libdir}/libfaultloggerd*${SOLIBS} \
+    ${libdir}/libdfx_signalhandler*${SOLIBS} \
+"
+RDEPENDS:${PN}-faultloggerd += "musl libcxx"
+RDEPENDS:${PN}-faultloggerd += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
+RDEPENDS:${PN} += "${PN}-faultloggerd"
+
+# //ark/runtime_core
+PACKAGES =+ "${PN}-ark-runtime-core"
+FILES:${PN}-ark-runtime-core = " \
+    ${libdir}/libarkbase*${SOLIBS} \
+    ${libdir}/libarkfile*${SOLIBS} \
+    ${libdir}/libarkziparchive*${SOLIBS} \
+"
+RDEPENDS:${PN}-ark-runtime-core += "musl libcxx"
+RDEPENDS:${PN}-ark-runtime-core += "${PN}-libutilsecurec ${PN}-thirdparty-icu"
+RDEPENDS:${PN} += "${PN}-ark-runtime-core"
+RDEPENDS:${PN}-ptest += "${PN}-ark-runtime-core"
+
+# //ark/js_runtime
+PACKAGES =+ "${PN}-ark-js-runtime"
+FILES:${PN}-ark-js-runtime = " \
+    ${libdir}/libark_jsruntime*${SOLIBS} \
+    ${libdir}/ark/libark_ecma_debugger*${SOLIBS} \
+"
+RDEPENDS:${PN}-ark-js-runtime += "musl libcxx"
+RDEPENDS:${PN}-ark-js-runtime += "${PN}-ark-runtime-core ${PN}-libutilsecurec ${PN}-thirdparty-icu"
+RDEPENDS:${PN} += "${PN}-ark-js-runtime"
+
+# //base/compileruntime/js_worker_module
+PACKAGES =+ "${PN}-js-worker"
+FILES:${PN}-js-worker = " \
+    ${libdir}/libworker_init*${SOLIBS} \
+    ${libdir}/module/libworker*${SOLIBS} \
+"
+RDEPENDS:${PN}-js-worker += "musl libcxx"
+RDEPENDS:${PN}-js-worker += "${PN}-hilog ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-js-worker"
+
+# //foundation/distributedhardware/devicemanager
+PACKAGES =+ "${PN}-distributedhardware-devicemanager"
+FILES:${PN}-distributedhardware-devicemanager = " \
+    ${libdir}/libdevicemanager*${SOLIBS} \
+    ${libdir}/module/distributedhardware/libdevicemanager*${SOLIBS} \
+"
+RDEPENDS:${PN}-distributedhardware-devicemanager += "musl libcxx"
+RDEPENDS:${PN}-distributedhardware-devicemanager += "${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-security-deviceauth ${PN}-aafwk ${PN}-appexecfwk"
+RDEPENDS:${PN}-distributedhardware-devicemanager += "${PN}-dsoftbus ${PN}-safwk ${PN}-syspara ${PN}-hilog ${PN}-ace-napi"
+RDEPENDS:${PN} += "${PN}-distributedhardware-devicemanager"
+RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager"
+
+# //developtools/hdc_standard
+PACKAGES =+ "${PN}-hdc"
+FILES:${PN}-hdc = "${bindir}/hdcd"
+RDEPENDS:${PN}-hdc += "musl libcxx"
+RDEPENDS:${PN}-hdc += "${PN}-libutils ${PN}-syspara libcrypto"
+RDEPENDS:${PN} += "${PN}-hdc"
+
+PACKAGES =+ "${PN}-param-service"
+FILES:${PN}-param-service = " \
+    ${bindir}/getparam \
+    ${bindir}/setparam \
+    ${bindir}/param_service \
+"
+RDEPENDS:${PN}-param-service += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-param-service"
+
+# Third Party Components (//third_party/*)
+
+PACKAGES =+ "${PN}-thirdparty-jsoncpp"
+FILES:${PN}-thirdparty-jsoncpp = "${libdir}/libjsoncpp*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-jsoncpp += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-jsoncpp"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-jsoncpp"
+
+PACKAGES =+ "${PN}-thirdparty-mtdev"
+FILES:${PN}-thirdparty-mtdev = "${libdir}/libmtdev*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-mtdev += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-mtdev"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-mtdev"
+
+PACKAGES =+ "${PN}-thirdparty-sqlite"
+FILES:${PN}-thirdparty-sqlite = "${libdir}/libsqlite*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-sqlite += "musl libcxx libcrypto ${PN}-libutils"
+RDEPENDS:${PN} += "${PN}-thirdparty-sqlite"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-sqlite"
+
+PACKAGES =+ "${PN}-thirdparty-libxml2"
+FILES:${PN}-thirdparty-libxml2 = "${libdir}/libxml2*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libxml2 += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libxml2"
+
+PACKAGES =+ "${PN}-thirdparty-icu"
+FILES:${PN}-thirdparty-icu = "${libdir}/libhmicu*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-icu += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-icu"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-icu"
+
+PACKAGES =+ "${PN}-thirdparty-gstreamer"
+FILES:${PN}-thirdparty-gstreamer = " \
+    ${bindir}/gst-inspect \
+    ${bindir}/gst-launch \
+    ${libdir}/libgstpbutils*${SOLIBS} \
+    ${libdir}/libgsttag*${SOLIBS} \
+    ${libdir}/libgstfft*${SOLIBS} \
+    ${libdir}/libgstvideo*${SOLIBS} \
+    ${libdir}/libgstaudio*${SOLIBS} \
+    ${libdir}/libgstriff*${SOLIBS} \
+    ${libdir}/libgstrtp*${SOLIBS} \
+    ${libdir}/libgstreamer*${SOLIBS} \
+    ${libdir}/libgstbase*${SOLIBS} \
+    ${libdir}/libgstplayer*${SOLIBS} \
+    ${libdir}/media/plugins/libgstplayback*${SOLIBS} \
+    ${libdir}/media/plugins/libgstvideoconvert*${SOLIBS} \
+    ${libdir}/media/plugins/libgstvideoscale*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudiomixer*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudioparsers*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudiorate*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudiofx*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudioconvert*${SOLIBS} \
+    ${libdir}/media/plugins/libgstaudioresample*${SOLIBS} \
+    ${libdir}/media/plugins/libgsttypefindfunctions*${SOLIBS} \
+    ${libdir}/media/plugins/libgstsubparse*${SOLIBS} \
+    ${libdir}/media/plugins/libgstrawpars*${SOLIBS} \
+    ${libdir}/media/plugins/libgstapp*${SOLIBS} \
+    ${libdir}/media/plugins/libgstlibav*${SOLIBS} \
+    ${libdir}/media/plugins/libgstautodetect*${SOLIBS} \
+    ${libdir}/media/plugins/libgstisomp4*${SOLIBS} \
+    ${libdir}/media/plugins/libgstwavparse*${SOLIBS} \
+    ${libdir}/media/plugins/libgstmultifile*${SOLIBS} \
+    ${libdir}/media/plugins/libgstcoreelements*${SOLIBS} \
+    ${libdir}/media/plugins/libgstcoretracers*${SOLIBS} \
+"
+RDEPENDS:${PN}-thirdparty-gstreamer += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-gstreamer += "${PN}-thirdparty-glib ${PN}-thirdparty-ffmpeg"
+RDEPENDS:${PN} += "${PN}-thirdparty-gstreamer"
+
+PACKAGES =+ "${PN}-thirdparty-glib"
+FILES:${PN}-thirdparty-glib = " \
+    ${libdir}/libglib*${SOLIBS} \
+    ${libdir}/libgmodule*${SOLIBS} \
+    ${libdir}/libgobject*${SOLIBS} \
+"
+RDEPENDS:${PN}-thirdparty-glib += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-glib += "${PN}-thirdparty-libffi"
+RDEPENDS:${PN} += "${PN}-thirdparty-glib"
+
+PACKAGES =+ "${PN}-thirdparty-ffmpeg"
+FILES:${PN}-thirdparty-ffmpeg = "${libdir}/libohosffmpeg*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-ffmpeg += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-ffmpeg += ""
+RDEPENDS:${PN} += "${PN}-thirdparty-ffmpeg"
+
+PACKAGES =+ "${PN}-thirdparty-pixman"
+FILES:${PN}-thirdparty-pixman = "${libdir}/libpixman*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-pixman += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-pixman"
+
+PACKAGES =+ "${PN}-thirdparty-libinput"
+FILES:${PN}-thirdparty-libinput = "${libdir}/libinput-third*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libinput += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-libinput += "${PN}-thirdparty-libevdev ${PN}-thirdparty-eudev ${PN}-thirdparty-mtdev"
+RDEPENDS:${PN} += "${PN}-thirdparty-libinput"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-libinput"
+
+PACKAGES =+ "${PN}-thirdparty-libevdev"
+FILES:${PN}-thirdparty-libevdev = "${libdir}/libevdev*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libevdev += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libevdev"
+
+PACKAGES =+ "${PN}-thirdparty-eudev"
+FILES:${PN}-thirdparty-eudev = " \
+    ${bindir}/udevd \
+    ${libdir}/libudev*${SOLIBS} \
+"
+RDEPENDS:${PN}-thirdparty-eudev += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-eudev"
+
+PACKAGES =+ "${PN}-thirdparty-libdrm"
+FILES:${PN}-thirdparty-libdrm = "${libdir}/libdrm*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libdrm += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libdrm"
+
+PACKAGES =+ "${PN}-thirdparty-libpng"
+FILES:${PN}-thirdparty-libpng = "${libdir}/libpng*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libpng += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-libpng += "${PN}-multimedia-image ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-thirdparty-libpng"
+
+PACKAGES =+ "${PN}-thirdparty-libffi"
+FILES:${PN}-thirdparty-libffi = "${libdir}/libffi*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libffi += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libffi"
+
+PACKAGES =+ "${PN}-thirdparty-libphonenumber"
+FILES:${PN}-thirdparty-libphonenumber = "${libdir}/libphonenumber_standard*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libphonenumber += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-libphonenumber += "${PN}-thirdparty-icu ${PN}-thirdparty-protobuf"
+RDEPENDS:${PN} += "${PN}-thirdparty-libphonenumber"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-libphonenumber"
+
+PACKAGES =+ "${PN}-thirdparty-protobuf"
+FILES:${PN}-thirdparty-protobuf = "${libdir}/libprotobuf_standard*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-protobuf += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-protobuf"
+RDEPENDS:${PN}-ptest += "${PN}-thirdparty-protobuf"
+
+PACKAGES =+ "${PN}-thirdparty-libunwind"
+FILES:${PN}-thirdparty-libunwind = "${libdir}/libunwind*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libunwind += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libunwind"
+
+PACKAGES =+ "${PN}-thirdparty-giflib"
+FILES:${PN}-thirdparty-giflib = "${libdir}/libgif*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-giflib += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-giflib += "${PN}-libutils ${PN}-hilog ${PN}-multimedia-image"
+RDEPENDS:${PN} += "${PN}-thirdparty-giflib"
+
+PACKAGES =+ "${PN}-thirdparty-libcoap"
+FILES:${PN}-thirdparty-libcoap = "${libdir}/libcoap*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-libcoap += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-libcoap"
+
+PACKAGES =+ "${PN}-thirdparty-wayland"
+FILES:${PN}-thirdparty-wayland = " \
+    ${bindir}/layer-add-surfaces \
+    ${bindir}/LayerManagerControl \
+    ${bindir}/simple-weston-client \
+    ${libdir}/libilm*${SOLIBS} \
+    ${libdir}/libivi*${SOLIBS} \
+    ${libdir}/libscreen-info-module*${SOLIBS} \
+"
+RDEPENDS:${PN}-thirdparty-wayland += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-wayland += "${PN}-thirdparty-weston ${PN}-hilog ${PN}-thirdparty-libffi ${PN}-graphic"
+RDEPENDS:${PN}-thirdparty-wayland += "${PN}-thirdparty-libevdev ${PN}-thirdparty-libinput ${PN}-thirdparty-libpng"
+RDEPENDS:${PN} += "${PN}-thirdparty-wayland"
+
+PACKAGES =+ "${PN}-thirdparty-weston"
+FILES:${PN}-thirdparty-weston = " \
+    ${bindir}/weston \
+    ${libdir}/libweston*${SOLIBS} \
+    ${libdir}/drm-backend*${SOLIBS} \
+    ${libdir}/libtrace*${SOLIBS} \
+    ${libdir}/libivi-shell*${SOLIBS} \
+    ${libdir}/openharmony/profile/multimodalinputservice.xml \
+"
+RDEPENDS:${PN}-thirdparty-weston += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-weston += "${PN}-hilog ${PN}-libutils ${PN}-thirdparty-libxml2 ${PN}-thirdparty-libffi ${PN}-thirdparty-libdrm ${PN}-graphic"
+RDEPENDS:${PN}-thirdparty-weston += "${PN}-thirdparty-libinput ${PN}-thirdparty-libevdev ${PN}-thirdparty-eudev ${PN}-thirdparty-pixman ${PN}-display-gralloc"
+RDEPENDS:${PN} += "${PN}-thirdparty-weston"
 
 # Disable all ptest suites that are know to not work for now. When the x-bit is
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
