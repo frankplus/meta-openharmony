@@ -4,31 +4,37 @@
 
 Patch for //developtools/hdc_standard git repository of OpenHarmony 3.1 codebase.
 
-Only build for linux host using host toolchain.
+Disable hdc_std since there is a separate recipe for the host tool.
 
-Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Signed-off-by: Kristijonas Ciulcinskas <kristijonas.ciulcinskas@huawei.com>
+Signed-off-by: Grzegorz Gwóźdź <grzegorz.gwozdz@huawei.com>
 Upstream-Status: Inappropriate [configuration/integration]
 
 diff --git a/developtools/hdc_standard/BUILD.gn b/developtools/hdc_standard/BUILD.gn
 index b2c1cfbeea4a..8b4eeaa1fc1f 100644
 --- a/developtools/hdc_standard/BUILD.gn
 +++ b/developtools/hdc_standard/BUILD.gn
-@@ -194,25 +194,13 @@ group("hdc_target_standard") {
+@@ -188,32 +188,12 @@ ohos_executable("hdc_std") {
+ 
+ group("hdc_target_standard") {
+   deps = [
+-    ":hdc_std",
+     ":hdcd",
+   ]
  }
  
- group("hdc_target_standard_linux") {
+-group("hdc_target_standard_linux") {
 -  deps = [ ":hdc_std(//build/toolchain/linux:clang_x64)" ]
 -}
 -
 -group("hdc_target_standard_mingw") {
 -  deps = [ ":hdc_std(//build/toolchain/mingw:mingw_x86_64)" ]
-+  deps = [ ":hdc_std($host_toolchain)" ]
- }
- 
+-}
+-
  group("hdc_target_standard_all") {
-   deps = [
-     ":hdc_target_standard",
-     ":hdc_target_standard_linux",
+-  deps = [
+-    ":hdc_target_standard",
+-    ":hdc_target_standard_linux",
 -    ":hdc_target_standard_mingw",
 -  ]
 -}
@@ -37,6 +43,8 @@ index b2c1cfbeea4a..8b4eeaa1fc1f 100644
 -  deps = [
 -    ":hdc_target_standard",
 -    ":hdc_target_standard_mingw",
-   ]
+-  ]
++  deps = [ ":hdc_target_standard" ]
  }
  
+ group("hdc_all") {

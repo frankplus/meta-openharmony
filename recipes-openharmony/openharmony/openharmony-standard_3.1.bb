@@ -212,8 +212,6 @@ do_install () {
     # Workaround! Build system does not install libcrypto.z.so (boringssl), so
     # we install it manually for now
     cp ${B}/developtools/profiler/libcrypto.z.so ${D}${libdir}/
-    # Same for libusb_shared.z.so
-    cp ${B}/common/common/libusb_shared.z.so ${D}${libdir}/
 }
 
 inherit update-alternatives
@@ -381,7 +379,6 @@ OPENHARMONY_PARTS += "startup:init"
 OPENHARMONY_PARTS += "startup:startup_l2"
 OPENHARMONY_PARTS += "telephony:core_service"
 OPENHARMONY_PARTS += "telephony:ril_adapter"
-OPENHARMONY_PARTS += "usb:libusb_shared"
 OPENHARMONY_PARTS += "useriam:auth_executor_mgr"
 OPENHARMONY_PARTS += "useriam:pin_auth"
 OPENHARMONY_PARTS += "useriam:user_auth"
