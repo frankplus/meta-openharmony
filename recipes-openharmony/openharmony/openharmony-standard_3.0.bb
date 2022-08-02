@@ -193,7 +193,12 @@ RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl ${PN}-libutils"
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-FILES:${PN} += "${libdir}/media ${libdir}/module ${libdir}/ark ${libdir}/openharmony ${libdir}/*${SOLIBS}"
+# Remove default file patterns from FILES:${PN} and avoid non-packaged
+# files to be included in the ${PN} package
+FILES:${PN}:remove = "${libdir}/lib*.so"
+FILES:${PN}:remove = "${bindir}/*"
+FILES:${PN}:remove = "${libdir}/${BPN}/*"
+
 FILES:${PN}-configs = "${sysconfdir}"
 FILES:${PN}-fonts = "${datadir}/fonts"
 
