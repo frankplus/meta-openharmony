@@ -688,7 +688,16 @@ FILES:${PN}-samgr = " \
     ${bindir}/samgr \
     ${libdir}/libsamgr*${SOLIBS} \
     ${libdir}/liblsamgr*${SOLIBS} \
+    ${systemd_unitdir}/samgr.service \
 "
+SYSTEMD_PACKAGES += "${PN}-samgr"
+SYSTEMD_SERVICE:${PN}-samgr = "samgr.service"
+SRC_URI += "file://samgr.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/samgr.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/samgr_standard.cfg
+}
 RDEPENDS:${PN}-samgr += "musl libcxx"
 RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-samgr"
@@ -702,6 +711,8 @@ do_install_ptest:append() {
     install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-samgr/ptest/run-ptest
     mv ${D}${PTEST_PATH}/unittest/samgr/samgr ${D}${libdir}/${BPN}-samgr/ptest/unittest
     rmdir ${D}${PTEST_PATH}/unittest/samgr
+
+    echo "samgr.service" > ${D}${libdir}/${BPN}-samgr/ptest/systemd-units
 }
 RDEPENDS:${PN}-samgr-ptest += "musl libcxx"
 RDEPENDS:${PN}-samgr-ptest += "${PN}-samgr ${PN}-libutils ${PN}-hilog ${PN}-ipc"
