@@ -54,7 +54,7 @@ for ts in unittest moduletest systemtest ; do
 done
 
 # Component level test fixture teardown
-if [ -f setup.sh ]; then
+if [ -f teardown.sh ]; then
     source teardown.sh
 fi
 
