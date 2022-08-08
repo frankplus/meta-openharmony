@@ -39,6 +39,8 @@ include:
  - local: '.gitlab-ci/container.yml'
 
 variables:
+  # Force the use of git clone to avoid odd git and repo problems
+  GIT_STRATEGY: "clone"
   # output upload and download progress every 10 seconds
   TRANSFER_METER_FREQUENCY: "10s"
   # Use no compression for artifacts
