@@ -313,6 +313,10 @@ OPENHARMONY_PARTS += "hiviewdfx:hilog_native"
 OPENHARMONY_PARTS += "hiviewdfx:hilog_service"
 OPENHARMONY_PARTS += "hiviewdfx:hisysevent_native"
 OPENHARMONY_PARTS += "hiviewdfx:hiviewdfx_hilog_native"
+OPENHARMONY_PARTS += "hiviewdfx:hiview"
+OPENHARMONY_PARTS += "hiviewdfx:hiview_L2"
+OPENHARMONY_PARTS += "hiviewdfx:hicollie_native"
+OPENHARMONY_PARTS += "hiviewdfx:hitrace_native"
 OPENHARMONY_PARTS += "miscservices:inputmethod_native"
 OPENHARMONY_PARTS += "miscservices:time_native"
 OPENHARMONY_PARTS += "multimedia:multimedia_audio_standard"
@@ -437,7 +441,6 @@ do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hilog/ptest"
 do_install_ptest:append() {
     install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hilog/ptest/run-ptest
     mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hilog ${D}${libdir}/${BPN}-hilog/ptest/moduletest
-    rmdir ${D}${PTEST_PATH}/moduletest/hiviewdfx
     echo "hilogd.service" > ${D}${libdir}/${BPN}-hilog/ptest/systemd-units
 }
 FILES:${PN}-hilog-ptest = "${libdir}/${BPN}-hilog/ptest"
@@ -1536,6 +1539,94 @@ FILES:${PN}-faultloggerd = " \
 RDEPENDS:${PN}-faultloggerd += "musl libcxx"
 RDEPENDS:${PN}-faultloggerd += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
 RDEPENDS:${PN} += "${PN}-faultloggerd"
+
+# thirdparty-iowow
+PACKAGES =+ "${PN}-thirdparty-iowow"
+FILES:${PN}-thirdparty-iowow = "${libdir}/libiowow*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-iowow += "musl libcxx"
+RDEPENDS:${PN} += "${PN}-thirdparty-iowow"
+
+# thirdparty-ejdb
+PACKAGES =+ "${PN}-thirdparty-ejdb"
+FILES:${PN}-thirdparty-ejdb = "${libdir}/libejdb*${SOLIBS}"
+RDEPENDS:${PN}-thirdparty-ejdb += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-ejdb += "${PN}-thirdparty-iowow"
+RDEPENDS:${PN} += "${PN}-thirdparty-ejdb"
+
+# //base/hiviewdfx/hiview
+PACKAGES =+ "${PN}-hiview"
+FILES:${PN}-hiview = " \
+    ${bindir}/hiview \
+    ${libdir}/libhiviewbase*${SOLIBS} \
+"
+RDEPENDS:${PN}-hiview += "musl libcxx"
+RDEPENDS:${PN}-hiview += " \
+    ${PN}-libutils \
+    ${PN}-hilog \
+    ${PN}-syspara \
+    ${PN}-ipc \
+    ${PN}-safwk \
+    ${PN}-samgr \
+    ${PN}-appexecfwk \
+    ${PN}-thirdparty-iowow \
+    ${PN}-thirdparty-ejdb \
+"
+RDEPENDS:${PN} += "${PN}-hiview"
+
+# hiview-ptest
+PACKAGES =+ "${PN}-hiview-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hiview/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hiview/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hiview ${D}${libdir}/${BPN}-hiview/ptest/moduletest
+    mv ${D}${PTEST_PATH}/unittest/hiview ${D}${libdir}/${BPN}-hiview/ptest/unittest
+    mv ${D}${PTEST_PATH}/unittest/hiview_L2/* ${D}${libdir}/${BPN}-hiview/ptest/unittest/
+
+    # Removing QA non-passing tests, because libfaultlogger.z.so isn't included (problem with hiview_L2)
+    rm -r ${D}${PTEST_PATH}/unittest/hiviewdfx/faultlogger
+}
+FILES:${PN}-hiview-ptest = "${libdir}/${BPN}-hiview/ptest"
+RDEPENDS:${PN}-hiview-ptest += "musl libcxx"
+RDEPENDS:${PN}-hiview-ptest += "${PN}-hiview ${PN}-libutils ${PN}-hilog ${PN}-syspara ${PN}-thirdparty-iowow ${PN}-thirdparty-ejdb"
+RDEPENDS:${PN}-ptest += "${PN}-hiview-ptest"
+
+# //base/hiviewdfx/hicollie
+PACKAGES =+ "${PN}-hicollie"
+FILES:${PN}-hicollie = "${libdir}/libhicollie*${SOLIBS}"
+RDEPENDS:${PN}-hicollie += "musl libcxx"
+RDEPENDS:${PN}-hicollie += "${PN}-libutils ${PN}-hilog ${PN}-hisysevent"
+RDEPENDS:${PN} += "${PN}-hicollie"
+
+# hicollie-ptest
+PACKAGES =+ "${PN}-hicollie-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hicollie/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hicollie/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hiviewdfx/hicollie ${D}${libdir}/${BPN}-hicollie/ptest/unittest
+}
+FILES:${PN}-hicollie-ptest = "${libdir}/${BPN}-hicollie/ptest"
+RDEPENDS:${PN}-hicollie-ptest += "musl libcxx"
+RDEPENDS:${PN}-hicollie-ptest += "${PN}-hicollie ${PN}-libutils"
+RDEPENDS:${PN}-ptest += "${PN}-hicollie-ptest"
+
+# //base/hiviewdfx/hitrace
+PACKAGES =+ "${PN}-hitrace"
+FILES:${PN}-hitrace = "${libdir}/libhitrace*${SOLIBS}"
+RDEPENDS:${PN}-hitrace += "musl libcxx"
+RDEPENDS:${PN}-hitrace += "${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN} += "${PN}-hitrace"
+
+# hitrace-ptest
+PACKAGES =+ "${PN}-hitrace-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-hitrace/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hitrace/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hiviewdfx/hitrace ${D}${libdir}/${BPN}-hitrace/ptest/unittest
+}
+FILES:${PN}-hitrace-ptest = "${libdir}/${BPN}-hitrace/ptest"
+RDEPENDS:${PN}-hitrace-ptest += "musl libcxx"
+RDEPENDS:${PN}-hitrace-ptest += "${PN}-hitrace ${PN}-libutils ${PN}-hilog"
+RDEPENDS:${PN}-ptest += "${PN}-hitrace-ptest"
 
 # //ark/runtime_core
 PACKAGES =+ "${PN}-ark-runtime-core"
