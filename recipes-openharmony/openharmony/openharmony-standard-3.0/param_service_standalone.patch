@@ -4,17 +4,18 @@
 
 Patch for //base/startup/init_lite
 
-param_service: Add to build system
+param_service: Add standalone param_service executable
 
 In OpenHarmony 3.0 Param Service is a part of the whole Init system. This
 service is required by many other services. Therefore we have to split out
 the service as an independent from Init when Init is not used.
 
 Signed-off-by: Robert Drab <robert.drab@huawei.com>
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
 Upstream-Status: Inappropriate
 
 diff --git a/services/BUILD.gn b/services/BUILD.gn
-index 1994c2ef..e094f7ce 100644
+index 1994c2ef..bdf34165 100644
 --- a/services/BUILD.gn
 +++ b/services/BUILD.gn
 @@ -85,6 +85,25 @@ if (defined(ohos_lite)) {
@@ -81,7 +82,7 @@ index 07e1d278..ba420b66 100644
 +  part_name = "startup_l2"
  }
 diff --git a/services/param/service/param_service.c b/services/param/service/param_service.c
-index cd5d93be..03a10ae0 100644
+index cd5d93be..2f0beffe 100644
 --- a/services/param/service/param_service.c
 +++ b/services/param/service/param_service.c
 @@ -131,7 +131,11 @@ static int ProcessParamSet(const RequestMsg *msg)
@@ -96,7 +97,23 @@ index cd5d93be..03a10ae0 100644
      return 0;
  }
  
-@@ -267,7 +271,11 @@ int SystemWriteParam(const char *name, const char *value)
+@@ -243,6 +247,15 @@ int StartParamService()
+     uv_fs_t req;
+     uv_fs_unlink(uv_default_loop(), &req, PIPE_NAME, NULL);
+ 
++    // Stop the param service properly on a few signals
++    uv_signal_t sigterm, sigint, sighup;
++    uv_signal_init(uv_default_loop(), &sigterm);
++    uv_signal_start(&sigterm, StopParamService, SIGTERM);
++    uv_signal_init(uv_default_loop(), &sigint);
++    uv_signal_start(&sigint, StopParamService, SIGINT);
++    uv_signal_init(uv_default_loop(), &sighup);
++    uv_signal_start(&sighup, StopParamService, SIGHUP);
++
+     uv_pipe_t pipeServer;
+     int ret = uv_pipe_init(uv_default_loop(), &pipeServer, 0);
+     PARAM_CHECK(ret == 0, return ret, "Failed to uv_pipe_init %d", ret);
+@@ -267,7 +280,11 @@ int SystemWriteParam(const char *name, const char *value)
      PARAM_CHECK(ret == 0, return ret, "Failed to set persist param %s", name);
  
      // notify event to process trigger
@@ -108,3 +125,61 @@ index cd5d93be..03a10ae0 100644
      return ret;
  }
  
+diff --git a/services/param/src/param_service_main.c b/services/param/src/param_service_main.c
+new file mode 100644
+index 00000000..0be35eb9
+--- /dev/null
++++ b/services/param/src/param_service_main.c
+@@ -0,0 +1,52 @@
++/*
++ * SPDX-FileCopyrightText: Huawei Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <init_log.h>
++#include <init_param.h>
++#include <errno.h>
++#include <unistd.h>
++
++char *parse_args(int argc, char **argv) {
++    char *fpath = NULL;
++
++    if (argc == 2 && argv[1]) {
++        if (access(argv[1], R_OK) == 0) {
++            fpath = argv[1];
++        }
++    }
++
++    return fpath;
++}
++
++int main(int argc, char **argv)
++{
++    char *params_fpath = "/system/etc/ohos.para";
++
++    if (argc > 1)
++        params_fpath = parse_args(argc, argv);
++
++    if (!params_fpath) {
++        INIT_LOGI("Invalid params file path!");
++        return -EINVAL;
++    }
++
++    InitParamService();
++    int ret = LoadDefaultParams(params_fpath);
++    if (ret) {
++        INIT_LOGE("Failed to load default params! Error code: %d", ret);
++    }
++    ret = LoadPersistParams();
++    if (ret) {
++        INIT_LOGE("Failed to load persist params! Error code: %d", ret);
++    }
++
++    // Following call spins up libuv event loop that will keep service running
++    INIT_LOGI("Starting param service...");
++    StartParamService();
++    INIT_LOGI("Param service stopped.");
++
++    return 0;
++}
