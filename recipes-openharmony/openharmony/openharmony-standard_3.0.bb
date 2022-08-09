@@ -347,6 +347,24 @@ copy_subsystem_config_json_file() {
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
+# OpenHarmony pre-init package and its systemd service
+# Used to create folders needed by OH services and components
+PACKAGES =+ "${PN}-openharmony-preinit"
+SYSTEMD_PACKAGES = "${PN}-openharmony-preinit"
+SYSTEMD_SERVICE:${PN}-openharmony-preinit = "openharmony-preinit.service"
+FILES:${PN}-openharmony-preinit = " \
+    ${libdir}/openharmony-preinit \
+"
+SRC_URI += "file://openharmony-preinit file://openharmony-preinit.service"
+do_install:append() {
+    install -d ${D}/${sbindir}
+    install -m 755 ${WORKDIR}/openharmony-preinit ${D}/${sbindir}
+
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/openharmony-preinit.service ${D}${systemd_unitdir}/system/
+}
+RDEPENDS:${PN} += "${PN}-openharmony-preinit"
+
 # //utils/native component
 PACKAGES =+ "${PN}-libutilsecurec ${PN}-libutils"
 FILES:${PN}-libutilsecurec = "${libdir}/libutilsecurec*${SOLIBS}"
@@ -370,7 +388,7 @@ RDEPENDS:${PN}-ptest += "${PN}-libutils-ptest"
 
 # //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog"
-SYSTEMD_PACKAGES = "${PN}-hilog"
+SYSTEMD_PACKAGES += "${PN}-hilog"
 SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
 SRC_URI += "file://hilogd.service"
 do_install:append() {

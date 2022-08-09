@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+#!/bin/sh
+
+mkdir -p /data/backup
+mkdir -p /data/bootchart
+mkdir -p /data/cache
+mkdir -p /data/cache/backup
+mkdir -p /data/cache/backup_stage
+mkdir -p /data/cache/recovery
+mkdir -p /data/data/.pulse_dir
+mkdir -p /data/dhcp
+mkdir -p /data/drm
+mkdir -p /data/local/tmp
+mkdir -p /data/local/traces
+mkdir -p /data/lost
+mkdir -p /data/mediadrm
+mkdir -p /data/media/obb
+mkdir -p /data/misc/apns
+mkdir -p /data/misc/audioserver
+mkdir -p /data/misc/bluedroid
+mkdir -p /data/misc/bluetooth/logs
+mkdir -p /data/misc/boottrace
+mkdir -p /data/misc/cameraserver
+mkdir -p /data/misc/carrierid
+mkdir -p /data/misc_ce
+mkdir -p /data/misc_de
+mkdir -p /data/misc/dhcp
+mkdir -p /data/misc/ethernet
+mkdir -p /data/misc/gatekeeper
+mkdir -p /data/misc/gcov
+mkdir -p /data/misc/keychain
+mkdir -p /data/misc/keystore
+mkdir -p /data/misc/media
+mkdir -p /data/misc/net
+mkdir -p /data/misc/network_watchlist
+mkdir -p /data/misc/perfprofd
+mkdir -p /data/misc/profiles/cur
+mkdir -p /data/misc/profiles/ref
+mkdir -p /data/misc/profman
+mkdir -p /data/misc/radio
+mkdir -p /data/misc/recovery/proc
+mkdir -p /data/misc/shared_relro
+mkdir -p /data/misc/sms
+mkdir -p /data/misc/systemkeys
+mkdir -p /data/misc/textclassifier
+mkdir -p /data/misc/trace
+mkdir -p /data/misc/update_engine
+mkdir -p /data/misc/update_engine_log
+mkdir -p /data/misc/user
+mkdir -p /data/misc/vold
+mkdir -p /data/misc/vpn
+mkdir -p /data/misc/wifi/sockets
+mkdir -p /data/misc/wifi/wpa_supplicant
+mkdir -p /data/misc/wmtrace
+mkdir -p /data/misc/zoneinfo
+mkdir -p /data/nfc/param
+mkdir -p /data/ota
+mkdir -p /data/ota_package
+mkdir -p /data/preloads
+mkdir -p /data/resourcefoundation.xml
+mkdir -p /data/ss
+mkdir -p /data/system_ce
+mkdir -p /data/system_de
+mkdir -p /data/system/dropbox
+mkdir -p /data/system/heapdump
+mkdir -p /data/system/users
+mkdir -p /data/user
+mkdir -p /data/user_de
+mkdir -p /data/vendor_ce
+mkdir -p /data/vendor_de
+mkdir -p /data/vendor/hardware
+mkdir -p /data/weston
+mkdir -p /usr/lib/dri
+
+# /dev/binder needs to be rw for all users
+chmod 666 /dev/binder
+
+# /dev/dri/card0 needs to be rw for all users
+if [ -c /dev/dri/card0 ]; then
+	chmod 666 /dev/dri/card0
+fi
