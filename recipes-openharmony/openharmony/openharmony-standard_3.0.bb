@@ -182,6 +182,7 @@ do_install () {
 PACKAGES =+ "${PN}-configs ${PN}-fonts"
 
 RDEPENDS:${PN} += "${PN}-configs ${PN}-fonts"
+RDEPENDS:${PN} += "coreutils"
 
 RDEPENDS:${PN} += "musl libcxx libcrypto libssl libatomic"
 RDEPENDS:${PN}-ptest += "musl libcxx libcrypto libssl ${PN}-libutils"
