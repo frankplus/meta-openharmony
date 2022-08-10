@@ -926,6 +926,14 @@ RDEPENDS:${PN}-ptest += "${PN}-security-huks-ptest"
 
 # //base/security/deviceauth
 PACKAGES =+ "${PN}-security-deviceauth"
+SYSTEMD_PACKAGES += "${PN}-security-deviceauth"
+SYSTEMD_SERVICE:${PN}-security-deviceauth = "deviceauth.service"
+SRC_URI += "file://deviceauth.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/deviceauth.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/deviceauth_service.cfg
+}
 FILES:${PN}-security-deviceauth = " \
     ${bindir}/deviceauth_service \
     ${libdir}/libdeviceauth*${SOLIBS} \
