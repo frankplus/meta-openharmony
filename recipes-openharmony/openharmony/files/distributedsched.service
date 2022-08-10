@@ -1,12 +1,12 @@
 [Unit]
-Description=OpenHarmony DSoftBus services
+Description=OpenHarmony Distributed Schedule service
 Requires=appspawn.service
 After=appspawn.service
 
 [Service]
 Type=exec
 # should run as system:system
-ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
+ExecStart=/usr/bin/sa_main /system/profile/distributedsched.xml
 
 [Install]
 WantedBy=multi-user.target

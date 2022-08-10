@@ -666,6 +666,14 @@ RDEPENDS:${PN}-ptest += "${PN}-ipc-ptest"
 
 # //foundation/communication/dsoftbus
 PACKAGES =+ "${PN}-dsoftbus"
+SYSTEMD_PACKAGES += "${PN}-dsoftbus"
+SYSTEMD_SERVICE:${PN}-dsoftbus = "dsoftbus.service"
+SRC_URI += "file://dsoftbus.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/dsoftbus.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/softbus_server.cfg
+}
 FILES:${PN}-dsoftbus = " \
     ${libdir}/libsoftbus*${SOLIBS} \
     ${libdir}/libnstackx*${SOLIBS} \
@@ -788,6 +796,14 @@ RDEPENDS:${PN}-ptest += "${PN}-appdatamgr-ptest"
 
 # //foundation/distributeddatamgr/distributeddatamgr
 PACKAGES =+ "${PN}-distributeddatamgr"
+SYSTEMD_PACKAGES += "${PN}-distributeddatamgr"
+SYSTEMD_SERVICE:${PN}-distributeddatamgr = "distributed_data.service"
+SRC_URI += "file://distributed_data.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/distributed_data.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/distributed_data.cfg
+}
 FILES:${PN}-distributeddatamgr = " \
     ${libdir}/libdistributeddata*${SOLIBS} \
     ${libdir}/libapp_distributeddata*${SOLIBS} \
@@ -820,6 +836,14 @@ RDEPENDS:${PN}-ptest += "${PN}-distributeddatamgr-ptest"
 
 # //base/account/os_account
 PACKAGES =+ "${PN}-os-account"
+SYSTEMD_PACKAGES += "${PN}-os-account"
+SYSTEMD_SERVICE:${PN}-os-account = "accountmgr.service"
+SRC_URI += "file://accountmgr.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/accountmgr.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/accountmgr.cfg
+}
 FILES:${PN}-os-account = " \
     ${libdir}/libaccount*${SOLIBS} \
     ${libdir}/module/account/*${SOLIBS} \
@@ -855,6 +879,14 @@ RDEPENDS:${PN} += "${PN}-security-dataclassification"
 
 # //foundation/distributedschedule/dmsfwk
 PACKAGES =+ "${PN}-dmsfwk"
+SYSTEMD_PACKAGES += "${PN}-dmsfwk"
+SYSTEMD_SERVICE:${PN}-dmsfwk = "distributedsched.service"
+SRC_URI += "file://distributedsched.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/distributedsched.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/distributedsched.cfg
+}
 FILES:${PN}-dmsfwk = " \
     ${libdir}/libdistributedschedsvr*${SOLIBS} \
     ${libdir}/libzuri*${SOLIBS} \
@@ -903,6 +935,14 @@ RDEPENDS:${PN}-ptest += "${PN}-security-permission-ptest"
 
 # //base/security/huks
 PACKAGES =+ "${PN}-security-huks"
+SYSTEMD_PACKAGES += "${PN}-security-huks"
+SYSTEMD_SERVICE:${PN}-security-huks = "huks.service"
+SRC_URI += "file://huks.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/huks.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/huks_service.cfg
+}
 FILES:${PN}-security-huks = " \
     ${libdir}/libhuks*${SOLIBS} \
     ${libdir}/openharmony/profile/huks_service.xml \
@@ -1023,6 +1063,14 @@ RDEPENDS:${PN} += "${PN}-peripheral-input"
 
 # //base/miscservices/time
 PACKAGES =+ "${PN}-timeservice"
+SYSTEMD_PACKAGES += "${PN}-timeservice"
+SYSTEMD_SERVICE:${PN}-timeservice = "time.service"
+SRC_URI += "file://time.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/time.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/timeservice.cfg
+}
 FILES:${PN}-timeservice = " \
     ${libdir}/libtime_service*${SOLIBS} \
     ${libdir}/module/libsystemtime*${SOLIBS} \
@@ -1169,6 +1217,14 @@ RDEPENDS:${PN} += "${PN}-ace-napi"
 
 # //base/miscservices/inputmethod
 PACKAGES =+ "${PN}-inputmethod"
+SYSTEMD_PACKAGES += "${PN}-inputmethod"
+SYSTEMD_SERVICE:${PN}-inputmethod = "inputmethod.service"
+SRC_URI += "file://inputmethod.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/inputmethod.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/inputmethodservice.cfg
+}
 FILES:${PN}-inputmethod = " \
     ${libdir}/libinputmethod_*${SOLIBS} \
     ${libdir}/module/libinputmethodengine*${SOLIBS} \
