@@ -1,5 +1,7 @@
 [Unit]
 Description=OpenHarmony hilog daemon
+Requires=param.service
+After=param.service
 
 [Service]
 Type=exec
