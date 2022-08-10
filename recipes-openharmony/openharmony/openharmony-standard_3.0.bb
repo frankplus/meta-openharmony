@@ -1439,6 +1439,14 @@ RDEPENDS:${PN}-ptest += "${PN}-telephony-ril-adapter-ptest"
 
 # //base/hiviewdfx/faultloggerd
 PACKAGES =+ "${PN}-faultloggerd"
+SYSTEMD_PACKAGES += "${PN}-faultloggerd"
+SYSTEMD_SERVICE:${PN}-faultloggerd = "faultloggerd.service"
+SRC_URI += "file://faultloggerd.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/faultloggerd.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/faultloggerd32.cfg
+}
 FILES:${PN}-faultloggerd = " \
     ${bindir}/faultloggerd \
     ${bindir}/processdump \
