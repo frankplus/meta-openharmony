@@ -470,6 +470,8 @@ prune_sstate_cache:
 # necessary, and is therefore not added as a proper manual job.  To run it,
 # use "CI/CD" -> "Pipelines" -> "Run pipeline", and then define
 # CLEAR_PERSISTENT_STORAGE variable (any value will do).
+# To clear all persisten meta-openharmony files, set CLEAR_PERSISTENT_STORAGE to
+# "*", to clear only repo mirror files set it to "repo-mirror", and so on.
 clear_persistent_storage:
   stage: maintenance
   rules:
@@ -478,5 +480,5 @@ clear_persistent_storage:
     name: ubuntu:20.04
   script:
     - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" ] ; then
-        rm -rf "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony" ;
+        rm -rf "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE/meta-openharmony/$CLEAR_PERSISTENT_STORAGE" ;
       fi
