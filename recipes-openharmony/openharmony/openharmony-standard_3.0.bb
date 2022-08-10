@@ -1496,6 +1496,13 @@ RDEPENDS:${PN}-hdc += "${PN}-libutils ${PN}-syspara libcrypto"
 RDEPENDS:${PN} += "${PN}-hdc"
 
 PACKAGES =+ "${PN}-param-service"
+SYSTEMD_PACKAGES += "${PN}-param-service"
+SYSTEMD_SERVICE:${PN}-param-service = "param.service"
+SRC_URI += "file://param.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/param.service ${D}${systemd_unitdir}/system/
+}
 FILES:${PN}-param-service = " \
     ${bindir}/getparam \
     ${bindir}/setparam \
