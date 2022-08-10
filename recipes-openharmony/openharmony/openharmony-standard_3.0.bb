@@ -458,6 +458,14 @@ RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
 
 # //foundation/appexecfwk/standard component
 PACKAGES =+ "${PN}-appexecfwk"
+SYSTEMD_PACKAGES += "${PN}-appexecfwk"
+SYSTEMD_SERVICE:${PN}-appexecfwk = "installs.service"
+SRC_URI += "file://installs.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/installs.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/installs.cfg
+}
 FILES:${PN}-appexecfwk = "\
     ${bindir}/appexec \
     ${bindir}/bm \
