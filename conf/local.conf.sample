@@ -114,3 +114,5 @@ MIRRORS:prepend = "git://gitee.com/openharmony/ git://github.com/openharmony/ \n
 # distro configuration file.
 #
 #OPENHARMONY_VERSION = "3.1"
+
+USER_CLASSES += "buildstats buildstats-summary"

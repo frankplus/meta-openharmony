@@ -296,6 +296,7 @@ build:
     paths:
       - build/tmp-*/deploy/images/${MACHINE}
       - build/tmp-*/deploy/sdk
+      - build/tmp-*/buildstats*
     expire_in: 1 month
 
 # Build and execute OpenHarmony test image.
