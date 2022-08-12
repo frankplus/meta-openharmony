@@ -71,9 +71,29 @@ inherit python3native gn_base ptest
 
 B = "${S}/out/ohos-arm-release"
 
-COMPATIBLE_MACHINE = "qemuarm"
+COMPATIBLE_MACHINE = "(qemuarm|qemuarm64|qemuarm-efi|qemuarm64-efi|raspberrypi4-64)"
 
-OHOS_DEVICE_CPU_ARCH = "arm"
+def get_ohos_arch(d):
+    arch = get_musl_loader_arch(d)
+    if arch.startswith("aarch64"):
+        return "arm64"
+    elif arch.startswith("arm"):
+        return "arm"
+    return arch
+
+def get_ohos_libdir(d):
+    if get_ohos_arch(d).endswith("64"):
+        return "lib64"
+    else:
+        return "lib"
+
+def get_ohos_libdirs(d):
+    if get_ohos_arch(d).endswith("64"):
+        return "/system/lib64 /system/lib"
+    else:
+        return "/system/lib"
+
+OHOS_DEVICE_CPU_ARCH = "${@get_ohos_arch(d)}"
 OHOS_DEVICE_NAME = "qemuarm"
 OHOS_DEVICE_COMPANY = "oniro"
 OHOS_PRODUCT_NAME = "yocto-ohos-${OHOS_DEVICE_NAME}"
@@ -157,10 +177,14 @@ do_install () {
     # then setup /system/lib and /system/bin symlinks to avoid breaking use of
     # hard-coded paths.
     mkdir -p ${D}/system ${D}${libdir} ${D}${bindir}
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib/* ${D}${libdir}/
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/${@get_ohos_libdir(d)}/* ${D}${libdir}/
     install -m 755 -t ${D}${bindir}/ ${OHOS_PACKAGE_OUT_DIR}/system/bin/*
-    ln -sfT ..${libdir} ${D}/system/lib
+    ln -sfT ..${libdir} ${D}/system/${@get_ohos_libdir(d)}
     ln -sfT ..${bindir} ${D}/system/bin
+    # FIXME this is not really the right thing to do, but OpenHarmony hardcodes
+    # /system/lib in some places and uses /system/lib64 in a few others.
+    # For now, this fix is sufficient.
+    [ "${@get_ohos_libdir(d)}" != "lib" ] && ln -s ${@get_ohos_libdir(d)} ${D}/system/lib
 
     # system ability configurations
     mkdir -p ${D}${libdir}/openharmony/profile
@@ -204,7 +228,7 @@ FILES:${PN}:remove = "${libdir}/${BPN}/*"
 FILES:${PN}-configs = "${sysconfdir}"
 FILES:${PN}-fonts = "${datadir}/fonts"
 
-FILES:${PN} += "/system/bin /system/lib /system/profile"
+FILES:${PN} += "/system/bin ${@get_ohos_libdirs(d)} /system/profile"
 FILES:${PN}-configs += "/system/etc"
 FILES:${PN}-fonts += "/system/fonts"
 
