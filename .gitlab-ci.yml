@@ -165,7 +165,7 @@ stages:
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
-    - bitbake "${RECIPE}"
+    - time bitbake "${RECIPE}"
   after_script:
     # Update sstate-cache mirror
     - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" -a -d build/sstate-cache ] ; then
