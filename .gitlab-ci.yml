@@ -223,8 +223,8 @@ fetch:
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
     - mkdir -pv build/mirror-updates-ch
-    - rm -f build/downloads/*.done build/downloads/npm2/*.{done,resolved}
-    - for f in build/downloads/* build/downloads/npm2/* ; do if test -f "$f" -a ! -L "$f" ; then
+    - rm -f build/downloads/*.{done,resolved} build/downloads/npm2/*.{done,resolved} build/downloads/uninative/*/*.{done,resolved}
+    - for f in build/downloads/* build/downloads/npm2/* build/downloads/uninative/*/*; do if test -f "$f" -a ! -L "$f" ; then
         fname=$(basename "$f") ;
         if [ -n "$SOURCE_MIRROR_PATH" -a ! -e "$SOURCE_MIRROR_PATH/$fname" ] ; then
           cp "$f" "$SOURCE_MIRROR_PATH/$fname~tmp" ;
