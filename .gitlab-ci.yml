@@ -252,11 +252,12 @@ mirror_ch:
     - job: fetch
       artifacts: true
   rules:
-    - if: $CI_SERVER_HOST == "git.ostc-eu.org"
-  # We don't want to block MRs due to issues with mirror server
+    - if: $CI_SERVER_HOST == "gitlab.eclipse.org" && $CI_PROJECT_PATH == "eclipse/oniro-core/meta-openharmony" && $CI_COMMIT_BRANCH == "kirkstone"
+  # No need to mark builds broken due to infrastructure problems
   allow_failure: true
   tags:
-    - huawei-cloud-ch
+    - region.china
+    - mirror
   image:
     name: ubuntu:20.04
   script:
@@ -273,7 +274,7 @@ build:
     - job: fetch
       artifacts: false
   rules:
-    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+    - if: $CHINA_CI != null
       # Don't use CI resources on normal builds when doing China builds
       when: never
     - when: on_success
@@ -299,7 +300,7 @@ ptest:
     - job: build
       artifacts: false
   rules:
-    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+    - if: $CHINA_CI != null
       # Don't use CI resources on normal tests when doing China builds
       when: never
     - when: on_success
@@ -327,12 +328,9 @@ build_ch:
     - job: mirror_ch
       artifacts: false
   rules:
-    - if: $CI_SERVER_HOST == "git.ostc-eu.org" && $CHINA_CI != null
+    - if: $CHINA_CI != null
   tags:
     - region.china
-    - cpu.4
-    - mem.16
-    - large-disk
   variables:
     MANIFEST_FILE: manifests/gitee/ci.xml
     SOURCE_MIRROR_URL: $SOURCE_MIRROR_URL_CH
