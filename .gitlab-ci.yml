@@ -222,6 +222,11 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
+    - if [ $CI_SERVER_HOST = "gitlab.eclipse.org" -a
+           $CI_PROJECT_PATH = "eclipse/oniro-core/meta-openharmony" -a
+           $CI_COMMIT_BRANCH == "kirkstone" ] ; then
+        DO_MIRROR_UPDATES_CH=1 ;
+      fi
     - mkdir -pv build/mirror-updates-ch
     - rm -f build/downloads/*.{done,resolved} build/downloads/npm2/*.{done,resolved} build/downloads/uninative/*/*.{done,resolved}
     - for f in build/downloads/* build/downloads/npm2/* build/downloads/uninative/*/*; do if test -f "$f" -a ! -L "$f" ; then
@@ -231,8 +236,10 @@ fetch:
           mv "$SOURCE_MIRROR_PATH/$fname~tmp" "$SOURCE_MIRROR_PATH/$fname" ;
           echo "Persisted mirror file $SOURCE_MIRROR_PATH/$fname" ;
         fi ;
-        if ! curl --output /dev/null --silent --head --fail "$SOURCE_MIRROR_URL_CH/$fname" ; then
-          ln -v "$f" build/mirror-updates-ch/ ;
+        if [ "$DO_MIRROR_UPDATES_CH" = 1 ] ; then
+          if ! curl --output /dev/null --silent --head --fail "$SOURCE_MIRROR_URL_CH/$fname" ; then
+            ln -v "$f" build/mirror-updates-ch/ ;
+          fi ;
         fi ;
       fi ; done
   cache:
@@ -262,7 +269,7 @@ mirror_ch:
     name: ubuntu:20.04
   script:
     - for f in build/mirror-updates-ch/* ; do
-        if test ! -e /var/www/source-mirror/$(basename "$f") ; then
+        if test -f "$f" -a ! -e /var/www/source-mirror/$(basename "$f") ; then
           cp -v "$f" /var/www/source-mirror/ ;
         fi ;
       done
