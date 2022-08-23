@@ -20,8 +20,7 @@ variables:
 .kaniko:
   stage: container
   rules:
-    - if: $CI_REGISTRY == "registry.ostc-eu.org"
-      when: always
+    - if: $CI_REGISTRY
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
