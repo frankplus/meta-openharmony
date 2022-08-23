@@ -207,7 +207,7 @@ fetch:
       for OPENHARMONY_VERSION in 3.0 ; do
       for MACHINE in qemuarma7 ; do
         RECIPES="oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests" ;
-        echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE RECIPE=$RECIPE ;
+        echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE ;
         sed -r "s/^OPENHARMONY_VERSION.*/OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"/" -i conf/auto.conf ;
         time bitbake $RECIPES --runall=fetch ;
       done ; done ; done
