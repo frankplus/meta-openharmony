@@ -424,6 +424,9 @@ ohos_fetch:
 ohos:
   stage: test
   needs:
+    - job: openharmony-builder
+      artifacts: false
+      optional: true
     - job: ohos_fetch
       artifacts: true
     - job: build
