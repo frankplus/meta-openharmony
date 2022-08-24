@@ -20,7 +20,7 @@ variables:
 .kaniko:
   stage: container
   rules:
-    - if: $CI_REGISTRY
+    - if: $CI_REGISTRY && $CI_REGISTRY_USER && $CI_REGISTRY_PASSWORD && $CI_REGISTRY_IMAGE
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]

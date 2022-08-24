@@ -30,6 +30,11 @@
 # switch between branch pipelines and merge request pipelines
 workflow:
   rules:
+    # To use these pipelines, you must either enable Docker registry or set
+    # CI_REGISTRY_IMAGE variable to an external Docker registry which hosts the
+    # needed container images
+    - if: $CI_REGISTRY_IMAGE == null
+      when: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
@@ -49,13 +54,20 @@ variables:
   CACHE_COMPRESSION_LEVEL: "fastest"
   # The bitbake-builder Docker image registry path.
   #
-  # As we don't have Docker registry support on gitlab.eclipse.org, use this
-  # setup for now. When updating the bitbake-builder image, you therefore need
-  # to push to git.ostc-eu.org first, and wait for the bitbake-builder image to
-  # be pushed to the registry before starting a pipeline on gitlab.eclipse.org.
-  BITBAKE_BUILDER: "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony/bitbake-builder"
+  # While we don't have Docker registry support on gitlab.eclipse.org, we will
+  # still define this based on CI_REGISTRY_IMAGE variable.
+  #
+  # As a consequence, the CI_REGISTRY_IMAGE variable needs to be set manually
+  # for all meta-openharmony forks on gitlab.eclipse.org. It should be set to
+  # "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony" to use the
+  # registry that we are pushing to.
+  #
+  # But on the other hand, forking meta-openharmony to a GitLab instance with
+  # Docker registry support should simply work, automatically building and using
+  # the registry of the project/fork.
+  BITBAKE_BUILDER: "$CI_REGISTRY_IMAGE/bitbake-builder"
   # And same for openharmony-builder
-  OPENHARMONY_BUILDER: "registry.ostc-eu.org/ostc/pre-integration/meta-openharmony/openharmony-builder"
+  OPENHARMONY_BUILDER: "$CI_REGISTRY_IMAGE/openharmony-builder"
 
 stages:
   - container
