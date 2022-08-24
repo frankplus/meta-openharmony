@@ -21,15 +21,15 @@ variables:
   stage: container
   rules:
     - if: $CI_REGISTRY && $CI_REGISTRY_USER && $CI_REGISTRY_PASSWORD && $CI_REGISTRY_IMAGE
+      changes:
+        - .gitlab-ci/container.yml
+        - .gitlab-ci/container/$CONTAINER_PATH/**
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   variables:
     CONTAINER_DOCKERFILE: Dockerfile
   script:
-    - if [ -z "$CONTAINER_PATH" ] ; then
-        CONTAINER_PATH="$CONTAINER_NAME" ;
-      fi
     - CONTEXT="$CI_PROJECT_DIR/.gitlab-ci/container/$CONTAINER_PATH"
     - DOCKERFILE="$CONTEXT/$CONTAINER_DOCKERFILE"
     - if [ -n "$CONTAINER_FROM" ] ; then
@@ -71,13 +71,12 @@ bitbake-builder:
   variables:
     CONTAINER_NAME: bitbake-builder
     CONTAINER_VERSION: $BITBAKE_CONTAINER_VERSION
+    CONTAINER_PATH: bitbake-builder
 
 bitbake-toolbox:
-  extends: .kaniko
+  extends: bitbake-builder
   variables:
     CONTAINER_NAME: bitbake-toolbox
-    CONTAINER_VERSION: $BITBAKE_CONTAINER_VERSION
-    CONTAINER_PATH: bitbake-builder
     CONTAINER_DOCKERFILE: Dockerfile.toolbox
     CONTAINER_FROM: bitbake-builder
   needs:
@@ -89,13 +88,12 @@ openharmony-builder:
   variables:
     CONTAINER_NAME: openharmony-builder
     CONTAINER_VERSION: $OPENHARMONY_CONTAINER_VERSION
+    CONTAINER_PATH: openharmony-builder
 
 openharmony-toolbox:
-  extends: .kaniko
+  extends: openharmony-builder
   variables:
     CONTAINER_NAME: openharmony-toolbox
-    CONTAINER_VERSION: $OPENHARMONY_CONTAINER_VERSION
-    CONTAINER_PATH: openharmony-builder
     CONTAINER_DOCKERFILE: Dockerfile.toolbox
     CONTAINER_FROM: openharmony-builder
   needs:
