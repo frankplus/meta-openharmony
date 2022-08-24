@@ -14,7 +14,7 @@
 # limitations under the License.
 
 variables:
-  BITBAKE_CONTAINER_VERSION: "0.7"
+  BITBAKE_CONTAINER_VERSION: "0.8"
   OPENHARMONY_CONTAINER_VERSION: "0.1"
 
 .kaniko:

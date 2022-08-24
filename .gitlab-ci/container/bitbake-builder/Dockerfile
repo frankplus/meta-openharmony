@@ -31,6 +31,7 @@ RUN eatmydata apt-get update -qq \
         language-pack-en-base time locales python-is-python3 python3-distutils libssl-dev \
         iproute2 iputils-ping curl jq ca-certificates git-lfs \
         lz4 zstd git-restore-mtime \
+        python3-cairo \
  && eatmydata apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN locale-gen
 
