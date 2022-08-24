@@ -286,6 +286,9 @@ build:
       when: never
     - when: on_success
   extends: .bitbake
+  after_script:
+    - !reference [.bitbake, after_script]
+    - time repo/oe-core/scripts/pybootchartgui/pybootchartgui.py build/tmp-*/buildstats/* -o build/tmp-*/buildstats
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
