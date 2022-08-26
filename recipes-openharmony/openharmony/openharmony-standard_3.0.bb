@@ -64,6 +64,8 @@ SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patch
 SRC_URI += "file://param_service_standalone.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
+SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
+
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 

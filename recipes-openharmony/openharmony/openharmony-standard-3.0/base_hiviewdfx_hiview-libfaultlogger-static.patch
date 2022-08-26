@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+This patch applies to //base/hiviewdfx/hiview repository of OpenHarmony 3.0.
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate (workaround)
+
+diff --git a/adapter/plugins/faultlogger/BUILD.gn b/adapter/plugins/faultlogger/BUILD.gn
+index 83b9a84d5e68..4b5ce3ca4048 100644
+--- a/adapter/plugins/faultlogger/BUILD.gn
++++ b/adapter/plugins/faultlogger/BUILD.gn
+@@ -13,7 +13,7 @@
+ import("//base/hiviewdfx/hiview/hiview.gni")
+ import("//build/ohos.gni")
+ 
+-ohos_shared_library("libfaultlogger") {
++ohos_static_library("libfaultlogger") {
+   configs = [ "service/idl:faultlogger_service_impl_config" ]
+   public_configs = [ "interfaces/cpp/innerkits:faultlogger_innerkits_config" ]
+   deps = [ "interfaces/cpp/innerkits:faultlogger_client_impl" ]
