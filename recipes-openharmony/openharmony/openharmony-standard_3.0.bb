@@ -1542,6 +1542,18 @@ RDEPENDS:${PN}-faultlogger += "musl libcxx"
 RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
 RDEPENDS:${PN} += "${PN}-faultlogger"
 
+# faultlogger-ptest
+PACKAGES =+ "${PN}-faultlogger-ptest"
+do_install_ptest_base[cleandirs] += "${D}${libdir}/${BPN}-faultlogger/ptest"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-faultlogger/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/unittest/hiviewdfx/faultlogger ${D}${libdir}/${BPN}-faultlogger/ptest/unittest
+}
+FILES:${PN}-faultlogger-ptest = "${libdir}/${BPN}-faultlogger/ptest"
+RDEPENDS:${PN}-faultlogger-ptest += "musl libcxx"
+RDEPENDS:${PN}-faultlogger-ptest += "${PN}-faultlogger ${PN}-libutils ${PN}-hilog ${PN}-syspara ${PN}-ipc ${PN}-samgr ${PN}-appexecfwk ${PN}-safwk ${PN}-hiview"
+RDEPENDS:${PN}-ptest += "${PN}-faultlogger-ptest"
+
 # thirdparty-iowow
 PACKAGES =+ "${PN}-thirdparty-iowow"
 FILES:${PN}-thirdparty-iowow = "${libdir}/libiowow*${SOLIBS}"
@@ -1583,9 +1595,6 @@ do_install_ptest:append() {
     mv ${D}${PTEST_PATH}/moduletest/hiviewdfx/hiview ${D}${libdir}/${BPN}-hiview/ptest/moduletest
     mv ${D}${PTEST_PATH}/unittest/hiview ${D}${libdir}/${BPN}-hiview/ptest/unittest
     mv ${D}${PTEST_PATH}/unittest/hiview_L2/* ${D}${libdir}/${BPN}-hiview/ptest/unittest/
-
-    # Removing QA non-passing tests, because libfaultlogger.z.so isn't included (problem with hiview_L2)
-    rm -r ${D}${PTEST_PATH}/unittest/hiviewdfx/faultlogger
 }
 FILES:${PN}-hiview-ptest = "${libdir}/${BPN}-hiview/ptest"
 RDEPENDS:${PN}-hiview-ptest += "musl libcxx"
