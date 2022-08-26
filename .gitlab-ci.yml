@@ -251,9 +251,9 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
-    - if [ $CI_SERVER_HOST = "gitlab.eclipse.org" -a
-           $CI_PROJECT_PATH = "eclipse/oniro-core/meta-openharmony" -a
-           $CI_COMMIT_BRANCH == "kirkstone" ] ; then
+    - if [ "$CI_SERVER_HOST" = "gitlab.eclipse.org" -a
+           "$CI_PROJECT_PATH" = "eclipse/oniro-core/meta-openharmony" -a
+           "$CI_COMMIT_BRANCH" = "kirkstone" ] ; then
         DO_MIRROR_UPDATES_CH=1 ;
       fi
     - mkdir -pv build/mirror-updates-ch
