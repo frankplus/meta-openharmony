@@ -1503,7 +1503,7 @@ FILES:${PN}-telephony-ril-adapter = " \
     ${libdir}/libril_vendor*${SOLIBS} \
 "
 RDEPENDS:${PN}-telephony-ril-adapter += "musl libcxx"
-RDEPENDS:${PN}-telephony-ril-adapter += "${PN}-uhdf2 ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-faultloggerd"
+RDEPENDS:${PN}-telephony-ril-adapter += "${PN}-uhdf2 ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-faultlogger"
 RDEPENDS:${PN} += "${PN}-telephony-ril-adapter"
 
 PACKAGES =+ "${PN}-telephony-ril-adapter-ptest"
@@ -1521,24 +1521,24 @@ RDEPENDS:${PN}-telephony-ril-adapter-ptest += "${PN}-telephony-ril-adapter ${PN}
 RDEPENDS:${PN}-ptest += "${PN}-telephony-ril-adapter-ptest"
 
 # //base/hiviewdfx/faultloggerd
-PACKAGES =+ "${PN}-faultloggerd"
-SYSTEMD_PACKAGES += "${PN}-faultloggerd"
-SYSTEMD_SERVICE:${PN}-faultloggerd = "faultloggerd.service"
+PACKAGES =+ "${PN}-faultlogger"
+SYSTEMD_PACKAGES += "${PN}-faultlogger"
+SYSTEMD_SERVICE:${PN}-faultlogger = "faultloggerd.service"
 SRC_URI += "file://faultloggerd.service"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/faultloggerd.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/faultloggerd32.cfg
 }
-FILES:${PN}-faultloggerd = " \
+FILES:${PN}-faultlogger = " \
     ${bindir}/faultloggerd \
     ${bindir}/processdump \
     ${libdir}/libfaultloggerd*${SOLIBS} \
     ${libdir}/libdfx_signalhandler*${SOLIBS} \
 "
-RDEPENDS:${PN}-faultloggerd += "musl libcxx"
-RDEPENDS:${PN}-faultloggerd += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
-RDEPENDS:${PN} += "${PN}-faultloggerd"
+RDEPENDS:${PN}-faultlogger += "musl libcxx"
+RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
+RDEPENDS:${PN} += "${PN}-faultlogger"
 
 # thirdparty-iowow
 PACKAGES =+ "${PN}-thirdparty-iowow"
