@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenHarmony Weston window manager service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Weston Service"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

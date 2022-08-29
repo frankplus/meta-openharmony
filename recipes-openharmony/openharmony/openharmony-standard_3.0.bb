@@ -1299,7 +1299,15 @@ FILES:${PN}-graphic = " \
     ${libdir}/module/libdisplay*${SOLIBS} \
     ${libdir}/module/libwindow*${SOLIBS} \
     ${bindir}/bootanimation \
+    ${systemd_unitdir}/weston.service \
 "
+SYSTEMD_PACKAGES += "${PN}-graphic"
+SYSTEMD_SERVICE:${PN}-graphic = "weston.service"
+SRC_URI += "file://weston.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/weston.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-graphic += "musl libcxx"
 RDEPENDS:${PN}-graphic += "${PN}-multimodalinput ${PN}-hilog ${PN}-libutils ${PN}-thirdparty-weston ${PN}-thirdparty-wayland ${PN}-thirdparty-libffi ${PN}-thirdparty-libinput"
 RDEPENDS:${PN}-graphic += "${PN}-graphic ${PN}-multimedia-media ${PN}-ipc ${PN}-display-gralloc ${PN}-samgr ${PN}-thirdparty-libdrm ${PN}-thirdparty-libevdev"

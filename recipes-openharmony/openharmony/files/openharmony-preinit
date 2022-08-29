@@ -116,6 +116,27 @@ fi
 #   - "trigger early-boot",
 #   - "trigger boot"
 
+# trigger: post-fs
+# "start udevd_service",
+# "sleep 1",
+# "start multimodalinputservice",
+# "start mmi_uinput_service",
+# "sleep 2",
+# "export XDG_RUNTIME_DIR /data/weston",
+# "export XKB_CONFIG_ROOT /etc/xkb",
+# "export XKB_CONFIG_EXTRA_PATH /etc/xkb",
+# "mkdir /data/weston",
+# "chmod 777 /data/weston",
+# "start weston",
+# "trigger weston_start",
+# "sleep 2",
+# "exec /system/bin/udevadm trigger",
+# "exec /system/bin/udevadm settle --timeout=30"
+if systemctl -q is-enabled weston.service; then
+	/system/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
 # trigger: late-fs
 # "name" : "installs",
 # "path" : ["/system/bin/installs"],
