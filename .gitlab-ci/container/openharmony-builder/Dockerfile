@@ -100,7 +100,7 @@ RUN sed -i '$aexport PATH=/opt/harmonyos/llvm/bin:$PATH' /root/.bashrc \
  && export PATH=/opt/harmonyos/node-v12.20.0-linux-x64/bin:$PATH \
  && export PATH=/opt/harmonyos:$PATH \
  && export PATH=/root/.local/bin:$PATH \
- && npm install -g @ohos/hpm-cli --registry https://mirrors.huaweicloud.com/repository/npm/
+ && npm install -g @ohos/hpm-cli
 
 RUN useradd --create-home --uid 1000 --shell /usr/bin/bash builder
 COPY --chown=builder:builder .gitconfig /home/builder/.gitconfig
