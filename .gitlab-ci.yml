@@ -27,6 +27,18 @@
 # it? Can it be supported by Eclipse Foundation infrastructure?
 #
 
+#
+# Runner tags
+#
+# The meta-openharmony pipeline uses runner tags to control selection of the
+# GitLab CI runners to use for each job
+#
+# cpu.heavy     - Can cause massive CPU load on multi-core systems
+# cpu.light     - Does not cause much CPU load (single-threaded or I/O bound)
+# region.europe - Run in Europe
+# region.china  - Run in China
+# mirror        - Deploy mirror files (combine with region.* tag)
+
 # switch between branch pipelines and merge request pipelines
 workflow:
   rules:
@@ -206,7 +218,12 @@ fetch:
     - job: bitbake-builder
       artifacts: false
       optional: true
+  tags:
+    - cpu.light
   script:
+    # Fetching is io-bound, not cpu-bound, so we should be able to ignore the
+    # runner configured max on build jobs without eating up too much cpu time.
+    - echo "PARALLEL_MAKE = \"-j$(nproc)\"" >> conf/auto.conf
     # Configure build to create mirror tarballs of VCS repositories
     - echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/auto.conf
     # Run fetch tasks for all builds
@@ -234,9 +251,9 @@ fetch:
         SOURCE_MIRROR_PATH="$CI_PROJECT_DIR/build/mirror" ;
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
-    - if [ $CI_SERVER_HOST = "gitlab.eclipse.org" -a
-           $CI_PROJECT_PATH = "eclipse/oniro-core/meta-openharmony" -a
-           $CI_COMMIT_BRANCH == "kirkstone" ] ; then
+    - if [ "$CI_SERVER_HOST" = "gitlab.eclipse.org" -a
+           "$CI_PROJECT_PATH" = "eclipse/oniro-core/meta-openharmony" -a
+           "$CI_COMMIT_BRANCH" = "kirkstone" ] ; then
         DO_MIRROR_UPDATES_CH=1 ;
       fi
     - mkdir -pv build/mirror-updates-ch
@@ -301,6 +318,8 @@ build:
   after_script:
     - !reference [.bitbake, after_script]
     - time repo/oe-core/scripts/pybootchartgui/pybootchartgui.py build/tmp-*/buildstats/* -o build/tmp-*/buildstats
+  tags:
+    - cpu.heavy
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
@@ -328,6 +347,8 @@ ptest:
       when: never
     - when: on_success
   extends: .bitbake
+  tags:
+    - cpu.heavy
   parallel:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
@@ -396,6 +417,8 @@ ohos_fetch:
   image:
     name: $OPENHARMONY_BUILDER:$OPENHARMONY_CONTAINER_VERSION
   extends: .openharmony_tarball
+  tags:
+    - cpu.light
   parallel:
     matrix:
       - OPENHARMONY_VERSION: ["3.0"]
@@ -451,6 +474,8 @@ ohos:
   image:
     name: $OPENHARMONY_BUILDER:$OPENHARMONY_CONTAINER_VERSION
   extends: .openharmony_tarball
+  tags:
+    - cpu.heavy
   script:
     - tar xfz $TARBALL_FILE
     - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony

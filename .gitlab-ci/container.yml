@@ -29,6 +29,8 @@ variables:
     entrypoint: [""]
   variables:
     CONTAINER_DOCKERFILE: Dockerfile
+  tags:
+    - cpu.light
   script:
     - CONTEXT="$CI_PROJECT_DIR/.gitlab-ci/container/$CONTAINER_PATH"
     - DOCKERFILE="$CONTEXT/$CONTAINER_DOCKERFILE"
