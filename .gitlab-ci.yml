@@ -361,8 +361,9 @@ build_ch:
 # URL and filename for tarball containing entire OpenHarmony OS codebase
 .openharmony_tarball:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH
+    - if: $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+      # Only run these rather expensive jobs in the merge train pipelines
+    - if: $CI_COMMIT_BRANCH || $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
       # We don't really want these jobs to fail, but we don't want to block
       # pipeline and dependent jobs either
