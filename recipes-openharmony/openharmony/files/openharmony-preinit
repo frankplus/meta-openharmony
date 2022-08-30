@@ -260,6 +260,18 @@ if systemctl -q is-enabled time.service; then
 fi
 
 # trigger: boot
+# "name" : "foundation",
+# "path" : ["/system/bin/sa_main", "/system/profile/foundation.xml"],
+# "importance" : -20,
+# "uid" : "system",
+# "gid" : ["system"],
+# "caps" : ["SYS_PTRACE", "KILL"]
+if systemctl -q is-enabled foundation.service; then
+	/system/bin/sa_main /system/profile/foundation.xml & # SA: 180 182 3203 3299 3301 3308 3501 4010 | Required SA: 4700
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
 # "name" : "inputmethod_service",
 # "path" : ["/system/bin/sa_main", "/system/profile/inputmethod_service.xml"],
 # "uid" : "system",
