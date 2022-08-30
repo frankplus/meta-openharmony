@@ -1726,7 +1726,17 @@ RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager-ptest"
 
 # //developtools/hdc_standard
 PACKAGES =+ "${PN}-hdc"
-FILES:${PN}-hdc = "${bindir}/hdcd"
+FILES:${PN}-hdc = " \
+    ${bindir}/hdcd \
+    ${systemd_unitdir}/hdcd.service \
+"
+SYSTEMD_PACKAGES += "${PN}-hdc"
+SYSTEMD_SERVICE:${PN}-hdc = "hdcd.service"
+SRC_URI += "file://hdcd.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/hdcd.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-hdc += "musl libcxx"
 RDEPENDS:${PN}-hdc += "${PN}-libutils ${PN}-syspara libcrypto"
 RDEPENDS:${PN} += "${PN}-hdc"

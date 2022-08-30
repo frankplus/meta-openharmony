@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenHarmony Device Connector Daemon service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Device Connector Daemon Service"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

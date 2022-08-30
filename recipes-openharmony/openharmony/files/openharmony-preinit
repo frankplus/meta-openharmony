@@ -270,6 +270,20 @@ if systemctl -q is-enabled inputmethod.service; then
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
+# trigger: boot?
+# "name" : "hdcd",
+# "path" : ["/system/bin/hdcd"],
+# "socket" : [
+# "hdcd seqpacket 660 system system false"
+# ],
+# "disabled" : 1
+if systemctl -q is-enabled hdcd.service; then
+	setparam persist.hdc.port 35000
+	sleep "$STARTUP_CMD_SLEEP"
+
+	/system/bin/hdcd -t &
+fi
+
 if systemctl -q is-enabled faultloggerd.service; then
 	/usr/bin/install -m 775 -d /data/log/faultlog /data/log/faultlog/faultlogger /data/log/faultlog/temp/
 	/system/bin/faultloggerd &
