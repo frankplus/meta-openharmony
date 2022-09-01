@@ -147,6 +147,8 @@ NINJA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'make_test', '',
 
 # Build ACTS only when acts DISTRO_FEATURE is set
 NINJA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'acts deploy_testtools', '', d)}"
+# Needed rdeps for acts
+RDEPENDS:${PN}-ptest += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', '${PN}-hisysevent ${PN}-hiview ${PN}-hicollie ${PN}-hitrace ${PN}-hilog', '', d)}"
 
 # Copy FlexLexer.h from recipe sysroot
 do_copy_to_srcdir() {
