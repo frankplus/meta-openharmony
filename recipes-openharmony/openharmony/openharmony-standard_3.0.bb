@@ -109,6 +109,14 @@ OHOS_STANDARD_SYSTEM_CONFIG_DIR = "${OHOS_BUILD_CONFIGS_DIR}/standard_system"
 
 OHOS_PROJECT_BUILD_CONFIG_DIR = "${B}/build_configs"
 
+# Workaround for problem with nodejs 17:
+# error:0308010C:digital envelope routines::unsupported
+export NODE_OPTIONS = "--openssl-legacy-provider"
+export OPENSSL_CONF = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ssl-3/openssl.cnf"
+export SSL_CERT_DIR = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ssl-3/certs"
+export OPENSSL_ENGINES = "${RECIPE_SYSROOT_NATIVE}/usr/lib/engines-3"
+export OPENSSL_MODULES = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ossl-modules"
+
 GN_ARGS += 'target_os="ohos"'
 GN_ARGS += 'target_cpu="${OHOS_DEVICE_CPU_ARCH}"'
 GN_ARGS += 'product_name="${OHOS_PRODUCT_NAME}"'
