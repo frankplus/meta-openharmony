@@ -62,13 +62,3 @@ index a495343d..300aec75 100755
  ]
  
  _all_test_packages_ivi = [
-@@ -82,6 +82,9 @@ if (build_xts == true && XTS_SUITENAME == "acts") {
-   }
- 
-   selected_packages = exec_script(_select_script, _select_args, "list lines")
-+  # compileruntime is not being found as the part name is ccruntime
-+  # therefore it has to be added manually
-+  selected_packages += [ "${ACTS_ROOT}/compileruntime:compileruntime" ]
- 
-   selected_packages_ivi =
-       exec_script(_select_script, _select_args_ivi, "list lines")
