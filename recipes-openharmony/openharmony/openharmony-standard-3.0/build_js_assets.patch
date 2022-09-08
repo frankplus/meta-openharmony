@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //build git repository of OpenHarmony 3.0 codebase.
+
+This is a workaround for problem with nodejs 17:
+ error:0308010C:digital envelope routines::unsupported
+
+Even if NODE_OPTIONS is set in the recipe, it has to be also set here
+since the environment passed to nodejs is reset in this script.
+
+Signed-off-by: Thierry Escande <thierry.escande@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/scripts/build_js_assets.py b/scripts/build_js_assets.py
+index 624d594..f6fcd1b 100755
+--- a/scripts/build_js_assets.py
++++ b/scripts/build_js_assets.py
+@@ -55,6 +55,8 @@ def build_ace(cmd, options):
+             "aceManifestPath": manifest,
+             "buildMode": options.build_mode,
+             "PATH": os.environ.get('PATH'),
++            "NODE_OPTIONS": "--openssl-legacy-provider",
++            "OPENSSL_MODULES": "../../../recipe-sysroot-native/usr/lib/ossl-modules",
+         }
+         if not os.path.exists(manifest) and options.hap_profile:
+             with open(options.hap_profile) as profile:

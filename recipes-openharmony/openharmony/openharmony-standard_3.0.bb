@@ -43,6 +43,7 @@ SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;pat
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
 SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
+SRC_URI += "file://build_js_assets.patch;patchdir=${S}/build"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
@@ -108,6 +109,14 @@ OHOS_PRELOADER_BUILD_CONFIG_DIR = "${OHOS_BUILD_CONFIGS_DIR}/${OHOS_PRODUCT_NAME
 OHOS_STANDARD_SYSTEM_CONFIG_DIR = "${OHOS_BUILD_CONFIGS_DIR}/standard_system"
 
 OHOS_PROJECT_BUILD_CONFIG_DIR = "${B}/build_configs"
+
+# Workaround for problem with nodejs 17:
+# error:0308010C:digital envelope routines::unsupported
+export NODE_OPTIONS = "--openssl-legacy-provider"
+export OPENSSL_CONF = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ssl-3/openssl.cnf"
+export SSL_CERT_DIR = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ssl-3/certs"
+export OPENSSL_ENGINES = "${RECIPE_SYSROOT_NATIVE}/usr/lib/engines-3"
+export OPENSSL_MODULES = "${RECIPE_SYSROOT_NATIVE}/usr/lib/ossl-modules"
 
 GN_ARGS += 'target_os="ohos"'
 GN_ARGS += 'target_cpu="${OHOS_DEVICE_CPU_ARCH}"'
