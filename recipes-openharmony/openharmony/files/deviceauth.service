@@ -1,13 +1,10 @@
 [Unit]
 Description=OpenHarmony Device Authentication daemon
-Requires=samgr.service
-After=samgr.service
 
 [Service]
-Type=exec
-# Delay execution by 2 secs after samgr.service
-ExecStartPre=/bin/sleep 2
-ExecStart=/usr/bin/deviceauth_service
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Device Authentication Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

@@ -1,12 +1,10 @@
 [Unit]
 Description=OpenHarmony SystemAbilityFramework service
-Requires=param.service
-After=param.service
 
 [Service]
-Type=exec
-ExecStartPre=install -m 755 -d /data/sadata_se /data/sadata_se/samgr
-ExecStart=/usr/bin/samgr
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony SystemAbilityFramework Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

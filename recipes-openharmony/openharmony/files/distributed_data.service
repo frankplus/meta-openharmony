@@ -1,13 +1,10 @@
 [Unit]
 Description=OpenHarmony Distributed Data service
-Requires=appspawn.service
-After=appspawn.service
 
 [Service]
-Type=exec
-CapabilityBoundingSet=CAP_DAC_READ_SEARCH
-# should run as system:system
-ExecStart=/usr/bin/sa_main /system/profile/distributeddata.xml
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Distributed Data Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

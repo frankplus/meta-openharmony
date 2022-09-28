@@ -1,12 +1,10 @@
 [Unit]
 Description=OpenHarmony Param Service
-Requires=openharmony-preinit.service
-After=openharmony-preinit.service
 
 [Service]
-Type=exec
-ExecStartPre=install -m 755 -d /dev/unix/socket
-ExecStart=/usr/bin/param_service /system/etc/ohos.para
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Param Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

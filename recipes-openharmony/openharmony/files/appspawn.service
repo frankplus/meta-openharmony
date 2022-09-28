@@ -1,14 +1,10 @@
 [Unit]
 Description=OpenHarmony Appspawn service
-Requires=samgr.service
-After=samgr.service
 
 [Service]
-Type=exec
-# Delay execution by 2 secs after samgr.service
-ExecStartPre=/bin/sleep 2
-ExecStartPre=mkdir -p /data/app
-ExecStart=/usr/bin/appspawn
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Appspawn Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
