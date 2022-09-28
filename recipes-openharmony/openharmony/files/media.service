@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenHarmony media service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony Media Service"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

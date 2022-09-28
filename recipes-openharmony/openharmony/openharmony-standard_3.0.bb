@@ -1368,6 +1368,13 @@ FILES:${PN}-multimedia-media = " \
     ${libdir}/module/multimedia/libmedia*${SOLIBS} \
     ${libdir}/openharmony/profile/media_service.xml \
 "
+SYSTEMD_PACKAGES += "${PN}-multimedia-media"
+SYSTEMD_SERVICE:${PN}-multimedia-media = "media.service"
+SRC_URI += "file://media.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/media.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-multimedia-media += "musl libcxx"
 RDEPENDS:${PN}-multimedia-media += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-graphic ${PN}-peripheral-display"
 RDEPENDS:${PN}-multimedia-media += "${PN}-multimedia-audio ${PN}-thirdparty-gstreamer ${PN}-thirdparty-glib ${PN}-syspara ${PN}-ace-napi"
