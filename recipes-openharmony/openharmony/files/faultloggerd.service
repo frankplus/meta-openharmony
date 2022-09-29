@@ -1,12 +1,10 @@
 [Unit]
 Description=OpenHarmony FaultLogger daemon
-Requires=openharmony-preinit.service
-After=openharmony-preinit.service
 
 [Service]
-Type=exec
-ExecStartPre=install -m 775 -d /data/log/faultlog /data/log/faultlog/faultlogger /data/log/faultlog/temp/
-ExecStart=/usr/bin/faultloggerd
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony FaultLogger Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

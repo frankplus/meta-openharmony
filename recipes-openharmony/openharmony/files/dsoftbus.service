@@ -1,12 +1,10 @@
 [Unit]
 Description=OpenHarmony DSoftBus services
-Requires=appspawn.service
-After=appspawn.service
 
 [Service]
-Type=exec
-# should run as system:system
-ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
+Type=oneshot
+ExecStart=/bin/echo "OpenHarmony DSoftBus Service"
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

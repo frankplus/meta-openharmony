@@ -1,9 +1,9 @@
 [Unit]
-Description=OpenHarmony hilog daemon
+Description=OpenHarmony media service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/echo "OpenHarmony hilog Service"
+ExecStart=/bin/echo "OpenHarmony Media Service"
 RemainAfterExit=yes
 
 [Install]

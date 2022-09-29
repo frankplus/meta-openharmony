@@ -82,3 +82,231 @@ chmod 666 /dev/binder
 if [ -c /dev/dri/card0 ]; then
 	chmod 666 /dev/dri/card0
 fi
+
+install -m 755 -d /dev/unix/socket
+
+export XDG_RUNTIME_DIR=/data/weston
+export XKB_CONFIG_ROOT=/etc/openharmony/xkb
+export XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb
+
+STARTUP_CMD_SLEEP=2
+
+# trigger: part of the init process itself
+if systemctl -q is-enabled param.service; then
+	/system/bin/param_service &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# - pre-init stage
+# - init stage
+
+if systemctl -q is-enabled samgr.service; then
+	/system/bin/samgr &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# - post-init stage
+#   - "trigger early-fs",
+#   - "trigger fs",
+#   - "trigger post-fs",
+#   - "trigger late-fs",
+#   - "trigger post-fs-data",
+#   - "trigger load_persist_props_action",
+#   - "trigger firmware_mounts_complete",
+#   - "trigger early-boot",
+#   - "trigger boot"
+
+# trigger: post-fs
+# "start udevd_service",
+# "sleep 1",
+# "start multimodalinputservice",
+# "start mmi_uinput_service",
+# "sleep 2",
+# "export XDG_RUNTIME_DIR /data/weston",
+# "export XKB_CONFIG_ROOT /etc/xkb",
+# "export XKB_CONFIG_EXTRA_PATH /etc/xkb",
+# "mkdir /data/weston",
+# "chmod 777 /data/weston",
+# "start weston",
+# "trigger weston_start",
+# "sleep 2",
+# "exec /system/bin/udevadm trigger",
+# "exec /system/bin/udevadm settle --timeout=30"
+if systemctl -q is-enabled weston.service; then
+	/system/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: late-fs
+# "name" : "installs",
+# "path" : ["/system/bin/installs"],
+# "importance" : -20,
+# "uid" : "root",
+# "gid" : ["root"]
+if systemctl -q is-enabled installs.service; then
+	/system/bin/installs & # saId 511
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: late-fs
+# "name" : "appspawn",
+# "path" : ["/system/bin/appspawn"],
+# "importance" : -20,
+# "uid" : "root",
+# "gid" : ["root"]
+if systemctl -q is-enabled appspawn.service; then
+	/system/bin/appspawn & # SA: 1401 180 3703 3008
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: post-fs-data
+# "mkdir /data/log/ 0770 system log",
+# "mkdir /data/log/hilog/ 0750 logd log",
+# "uid" : "logd",
+# "gid" : "log",
+# "socket" : [
+#   "hilogInput dgram 0666 logd logd passcred",
+#   "hilogControl seqpacket 0600 logd logd false"
+# ]
+if systemctl -q is-enabled hilogd.service; then
+	/system/bin/hilogd &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: post-fs-data
+# "name" : "huks_service",
+# "path" : ["/system/bin/sa_main", "/system/profile/huks_service.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"]
+if systemctl -q is-enabled huks.service; then
+	/system/bin/sa_main /system/profile/huks_service.xml & # SA: 3510
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: post-fs-data
+# "name" : "deviceauth_service",
+# "path" : ["/system/bin/deviceauth_service"],
+# "uid" : "system",
+# "gid" : ["system", "shell"]
+if systemctl -q is-enabled deviceauth.service; then
+	/system/bin/deviceauth_service & # SA: 4701 | Required SA: 3510
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: post-fs-data
+# "name" : "accountmgr",
+# "path" : ["/system/bin/sa_main", "/system/profile/accountmgr.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"],
+# "writepid" : [
+# "/dev/cpuset/foreground/tasks",
+# "/dev/stune/foreground/tasks",
+# "/dev/blkio/foreground/tasks"
+# ]
+if systemctl -q is-enabled accountmgr.service; then
+	/system/bin/sa_main /system/profile/accountmgr.xml & # SA: 200
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: post-fs-data
+# "name" : "softbus_server",
+# "path" : ["/system/bin/sa_main", "/system/profile/softbus_server.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"]
+if systemctl -q is-enabled dsoftbus.service; then
+	/system/bin/sa_main /system/profile/softbus_server.xml & # SA: 1401 4700 | Required SA: 3299
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: not used?
+#sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
+#sleep "$STARTUP_CMD_SLEEP"
+
+# trigger: post-fs-data
+# "name" : "distributedsched",
+# "path" : ["/system/bin/sa_main", "/system/profile/distributedsched.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"]
+if systemctl -q is-enabled distributedsched.service; then
+	/system/bin/sa_main /system/profile/distributedsched.xml & # SA: 1401
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
+# "name" : "distributeddata",
+# "path" : ["/system/bin/sa_main","/system/profile/distributeddata.xml"],
+# "caps" : ["DAC_READ_SEARCH"],
+# "uid" : "system",
+# "gid" : ["system","shell","readproc"],
+# "writepid":[
+# "/dev/cpuset/foreground/tasks",
+# "/dev/stune/foreground/tasks",
+# "/dev/blkio/foreground/tasks"
+# ]
+if systemctl -q is-enabled distributed_data.service; then
+	/system/bin/sa_main /system/profile/distributeddata.xml & # SA: 1301
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
+# "name" : "time_service",
+# "path" : ["/system/bin/sa_main", "/system/profile/time_service.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"],
+# "caps" : ["SYS_TIME", "WAKE_ALARM"]
+if systemctl -q is-enabled time.service; then
+	/system/bin/sa_main /system/profile/time_service.xml & # SA: 1401 180 3702
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
+# "name" : "foundation",
+# "path" : ["/system/bin/sa_main", "/system/profile/foundation.xml"],
+# "importance" : -20,
+# "uid" : "system",
+# "gid" : ["system"],
+# "caps" : ["SYS_PTRACE", "KILL"]
+if systemctl -q is-enabled foundation.service; then
+	/system/bin/sa_main /system/profile/foundation.xml & # SA: 180 182 3203 3299 3301 3308 3501 4010 | Required SA: 4700
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
+# "name" : "media_service",
+# "path" : ["/system/bin/sa_main", "/system/profile/media_service.xml"],
+# "uid" : "system",
+# "gid" : ["media_rw", "system"]
+if systemctl -q is-enabled media.service; then
+	/system/bin/sa_main /system/profile/media_service.xml &
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot
+# "name" : "inputmethod_service",
+# "path" : ["/system/bin/sa_main", "/system/profile/inputmethod_service.xml"],
+# "uid" : "system",
+# "gid" : ["system", "shell"],
+# "caps" : ["SYS_TIME"]
+if systemctl -q is-enabled inputmethod.service; then
+	/system/bin/sa_main /system/profile/inputmethod_service.xml & # SA: 180 1401 3703
+	sleep "$STARTUP_CMD_SLEEP"
+fi
+
+# trigger: boot?
+# "name" : "hdcd",
+# "path" : ["/system/bin/hdcd"],
+# "socket" : [
+# "hdcd seqpacket 660 system system false"
+# ],
+# "disabled" : 1
+if systemctl -q is-enabled hdcd.service; then
+	setparam persist.hdc.port 35000
+	sleep "$STARTUP_CMD_SLEEP"
+
+	/system/bin/hdcd -t &
+fi
+
+if systemctl -q is-enabled faultloggerd.service; then
+	/usr/bin/install -m 775 -d /data/log/faultlog /data/log/faultlog/faultlogger /data/log/faultlog/temp/
+	/system/bin/faultloggerd &
+fi

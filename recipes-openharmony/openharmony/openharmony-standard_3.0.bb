@@ -499,11 +499,13 @@ RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
 # //foundation/appexecfwk/standard component
 PACKAGES =+ "${PN}-appexecfwk"
 SYSTEMD_PACKAGES += "${PN}-appexecfwk"
-SYSTEMD_SERVICE:${PN}-appexecfwk = "installs.service"
+SYSTEMD_SERVICE:${PN}-appexecfwk = "installs.service foundation.service"
 SRC_URI += "file://installs.service"
+SRC_URI += "file://foundation.service"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/installs.service ${D}${systemd_unitdir}/system/
+    install -m 644 ${WORKDIR}/foundation.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/installs.cfg
 }
 FILES:${PN}-appexecfwk = "\
@@ -1299,7 +1301,15 @@ FILES:${PN}-graphic = " \
     ${libdir}/module/libdisplay*${SOLIBS} \
     ${libdir}/module/libwindow*${SOLIBS} \
     ${bindir}/bootanimation \
+    ${systemd_unitdir}/weston.service \
 "
+SYSTEMD_PACKAGES += "${PN}-graphic"
+SYSTEMD_SERVICE:${PN}-graphic = "weston.service"
+SRC_URI += "file://weston.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/weston.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-graphic += "musl libcxx"
 RDEPENDS:${PN}-graphic += "${PN}-multimodalinput ${PN}-hilog ${PN}-libutils ${PN}-thirdparty-weston ${PN}-thirdparty-wayland ${PN}-thirdparty-libffi ${PN}-thirdparty-libinput"
 RDEPENDS:${PN}-graphic += "${PN}-graphic ${PN}-multimedia-media ${PN}-ipc ${PN}-display-gralloc ${PN}-samgr ${PN}-thirdparty-libdrm ${PN}-thirdparty-libevdev"
@@ -1358,6 +1368,13 @@ FILES:${PN}-multimedia-media = " \
     ${libdir}/module/multimedia/libmedia*${SOLIBS} \
     ${libdir}/openharmony/profile/media_service.xml \
 "
+SYSTEMD_PACKAGES += "${PN}-multimedia-media"
+SYSTEMD_SERVICE:${PN}-multimedia-media = "media.service"
+SRC_URI += "file://media.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/media.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-multimedia-media += "musl libcxx"
 RDEPENDS:${PN}-multimedia-media += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr ${PN}-safwk ${PN}-graphic ${PN}-peripheral-display"
 RDEPENDS:${PN}-multimedia-media += "${PN}-multimedia-audio ${PN}-thirdparty-gstreamer ${PN}-thirdparty-glib ${PN}-syspara ${PN}-ace-napi"
@@ -1718,7 +1735,17 @@ RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager-ptest"
 
 # //developtools/hdc_standard
 PACKAGES =+ "${PN}-hdc"
-FILES:${PN}-hdc = "${bindir}/hdcd"
+FILES:${PN}-hdc = " \
+    ${bindir}/hdcd \
+    ${systemd_unitdir}/hdcd.service \
+"
+SYSTEMD_PACKAGES += "${PN}-hdc"
+SYSTEMD_SERVICE:${PN}-hdc = "hdcd.service"
+SRC_URI += "file://hdcd.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/hdcd.service ${D}${systemd_unitdir}/system/
+}
 RDEPENDS:${PN}-hdc += "musl libcxx"
 RDEPENDS:${PN}-hdc += "${PN}-libutils ${PN}-syspara libcrypto"
 RDEPENDS:${PN} += "${PN}-hdc"
