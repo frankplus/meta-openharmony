@@ -75,6 +75,8 @@ mkdir -p /data/vendor/hardware
 mkdir -p /data/weston
 mkdir -p /usr/lib/dri
 
+chmod -R 777 /data
+
 # /dev/binder needs to be rw for all users
 chmod 666 /dev/binder
 
