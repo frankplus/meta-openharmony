@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+OpenHarmony uses couple of UIDs/GIDs for running it's services.
+Currently in meta-openharmony we have everything run as root, which 
+causes some issues in starting abilities. As a temporary workaround
+we are removing the Uid check.
+
+Apply to foundation/aafwk/standard
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+Upstream-Status: Inappropriate
+
+diff --git a/services/abilitymgr/include/ability_util.h b/services/abilitymgr/include/ability_util.h
+index a090a1eb..d495a75b 100644
+--- a/services/abilitymgr/include/ability_util.h
++++ b/services/abilitymgr/include/ability_util.h
+@@ -144,10 +144,10 @@ static sptr<AppExecFwk::IBundleMgr> GetBundleManager()
+         if (callerUid == -1) {
+             callerUid = IPCSkeleton::GetCallingUid();
+         }
+-        if (ROOT_UID == callerUid) {
+-            HILOG_ERROR("uid is root,ability cannot be start when the visible is false");
+-            return ABILITY_VISIBLE_FALSE_DENY_REQUEST;
+-        }
++        // if (ROOT_UID == callerUid) {
++        //     HILOG_ERROR("uid is root,ability cannot be start when the visible is false");
++        //     return ABILITY_VISIBLE_FALSE_DENY_REQUEST;
++        // }
+         auto bms = GetBundleManager();
+         CHECK_POINTER_AND_RETURN(bms, GET_ABILITY_SERVICE_FAILED);
+         auto isSystemApp = bms->CheckIsSystemAppByUid(callerUid);
