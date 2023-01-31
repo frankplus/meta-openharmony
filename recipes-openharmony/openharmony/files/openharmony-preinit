@@ -77,8 +77,9 @@ mkdir -p /usr/lib/dri
 
 chmod -R 777 /data
 
-# /dev/binder needs to be rw for all users
+# /dev/binder and /dev/ashmem need to be rw for all users
 chmod 666 /dev/binder
+chmod 666 /dev/ashmem
 
 # /dev/dri/card0 needs to be rw for all users
 if [ -c /dev/dri/card0 ]; then
