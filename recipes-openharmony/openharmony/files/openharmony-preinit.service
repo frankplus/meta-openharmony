@@ -4,6 +4,7 @@ Description=OpenHarmony pre-init setup
 [Service]
 Type=oneshot
 ExecStart=/bin/sh /usr/sbin/openharmony-preinit
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
