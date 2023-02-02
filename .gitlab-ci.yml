@@ -53,7 +53,9 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 include:
- - local: '.gitlab-ci/container.yml'
+  - local: '.gitlab-ci/container.yml'
+  - project: 'eclipsefdn/it/releng/gitlab-ci-templates'
+    file: '/jobs/eca.gitlab-ci.yml'
 
 variables:
   # Force the use of git clone to avoid odd git and repo problems
@@ -82,11 +84,15 @@ variables:
   OPENHARMONY_BUILDER: "$CI_REGISTRY_IMAGE/openharmony-builder"
 
 stages:
+  - compliance
   - container
   - maintenance
   - fetch
   - build
   - test
+
+eca:
+  extends: .eca
 
 # Common job definition for bitbake driven jobs, such as fetch and build
 .bitbake:
