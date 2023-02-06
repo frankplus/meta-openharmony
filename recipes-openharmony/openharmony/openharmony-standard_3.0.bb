@@ -74,6 +74,7 @@ SRC_URI += "file://test-xts-acts-Start-tests-from-onInit.patch;patchdir=${S}/tes
 SRC_URI += "file://RenderText-PerformLayout-remove-sigsegv-code.patch;patchdir=${S}/foundation/ace/ace_engine"
 SRC_URI += "file://remove-root-uid-check.patch;patchdir=${S}/foundation/aafwk/standard"
 SRC_URI += "file://test-xts-acts-timeout-increment.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 
