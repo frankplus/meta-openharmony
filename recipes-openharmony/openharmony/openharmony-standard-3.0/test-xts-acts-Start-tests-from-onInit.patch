@@ -1,0 +1,691 @@
+From a2f2299afa37a20dccf2bfbc7fcf3d6a96759d93 Mon Sep 17 00:00:00 2001
+From: Robert Drab <robert.drab@huawei.com>
+Date: Fri, 30 Sep 2022 10:28:29 +0200
+Subject: [PATCH] test/xts/acts: Start tests from onInit
+
+Currently, due to some services/graphics issues onShow callback is not being
+called and therefore tests are not executed. For screen-less devices graphics
+stack should not be required and therefore moving test execution to onInit
+
+Signed-off-by: Robert Drab <robert.drab@huawei.com>
+---
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../startability/src/main/js/default/pages/index/index.js   | 4 ++--
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../src/main/js/default/pages/index/index.js                | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 6 +++---
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../entry/src/main/js/default/pages/index/index.js          | 4 ++--
+ .../bmssceneeight/src/main/js/default/pages/index/index.js  | 2 +-
+ .../wifi_standard/src/main/js/default/pages/index/index.js  | 4 ++--
+ .../hap/src/main/js/default/pages/index/index.js            | 6 +++---
+ .../hap/src/main/js/default/pages/index/index.js            | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 6 +++---
+ .../src/main/js/default/pages/index/index.js                | 4 ++--
+ 28 files changed, 70 insertions(+), 70 deletions(-)
+
+diff --git a/aafwk/aafwk_standard/amsdatauriutils/entry/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/amsdatauriutils/entry/src/main/js/default/pages/index/index.js
+index 4bfa4f7e4..9cc6b872b 100644
+--- a/aafwk/aafwk_standard/amsdatauriutils/entry/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/amsdatauriutils/entry/src/main/js/default/pages/index/index.js
+@@ -22,8 +22,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('====onShow finish====<')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -39,6 +37,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+-}
+\ No newline at end of file
++}
+diff --git a/aafwk/aafwk_standard/amszipfileunzipfilest/entry/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/amszipfileunzipfilest/entry/src/main/js/default/pages/index/index.js
+index 71d803721..0e5c67f3e 100644
+--- a/aafwk/aafwk_standard/amszipfileunzipfilest/entry/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/amszipfileunzipfilest/entry/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default{
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -40,6 +38,8 @@ export default{
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/context/actscontexttest/entry/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/context/actscontexttest/entry/src/main/js/default/pages/index/index.js
+index 177e8dc6f..095743b34 100755
+--- a/aafwk/aafwk_standard/context/actscontexttest/entry/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/context/actscontexttest/entry/src/main/js/default/pages/index/index.js
+@@ -27,8 +27,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -43,6 +41,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/default/pages/index/index.js
+index a84693493..604c4fe49 100644
+--- a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/default/pages/index/index.js
+@@ -25,8 +25,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -40,6 +38,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultemptytest/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultemptytest/src/main/js/default/pages/index/index.js
+index 891d4d9d9..2a699fe4d 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultemptytest/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultemptytest/src/main/js/default/pages/index/index.js
+@@ -25,10 +25,8 @@ export default {
+     data: {
+         title: ""
+     },
+-    onInit() {
++    async onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    async onShow() {
+         commonEvent.publish("ACTS_FinishWithResult_0300_CommonEvent", PublishCallBackOne);
+         var promise = await featureAbility.terminateSelfWithResult(
+             {
+@@ -50,6 +48,8 @@ export default {
+                 console.debug('==========Terminate Ability Success==========')
+         });
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultpromiseparameterstest/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultpromiseparameterstest/src/main/js/default/pages/index/index.js
+index d84b9fb6e..638b3ba44 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultpromiseparameterstest/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresultpromiseparameterstest/src/main/js/default/pages/index/index.js
+@@ -26,10 +26,8 @@ export default {
+     data: {
+         title: ""
+     },
+-    onInit() {
++    async onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    async onShow() {
+         commonevent.publish("ACTS_FinishWithResult_0100_CommonEvent", PublishCallBack);
+         var promise = await featureAbility.terminateSelfWithResult(
+             {
+@@ -90,6 +88,8 @@ export default {
+             console.debug('==========Terminate Ability Success==========');
+         });
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresulttest/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresulttest/src/main/js/default/pages/index/index.js
+index c37fe74e7..056bd7fed 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/finishwithresulttest/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/finishwithresulttest/src/main/js/default/pages/index/index.js
+@@ -26,10 +26,8 @@ export default {
+     data: {
+         title: ""
+     },
+-    onInit() {
++    async onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    async onShow() {
+         commonEvent.publish("ACTS_FinishWithResult_0200_CommonEvent", PublishCallBack);
+         var promise = await featureAbility.terminateSelfWithResult(
+             {
+@@ -46,6 +44,8 @@ export default {
+             console.debug('==========Terminate Ability Success==========');
+         });
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/getcallingbundletest/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/getcallingbundletest/src/main/js/default/pages/index/index.js
+index 3098aaec6..454ecbc6e 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/getcallingbundletest/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/getcallingbundletest/src/main/js/default/pages/index/index.js
+@@ -31,10 +31,8 @@ export default {
+     data: {
+         title: ""
+     },
+-    onInit() {
++    async onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    async onShow() {
+         commonEvent.publish("ACTS_GetCallingBundle_0100_CommonEvent", PublishCallBackOne);
+         var context = featureAbility.getContext();
+         var info = await context.getCallingBundle();
+@@ -46,6 +44,8 @@ export default {
+             }
+         );
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/startability/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/startability/src/main/js/default/pages/index/index.js
+index 8dc8d643f..5a346d155 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/startability/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/startability/src/main/js/default/pages/index/index.js
+@@ -42,8 +42,6 @@ export default {
+     },
+     onInit() {
+         this.title = "StartAbility";
+-    },
+-    onShow() {
+         commonEvent.publish("ACTS_StartAbility_0100_CommonEvent", PublishCallBackOne);
+         commonEvent.publish("ACTS_StartAbility_0200_CommonEvent", PublishCallBackTwo);
+         commonEvent.publish("ACTS_StartAbility_0300_CommonEvent", PublishCallBackThree);
+@@ -51,6 +49,8 @@ export default {
+         commonEvent.publish("ACTS_StartAbility_0500_CommonEvent", PublishCallBackFive);
+         commonEvent.publish("ACTS_StartAbility_0600_CommonEvent", PublishCallBackSix);
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/startabilityforresult/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/startabilityforresult/src/main/js/default/pages/index/index.js
+index e4ab37dde..c19ab6613 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/startabilityforresult/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/startabilityforresult/src/main/js/default/pages/index/index.js
+@@ -21,10 +21,8 @@ export default {
+     data: {
+         title: "StartAbility"
+     },
+-    onInit() {
++    async onInit() {
+         this.title = "StartAbilityForResult";
+-    },
+-    async onShow() {
+         var promise = await featureAbility.terminateSelfWithResult(
+             {
+                 resultCode: 1,
+@@ -37,6 +35,8 @@ export default {
+         );
+         await featureAbility.terminateSelf();
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/featureability/sceneproject/terminateabilitytest/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/featureability/sceneproject/terminateabilitytest/src/main/js/default/pages/index/index.js
+index f6534d839..9b6ac1adc 100644
+--- a/aafwk/aafwk_standard/featureability/sceneproject/terminateabilitytest/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/featureability/sceneproject/terminateabilitytest/src/main/js/default/pages/index/index.js
+@@ -37,8 +37,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         commonEvent.publish("ACTS_TerminateAbility_0100_CommonEvent", PublishCallBackOne);
+         commonEvent.publish("ACTS_TerminateAbility_0200_CommonEvent", PublishCallBackTwo);
+         featureAbility.terminateSelf(
+@@ -49,6 +47,8 @@ export default {
+             }
+         );
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/default/pages/index/index.js b/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/default/pages/index/index.js
+index 177e8dc6f..095743b34 100644
+--- a/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/default/pages/index/index.js
++++ b/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/default/pages/index/index.js
+@@ -27,8 +27,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -43,6 +41,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/account/OsAccountTest_js/src/main/js/default/pages/index/index.js b/account/OsAccountTest_js/src/main/js/default/pages/index/index.js
+index e485a7268..630089840 100755
+--- a/account/OsAccountTest_js/src/main/js/default/pages/index/index.js
++++ b/account/OsAccountTest_js/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         //        const instrumentLog = new InstrumentLog({
+@@ -47,6 +45,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmsallshortcutinfotest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmsallshortcutinfotest/entry/src/main/js/default/pages/index/index.js
+index f8cda9ef1..784fa9b52 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmsallshortcutinfotest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmsallshortcutinfotest/entry/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = 'Test Shortcut';
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,8 +36,10 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+     onBackPress(){
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmscheckpermissiontest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmscheckpermissiontest/entry/src/main/js/default/pages/index/index.js
+index f8add8b1b..af2e7f098 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmscheckpermissiontest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmscheckpermissiontest/entry/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default {
+     },
+     onInit() {
+         this.title = 'Test CheckPermission';
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,5 +36,7 @@ export default {
+ 
+         require('../../../test/List.test')
+         core.execute()
++    },
++    onShow() {
+     }
+ }
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmshapmoduletest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmshapmoduletest/entry/src/main/js/default/pages/index/index.js
+index 96d476a61..56a8d3c0f 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmshapmoduletest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmshapmoduletest/entry/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default {
+     },
+     onInit() {
+         this.title = 'Test HapModuleInfo';
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -39,6 +37,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmskittest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmskittest/entry/src/main/js/default/pages/index/index.js
+index f894faacf..362bbb390 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmskittest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmskittest/entry/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = 'Bms Stress Test';
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,8 +36,10 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+     onBackPress(){
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmsmetadatatest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmsmetadatatest/entry/src/main/js/default/pages/index/index.js
+index 00dea8501..e7fe34258 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmsmetadatatest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmsmetadatatest/entry/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = 'Test MetaData';
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,8 +36,10 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+     onBackPress(){
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/default/pages/index/index.js
+index 7f77556a7..6bb4ad1c3 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = "Test ModuleUsageRecord";
+-    },
+-    onShow() {
+         console.info('onReady finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,6 +36,8 @@ export default {
+         require('../../../test/List.test.js')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/entry/src/main/js/default/pages/index/index.js
+index b3620946d..9b47685ef 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/entry/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -39,6 +37,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanageruninstall/entry/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanageruninstall/entry/src/main/js/default/pages/index/index.js
+index f90bb8113..398d8b4d7 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanageruninstall/entry/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanageruninstall/entry/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -38,6 +36,8 @@ export default {
+         require('../../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/appexecfwk/bundle_standard/bundlemanager/sceneProject/bmssceneeight/src/main/js/default/pages/index/index.js b/appexecfwk/bundle_standard/bundlemanager/sceneProject/bmssceneeight/src/main/js/default/pages/index/index.js
+index a2ff58470..97b3d97e7 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/sceneProject/bmssceneeight/src/main/js/default/pages/index/index.js
++++ b/appexecfwk/bundle_standard/bundlemanager/sceneProject/bmssceneeight/src/main/js/default/pages/index/index.js
+@@ -25,8 +25,8 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
++        commonEvent.publish("Third1_Publish_CommonEvent", PublishCallBackOne);
+     },
+     onShow() {
+-        commonEvent.publish("Third1_Publish_CommonEvent", PublishCallBackOne);
+     }
+ }
+diff --git a/communication/wifi_standard/src/main/js/default/pages/index/index.js b/communication/wifi_standard/src/main/js/default/pages/index/index.js
+index 96b91894f..42fac4605 100755
+--- a/communication/wifi_standard/src/main/js/default/pages/index/index.js
++++ b/communication/wifi_standard/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         
+@@ -43,6 +41,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+diff --git a/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/pages/index/index.js b/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/pages/index/index.js
+index c2b247fd0..47850ee1f 100755
+--- a/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/pages/index/index.js
++++ b/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/pages/index/index.js
+@@ -25,8 +25,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -40,6 +38,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+-}
+\ No newline at end of file
++}
+diff --git a/distributeddatamgr/distributeddatamgrjstest/hap/src/main/js/default/pages/index/index.js b/distributeddatamgr/distributeddatamgrjstest/hap/src/main/js/default/pages/index/index.js
+index 505e12812..e60161c72 100755
+--- a/distributeddatamgr/distributeddatamgrjstest/hap/src/main/js/default/pages/index/index.js
++++ b/distributeddatamgr/distributeddatamgrjstest/hap/src/main/js/default/pages/index/index.js
+@@ -23,14 +23,14 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         core.init()
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+-}
+\ No newline at end of file
++}
+diff --git a/hiviewdfx/hiappeventtest/hiappeventjstest/src/main/js/default/pages/index/index.js b/hiviewdfx/hiappeventtest/hiappeventjstest/src/main/js/default/pages/index/index.js
+index d1af64d75..9f3dde425 100755
+--- a/hiviewdfx/hiappeventtest/hiappeventjstest/src/main/js/default/pages/index/index.js
++++ b/hiviewdfx/hiappeventtest/hiappeventjstest/src/main/js/default/pages/index/index.js
+@@ -26,8 +26,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -41,6 +39,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+-}
+\ No newline at end of file
++}
+diff --git a/powermgr/powermgrbattery/src/main/js/default/pages/index/index.js b/powermgr/powermgrbattery/src/main/js/default/pages/index/index.js
+index a1ba7d09f..d9f5ed4ff 100755
+--- a/powermgr/powermgrbattery/src/main/js/default/pages/index/index.js
++++ b/powermgr/powermgrbattery/src/main/js/default/pages/index/index.js
+@@ -23,8 +23,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -43,6 +41,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+-}
+\ No newline at end of file
++}
+diff --git a/startup/startup_standard/src/main/js/default/pages/index/index.js b/startup/startup_standard/src/main/js/default/pages/index/index.js
+index 173f299a3..8a0dc339c 100644
+--- a/startup/startup_standard/src/main/js/default/pages/index/index.js
++++ b/startup/startup_standard/src/main/js/default/pages/index/index.js
+@@ -24,8 +24,6 @@ export default {
+     },
+     onInit() {
+         this.title = this.$t('strings.world');
+-    },
+-    onShow() {
+         console.info('onShow finish')
+         const core = Core.getInstance()
+         const expectExtend = new ExpectExtend({
+@@ -41,6 +39,8 @@ export default {
+         require('../../test/List.test')
+         core.execute()
+     },
++    onShow() {
++    },
+     onReady() {
+     },
+ }
+-- 
+2.25.1
+

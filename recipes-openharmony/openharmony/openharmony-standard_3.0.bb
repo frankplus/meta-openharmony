@@ -70,6 +70,10 @@ SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
+SRC_URI += "file://test-xts-acts-Start-tests-from-onInit.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://RenderText-PerformLayout-remove-sigsegv-code.patch;patchdir=${S}/foundation/ace/ace_engine"
+SRC_URI += "file://remove-root-uid-check.patch;patchdir=${S}/foundation/aafwk/standard"
+
 inherit python3native gn_base ptest
 
 B = "${S}/out/ohos-arm-release"
@@ -309,7 +313,9 @@ OPENHARMONY_PARTS += "communication:ipc"
 OPENHARMONY_PARTS += "communication:ipc_js"
 OPENHARMONY_PARTS += "developtools:bytrace_standard"
 OPENHARMONY_PARTS += "developtools:hdc_standard"
+OPENHARMONY_PARTS += "distributeddatamgr:appdatamgr_jskits"
 OPENHARMONY_PARTS += "distributeddatamgr:distributeddatamgr"
+OPENHARMONY_PARTS += "distributeddatamgr:distributedfilejs"
 OPENHARMONY_PARTS += "distributeddatamgr:native_appdatamgr"
 OPENHARMONY_PARTS += "distributedhardware:device_manager_base"
 OPENHARMONY_PARTS += "distributedschedule:dmsfwk_standard"
@@ -816,9 +822,14 @@ FILES:${PN}-appdatamgr = " \
     ${libdir}/libnative_preferences*${SOLIBS} \
     ${libdir}/libnative_dataability*${SOLIBS} \
     ${libdir}/libnative_appdatafwk*${SOLIBS} \
+    ${libdir}/module/libfileio*${SOLIBS} \
+    ${libdir}/module/libfile*${SOLIBS} \
+    ${libdir}/module/data/librdb*${SOLIBS} \
+    ${libdir}/module/data/libstorage*${SOLIBS} \
+    ${libdir}/module/data/libdataability*${SOLIBS} \
 "
 RDEPENDS:${PN}-appdatamgr += "musl libcxx libcrypto"
-RDEPENDS:${PN}-appdatamgr += "${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-thirdparty-icu ${PN}-thirdparty-sqlite"
+RDEPENDS:${PN}-appdatamgr += "${PN}-libutils ${PN}-ipc ${PN}-hilog ${PN}-thirdparty-libxml2 ${PN}-thirdparty-icu ${PN}-thirdparty-sqlite ${PN}-ace-napi ${PN}-appexecfwk ${PN}-dmsfwk"
 RDEPENDS:${PN} += "${PN}-appdatamgr"
 
 PACKAGES =+ "${PN}-appdatamgr-ptest"
