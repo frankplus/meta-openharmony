@@ -31,7 +31,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSIO
 SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
 
 # TODO: we probably want these
-SRC_URI += "file://hilog-Add-tests.patch"
+SRC_URI += "file://hilog-Add-tests.patch;patchdir=${S}/base/hiviewdfx/hilog"
 
 SRC_URI += "file://bison_parser.patch;patchdir=${S}/third_party/libxkbcommon"
 SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
