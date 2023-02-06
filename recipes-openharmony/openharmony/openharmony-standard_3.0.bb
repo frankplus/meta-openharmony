@@ -1969,3 +1969,8 @@ EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
 INSANE_SKIP:${PN} += "already-stripped"
+
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"

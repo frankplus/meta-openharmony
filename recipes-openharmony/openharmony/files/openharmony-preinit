@@ -182,7 +182,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled huks.service; then
-	/system/bin/sa_main /system/profile/huks_service.xml & # SA: 3510
+	su system -c '/system/bin/sa_main /system/profile/huks_service.xml &' # SA: 3510
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -192,7 +192,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled deviceauth.service; then
-	/system/bin/deviceauth_service & # SA: 4701 | Required SA: 3510
+	su system -c '/system/bin/deviceauth_service &' # SA: 4701 | Required SA: 3510
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -207,7 +207,7 @@ fi
 # "/dev/blkio/foreground/tasks"
 # ]
 if systemctl -q is-enabled accountmgr.service; then
-	/system/bin/sa_main /system/profile/accountmgr.xml & # SA: 200
+	su system -c '/system/bin/sa_main /system/profile/accountmgr.xml &' # SA: 200
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -217,7 +217,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled dsoftbus.service; then
-	/system/bin/sa_main /system/profile/softbus_server.xml & # SA: 1401 4700 | Required SA: 3299
+	su system -c '/system/bin/sa_main /system/profile/softbus_server.xml &' # SA: 1401 4700 | Required SA: 3299
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -231,7 +231,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled distributedsched.service; then
-	/system/bin/sa_main /system/profile/distributedsched.xml & # SA: 1401
+	su system -c '/system/bin/sa_main /system/profile/distributedsched.xml &' # SA: 1401
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -247,7 +247,7 @@ fi
 # "/dev/blkio/foreground/tasks"
 # ]
 if systemctl -q is-enabled distributed_data.service; then
-	/system/bin/sa_main /system/profile/distributeddata.xml & # SA: 1301
+	su system -c '/system/bin/sa_main /system/profile/distributeddata.xml &' # SA: 1301
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -258,7 +258,7 @@ fi
 # "gid" : ["system", "shell"],
 # "caps" : ["SYS_TIME", "WAKE_ALARM"]
 if systemctl -q is-enabled time.service; then
-	/system/bin/sa_main /system/profile/time_service.xml & # SA: 1401 180 3702
+	su system -c '/system/bin/sa_main /system/profile/time_service.xml &' # SA: 1401 180 3702
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -270,7 +270,7 @@ fi
 # "gid" : ["system"],
 # "caps" : ["SYS_PTRACE", "KILL"]
 if systemctl -q is-enabled foundation.service; then
-	/system/bin/sa_main /system/profile/foundation.xml & # SA: 180 182 3203 3299 3301 3308 3501 4010 | Required SA: 4700
+	su system -c '/system/bin/sa_main /system/profile/foundation.xml &' # SA: 180 182 3203 3299 3301 3308 3501 4010 | Required SA: 4700
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -280,7 +280,7 @@ fi
 # "uid" : "system",
 # "gid" : ["media_rw", "system"]
 if systemctl -q is-enabled media.service; then
-	/system/bin/sa_main /system/profile/media_service.xml &
+	su system -c '/system/bin/sa_main /system/profile/media_service.xml &'
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
@@ -291,7 +291,7 @@ fi
 # "gid" : ["system", "shell"],
 # "caps" : ["SYS_TIME"]
 if systemctl -q is-enabled inputmethod.service; then
-	/system/bin/sa_main /system/profile/inputmethod_service.xml & # SA: 180 1401 3703
+	su system -c '/system/bin/sa_main /system/profile/inputmethod_service.xml &' # SA: 180 1401 3703
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
