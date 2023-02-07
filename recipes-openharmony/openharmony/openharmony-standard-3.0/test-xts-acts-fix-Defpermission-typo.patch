@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+ 
+Fix DefPermission.hap filename typo which is causing a file not found error 
+when running ActsContextTest ACTS tests. 
+ 
+Upstream-Status: Pending 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+
+diff --git a/aafwk/aafwk_standard/context/actscontexttest/Test.json b/aafwk/aafwk_standard/context/actscontexttest/Test.json
+index b6afb1bb3..7cbe409ec 100755
+--- a/aafwk/aafwk_standard/context/actscontexttest/Test.json
++++ b/aafwk/aafwk_standard/context/actscontexttest/Test.json
+@@ -9,7 +9,7 @@
+     "kits": [
+         {
+             "test-file-name": [
+-                "DefPermission.hap",
++                "Defpermission.hap",
+                 "ActsContextTest.hap"
+             
+             ],

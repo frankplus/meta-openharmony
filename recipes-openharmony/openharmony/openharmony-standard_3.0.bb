@@ -73,6 +73,9 @@ SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.pat
 SRC_URI += "file://test-xts-acts-Start-tests-from-onInit.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://RenderText-PerformLayout-remove-sigsegv-code.patch;patchdir=${S}/foundation/ace/ace_engine"
 SRC_URI += "file://remove-root-uid-check.patch;patchdir=${S}/foundation/aafwk/standard"
+SRC_URI += "file://test-xts-acts-timeout-increment.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 
@@ -1968,3 +1971,8 @@ EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
 INSANE_SKIP:${PN} += "already-stripped"
+
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"
