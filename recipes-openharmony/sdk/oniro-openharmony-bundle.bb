@@ -18,3 +18,8 @@ TOOLCHAIN_TARGET_TASK += "openssl-dev"
 
 # OpenSSL for build host
 TOOLCHAIN_HOST_TASK += "nativesdk-openssl-dev"
+
+# libunwind for target
+DEPENDS += "libunwind"
+RDEPENDS:${PN} = "libunwind"
+TOOLCHAIN_TARGET_TASK += "libcxx-dev"
