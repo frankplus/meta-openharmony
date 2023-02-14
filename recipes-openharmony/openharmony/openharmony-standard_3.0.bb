@@ -70,9 +70,7 @@ SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
-SRC_URI += "file://test-xts-acts-Start-tests-from-onInit.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://RenderText-PerformLayout-remove-sigsegv-code.patch;patchdir=${S}/foundation/ace/ace_engine"
-SRC_URI += "file://remove-root-uid-check.patch;patchdir=${S}/foundation/aafwk/standard"
 SRC_URI += "file://test-xts-acts-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
