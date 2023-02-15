@@ -1580,7 +1580,7 @@ FILES:${PN}-faultlogger = " \
     ${libdir}/libdfx_signalhandler*${SOLIBS} \
 "
 RDEPENDS:${PN}-faultlogger += "musl libcxx"
-RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
+RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-faultlogger"
 
 # faultlogger-ptest
@@ -1911,11 +1911,6 @@ PACKAGES =+ "${PN}-thirdparty-protobuf"
 FILES:${PN}-thirdparty-protobuf = "${libdir}/libprotobuf_standard*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-protobuf += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-protobuf"
-
-PACKAGES =+ "${PN}-thirdparty-libunwind"
-FILES:${PN}-thirdparty-libunwind = "${libdir}/libunwind*${SOLIBS}"
-RDEPENDS:${PN}-thirdparty-libunwind += "musl libcxx"
-RDEPENDS:${PN} += "${PN}-thirdparty-libunwind"
 
 PACKAGES =+ "${PN}-thirdparty-giflib"
 FILES:${PN}-thirdparty-giflib = "${libdir}/libgif*${SOLIBS}"
