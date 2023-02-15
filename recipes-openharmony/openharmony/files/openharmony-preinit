@@ -73,6 +73,9 @@ mkdir -p /data/vendor_ce
 mkdir -p /data/vendor_de
 mkdir -p /data/vendor/hardware
 mkdir -p /data/weston
+mkdir -p /data/log/hilog
+mkdir -p /data/log/faultlog/faultlogger
+mkdir -p /data/log/faultlog/temp
 mkdir -p /usr/lib/dri
 
 chmod -R 777 /data
@@ -310,6 +313,5 @@ if systemctl -q is-enabled hdcd.service; then
 fi
 
 if systemctl -q is-enabled faultloggerd.service; then
-	/usr/bin/install -m 775 -d /data/log/faultlog /data/log/faultlog/faultlogger /data/log/faultlog/temp/
 	/system/bin/faultloggerd &
 fi
