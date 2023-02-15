@@ -103,6 +103,9 @@ if systemctl -q is-enabled param.service; then
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
+# Explicitly set default value to silence error message about parameter not being set
+setparam persist.ace.trace.enabled 0
+
 # - pre-init stage
 # - init stage
 
@@ -307,11 +310,14 @@ fi
 # "disabled" : 1
 if systemctl -q is-enabled hdcd.service; then
 	setparam persist.hdc.port 35000
+	setparam persist.hdc.root 1 # We are running hdcd as root
+	setparam ro.hdc.secure 0 # Do not enable secure mode
 	sleep "$STARTUP_CMD_SLEEP"
 
 	/system/bin/hdcd -t &
 fi
 
 if systemctl -q is-enabled faultloggerd.service; then
+	setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
 	/system/bin/faultloggerd &
 fi
