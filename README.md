@@ -116,6 +116,14 @@ quickly building and running OpenHarmony code in QEMU ARM simulator.
 See [recipes-openharmony/images/README.md](recipes-openharmony/images/README.md)
 for more information.
 
+## OpenHarmony host tools
+
+To facilitate working with OpenHarmony systems, an image with various host tools
+is provided.
+
+See [recipes-openharmony/tools/README.rst](recipes-openharmony/tools/README.rst)
+for more information.
+
 ## OpenHarmony prebuilts
 
 The meta-openharmony layer enables building of prebuilts for use with the
