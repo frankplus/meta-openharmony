@@ -331,7 +331,7 @@ build:
       - DISTRO: [oniro-openharmony-linux]
         OPENHARMONY_VERSION: ["3.0"]
         MACHINE: [qemuarma7]
-        RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image]
+        RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image, openharmony-tools]
   artifacts:
     paths:
       - build/tmp-*/deploy/images/${MACHINE}
