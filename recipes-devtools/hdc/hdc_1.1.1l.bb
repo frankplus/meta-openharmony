@@ -16,4 +16,4 @@ SRC_URI += "file://libusb-include-path.patch"
 
 DEPENDS += "libusb1 libuv openssl lz4 libboundscheck"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
