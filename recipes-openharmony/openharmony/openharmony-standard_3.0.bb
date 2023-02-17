@@ -1962,6 +1962,16 @@ do_install_ptest:append() {
     done
 }
 
+PACKAGES:prepend:df-acts = "${PN}-acts "
+do_install:append:df-acts() {
+    mkdir -p ${D}${libexecdir}/${PN}/acts
+    for d in config testcases ; do
+        cp -dR --no-preserve=ownership ${B}/suites/acts/$d ${D}${libexecdir}/${PN}/acts/
+    done
+}
+FILES:${PN}-acts = "${libexecdir}/${PN}/acts"
+INSANE_SKIP:${PN}-acts = "file-rdeps"
+
 EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
