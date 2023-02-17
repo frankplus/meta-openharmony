@@ -16,4 +16,8 @@ SRC_URI += "file://libusb-include-path.patch"
 
 DEPENDS += "libusb1 libuv openssl lz4 libboundscheck"
 
+do_install:append() {
+    ln -sfT hdc ${D}${bindir}/hdc_std
+}
+
 BBCLASSEXTEND = "native nativesdk"
