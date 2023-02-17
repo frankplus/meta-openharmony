@@ -73,6 +73,9 @@ mkdir -p /data/vendor_ce
 mkdir -p /data/vendor_de
 mkdir -p /data/vendor/hardware
 mkdir -p /data/weston
+mkdir -p /data/log/hilog
+mkdir -p /data/log/faultlog/faultlogger
+mkdir -p /data/log/faultlog/temp
 mkdir -p /usr/lib/dri
 
 chmod -R 777 /data
@@ -99,6 +102,9 @@ if systemctl -q is-enabled param.service; then
 	/system/bin/param_service &
 	sleep "$STARTUP_CMD_SLEEP"
 fi
+
+# Explicitly set default value to silence error message about parameter not being set
+setparam persist.ace.trace.enabled 0
 
 # - pre-init stage
 # - init stage
@@ -304,12 +310,14 @@ fi
 # "disabled" : 1
 if systemctl -q is-enabled hdcd.service; then
 	setparam persist.hdc.port 35000
+	setparam persist.hdc.root 1 # We are running hdcd as root
+	setparam ro.hdc.secure 0 # Do not enable secure mode
 	sleep "$STARTUP_CMD_SLEEP"
 
 	/system/bin/hdcd -t &
 fi
 
 if systemctl -q is-enabled faultloggerd.service; then
-	/usr/bin/install -m 775 -d /data/log/faultlog /data/log/faultlog/faultlogger /data/log/faultlog/temp/
+	setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
 	/system/bin/faultloggerd &
 fi

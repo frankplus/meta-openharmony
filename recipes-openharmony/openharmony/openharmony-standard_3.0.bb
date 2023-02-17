@@ -62,6 +62,7 @@ SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_sta
 SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patchdir=${S}/test/xts/acts"
 
+SRC_URI += "file://init_lite-silence-GetControlFromEnv-spam.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service_standalone.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 

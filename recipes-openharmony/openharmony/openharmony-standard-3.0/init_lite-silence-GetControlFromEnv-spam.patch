@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+This patch is for //base/startup/init_lite repository of OpenHarmony 3.0
+
+When initializing sockets, no less than 2 info and 2 error messages are logged for each socket.  It is caused by a codepath that allows for specifying a socket fd using an environment variable. When the variable is not defined, all 4 messages are logged. As this is really the normal case, I have changed all 4 messages to debug messages.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/interfaces/innerkits/socket/init_socket.c b/interfaces/innerkits/socket/init_socket.c
+index be64939e993e..247ba5bfbbfe 100755
+--- a/interfaces/innerkits/socket/init_socket.c
++++ b/interfaces/innerkits/socket/init_socket.c
+@@ -39,10 +39,10 @@ static int GetControlFromEnv(const char *path, int length)
+     if (path == NULL || length <= 0) {
+         return -1;
+     }
+-    INIT_LOGI("GetControlFromEnv path is %s ", path);
++    INIT_LOGD("GetControlFromEnv path is %s ", path);
+     const char *val = getenv(path);
+     if (val == NULL) {
+-        INIT_LOGE("GetControlFromEnv val is null %d", errno);
++        INIT_LOGD("GetControlFromEnv %s val is null", path);
+         return -1;
+     }
+     errno = 0;
+@@ -50,9 +50,9 @@ static int GetControlFromEnv(const char *path, int length)
+     if (errno) {
+         return -1;
+     }
+-    INIT_LOGI("GetControlFromEnv fd is %d ", fd);
++    INIT_LOGD("GetControlFromEnv fd is %d ", fd);
+     if (fcntl(fd, F_GETFD) < 0) {
+-        INIT_LOGE("GetControlFromEnv errno %d ", errno);
++        INIT_LOGE("GetControlFromEnv %s fnctl errno %d ", path, errno);
+         return -1;
+     }
+     return fd;
+@@ -67,10 +67,10 @@ int GetControlSocket(const char *name)
+     if (snprintf_s(path, sizeof(path), sizeof(path) - 1, OHOS_SOCKET_ENV_PREFIX"%s", name) == -1) {
+         return -1;
+     }
+-    INIT_LOGI("GetControlSocket path is %s ", path);
++    INIT_LOGD("GetControlSocket path is %s ", path);
+     int fd = GetControlFromEnv(path, MAX_SOCKET_ENV_PREFIX_LEN);
+     if (fd < 0) {
+-        INIT_LOGE("GetControlFromEnv fail ");
++        INIT_LOGD("GetControlFromEnv fail ");
+         return -1;
+     }
+     struct sockaddr_un addr;
