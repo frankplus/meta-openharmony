@@ -1975,3 +1975,18 @@ inherit useradd
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"
+
+# system haps
+PACKAGES =+ "${PN}-systemhaps"
+do_install:append() {
+    install -m 777 -d ${D}/system/app
+    install -m 666 ${S}/applications/standard/hap/Launcher.hap ${D}/system/app
+    install -m 666 ${S}/applications/standard/hap/SystemUI-NavigationBar.hap ${D}/system/app
+    install -m 666 ${S}/applications/standard/hap/SystemUI-StatusBar.hap ${D}/system/app
+    install -m 666 ${S}/applications/standard/hap/SystemUI-SystemDialog.hap ${D}/system/app
+    install -m 666 ${S}/applications/standard/hap/Settings.hap ${D}/system/app
+}
+FILES:${PN}-systemhaps = " \
+    /system/app/* \
+"
+RDEPENDS:${PN} += "${PN}-systemhaps"
