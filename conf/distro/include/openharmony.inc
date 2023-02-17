@@ -22,6 +22,9 @@ DISTROOVERRIDES:append = "${OPENHARMONY_OVERRIDES}"
 
 PREFERRED_VERSION_openharmony-standard = "${OPENHARMONY_VERSION}"
 
+# Enable "df-acts" override
+DISTRO_FEATURES_OVERRIDES += "acts"
+
 # clang_rt.profile library is used in openharmony-standard build
 PACKAGECONFIG:pn-compiler-rt:append:df-openharmony = " profile"
 
