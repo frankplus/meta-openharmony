@@ -39,6 +39,8 @@ MACHINE ??= "qemuarma7"
 # Default policy config
 #
 DISTRO ?= "oniro-openharmony-linux"
+# Comment this out if you don't want to build ACTS test suite
+DISTRO_FEATURES:append = " acts"
 
 #
 # Extra image configuration defaults
