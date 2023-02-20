@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Handle compare with Python 3.10 and newer.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/src/xdevice/_core/command/console.py b/src/xdevice/_core/command/console.py
+index 9e448ba8d7e3..122da3c974fb 100644
+--- a/src/xdevice/_core/command/console.py
++++ b/src/xdevice/_core/command/console.py
+@@ -22,6 +22,7 @@ import platform
+ import signal
+ import sys
+ import threading
++from packaging import version
+ 
+ from _core.config.config_manager import UserConfigManager
+ from _core.constants import SchedulerType
+@@ -84,7 +85,7 @@ class Console(object):
+         """
+         Main xDevice console providing user with the interface to interact
+         """
+-        if sys.version < '3.7':
++        if version.parse(sys.version.split(' ')[0]) < version.parse('3.7'):
+             LOG.error("Please use python 3.7 or higher version to "
+                       "start project")
+             sys.exit(0)
+diff --git a/src/xdevice/_core/report/__main__.py b/src/xdevice/_core/report/__main__.py
+index 33d3a492029c..0a9124f8c2e1 100644
+--- a/src/xdevice/_core/report/__main__.py
++++ b/src/xdevice/_core/report/__main__.py
+@@ -19,6 +19,7 @@
+ import os
+ import sys
+ import time
++from packaging import version
+ 
+ from _core.logger import platform_logger
+ from _core.report.reporter_helper import ExecInfo
+@@ -29,7 +30,7 @@ LOG = platform_logger("ReportMain")
+ 
+ 
+ def main_report():
+-    if sys.version < '3.7':
++    if version.parse(sys.version.split(' ')[0]) < version.parse('3.7'):
+         LOG.error("Please use python 3.7 or higher version to start "
+                   "project")
+         return
