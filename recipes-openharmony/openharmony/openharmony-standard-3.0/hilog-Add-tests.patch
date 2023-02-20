@@ -10,10 +10,10 @@ has a valid reason for having it commented out.
 Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
 Upstream-Status: Pending
 
-diff --git a/base/hiviewdfx/hilog/BUILD.gn b/base/hiviewdfx/hilog/BUILD.gn
+diff --git a/BUILD.gn b/BUILD.gn
 index 19a70e0..41fcac0 100644
---- a/base/hiviewdfx/hilog/BUILD.gn
-+++ b/base/hiviewdfx/hilog/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
 @@ -18,8 +18,8 @@ group("hilog_target") {
  }
  
@@ -25,10 +25,10 @@ index 19a70e0..41fcac0 100644
 +    "test:HiLogNDKTest",
    ]
  }
-diff --git a/base/hiviewdfx/hilog/ohos.build b/base/hiviewdfx/hilog/ohos.build
+diff --git a/ohos.build b/ohos.build
 index f17894e..56488e4 100644
---- a/base/hiviewdfx/hilog/ohos.build
-+++ b/base/hiviewdfx/hilog/ohos.build
+--- a/ohos.build
++++ b/ohos.build
 @@ -7,6 +7,9 @@
      "hilog": {
        "module_list": [

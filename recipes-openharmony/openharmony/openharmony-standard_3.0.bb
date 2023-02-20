@@ -31,7 +31,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSIO
 SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
 
 # TODO: we probably want these
-SRC_URI += "file://hilog-Add-tests.patch"
+SRC_URI += "file://hilog-Add-tests.patch;patchdir=${S}/base/hiviewdfx/hilog"
 
 SRC_URI += "file://bison_parser.patch;patchdir=${S}/third_party/libxkbcommon"
 SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
@@ -49,7 +49,7 @@ SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral
 SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
 
 SRC_URI += "file://peripherals-Limit-drivers-list-to-supported-by-the-qemuarm.patch;patchdir=${S}/drivers/adapter"
-SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/default/standard_system"
+SRC_URI += "file://display_device.c;subdir=src/drivers/peripheral/display/hal/default/standard_system"
 SRC_URI += "file://display-Use-temporary-qemuarm-implementation.patch;patchdir=${S}/drivers/peripheral"
 SRC_URI += "file://display_gralloc_gbm.c-Use-card-drm-node.patch;patchdir=${S}/device/hihope"
 SRC_URI += "file://hihope-gralloc-Backport-to-3.0.patch;patchdir=${S}/device/hihope"

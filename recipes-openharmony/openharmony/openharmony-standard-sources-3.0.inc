@@ -444,7 +444,7 @@ SRCREV_FORMAT .= "+signcenter_tool"
 # repository, from which only necessary files will be copied to the OH_SRCDIR
 # and the rest will be removed in the do_unpack stage postfunc.
 OH_GRALLOC_TMP_DIR = "tmp_hihope"
-SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;name=device_board_hihope;destsuffix=${OH_GRALLOC_TMP_DIR};lfs=0"
+SRC_URI += "${GITEE_URL}/device_board_hihope.git;protocol=https;branch=OpenHarmony-3.1-Release;name=device_board_hihope;destsuffix=${OH_SRCDIR}/${OH_GRALLOC_TMP_DIR};lfs=0"
 SRCREV_device_board_hihope = "baab11f2692d9ddbebf8790a5e4a0edd48bdb9bf"
 SRCREV_FORMAT .= "+device_board_hihope"
 SRC_URI += "https://repo.huaweicloud.com/harmonyos/compiler/restool/1.023-d/restool.tar.gz;name=restool;subdir=${OH_SRCDIR}/prebuilts/build-tools/common"
@@ -524,14 +524,13 @@ create_symlinks() {
 # Cherry-pick display directory containing required gralloc implementation
 # out of hihope board repository and remove the rest
 cherry_pick_sources() {
-    if [ ! -d "${WORKDIR}/${OH_GRALLOC_TMP_DIR}" ]; then
-        bbfatal "OH_GRALLOC_TMP_DIR (${WORKDIR}/${OH_GRALLOC_TMP_DIR}) not found!"
+    if [ ! -d "${S}/${OH_GRALLOC_TMP_DIR}" ]; then
+        bbfatal "OH_GRALLOC_TMP_DIR (${S}/${OH_GRALLOC_TMP_DIR}) not found!"
     fi
 
-    TARGET_DIR="${WORKDIR}/${OH_SRCDIR}/device/hihope/hardware/"
+    TARGET_DIR="${S}/device/hihope/hardware/"
     install -d "${TARGET_DIR}"
-    cp -R "${WORKDIR}/${OH_GRALLOC_TMP_DIR}/hardware/display" "${TARGET_DIR}"
-    rm -r "${WORKDIR}/${OH_GRALLOC_TMP_DIR}"
+    cp -R "${S}/${OH_GRALLOC_TMP_DIR}/hardware/display" "${TARGET_DIR}"
 }
 
 do_unpack[postfuncs] += "create_symlinks"
