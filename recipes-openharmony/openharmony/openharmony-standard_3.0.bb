@@ -75,6 +75,7 @@ SRC_URI += "file://RenderText-PerformLayout-remove-sigsegv-code.patch;patchdir=$
 SRC_URI += "file://test-xts-acts-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 
@@ -1580,7 +1581,7 @@ FILES:${PN}-faultlogger = " \
     ${libdir}/libdfx_signalhandler*${SOLIBS} \
 "
 RDEPENDS:${PN}-faultlogger += "musl libcxx"
-RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog ${PN}-thirdparty-libunwind"
+RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-faultlogger"
 
 # faultlogger-ptest
@@ -1911,11 +1912,6 @@ PACKAGES =+ "${PN}-thirdparty-protobuf"
 FILES:${PN}-thirdparty-protobuf = "${libdir}/libprotobuf_standard*${SOLIBS}"
 RDEPENDS:${PN}-thirdparty-protobuf += "musl libcxx"
 RDEPENDS:${PN} += "${PN}-thirdparty-protobuf"
-
-PACKAGES =+ "${PN}-thirdparty-libunwind"
-FILES:${PN}-thirdparty-libunwind = "${libdir}/libunwind*${SOLIBS}"
-RDEPENDS:${PN}-thirdparty-libunwind += "musl libcxx"
-RDEPENDS:${PN} += "${PN}-thirdparty-libunwind"
 
 PACKAGES =+ "${PN}-thirdparty-giflib"
 FILES:${PN}-thirdparty-giflib = "${libdir}/libgif*${SOLIBS}"

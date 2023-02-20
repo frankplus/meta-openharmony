@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/hiviewdfx/faultloggerd repository of OpenHarmony 3.0 codebase.
+
+The processdump tool relies on remote unwind feature of libunwind, which is not
+supported by the LLVM libunwind version. The processdump tool is not a required
+feature, so by dropping it, we can get rid of the libunwind fork, and avoid
+having to convince meta-clang to use the non-LLVM libunwind library.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Inappropriate [configuration/integration]
+
+diff a/base/hiviewdfx/faultloggerd/ohos.build b/base/hiviewdfx/faultloggerd/ohos.build
+--- a/base/hiviewdfx/faultloggerd/ohos.build	2023-02-14 18:40:25.662946940 +0100
++++ b/base/hiviewdfx/faultloggerd/ohos.build	2023-02-14 16:07:18.840350031 +0100
+@@ -5,7 +5,6 @@
+       "module_list": [
+         "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
+         "//base/hiviewdfx/faultloggerd/interfaces/innerkits/faultloggerd_client:libfaultloggerd",
+-        "//base/hiviewdfx/faultloggerd/tools/process_dump:processdump",
+         "//base/hiviewdfx/faultloggerd/services:faultloggerd"
+       ],
+       "test_list": [

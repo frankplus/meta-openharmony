@@ -1,0 +1,86 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //test/xts/acts repository of OpenHarmony 3.0 codebase.
+
+This fixes the ActsFaultLogger test-case.
+
+- Optimization needs to be disabled to avoid compiler optimizing out the null
+  pointer dereference.
+
+- In order for the faultloggerd process to actually generate the log files,
+  applications needs to install the needed signal handlers, as documented in
+  base/hiviewdfx/faultloggerd/README.md
+
+- Align the test with it's own name, so it actually matches on the generated
+  crash log.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Inappropritate [test-case was dropped in 3.0.2]
+
+diff --git a/hiviewdfx/faultloggertest/faultloggercpptest/BUILD.gn b/hiviewdfx/faultloggertest/faultloggercpptest/BUILD.gn
+index 0eeb66084952..4ba249d8c4af 100755
+--- a/hiviewdfx/faultloggertest/faultloggercpptest/BUILD.gn
++++ b/hiviewdfx/faultloggertest/faultloggercpptest/BUILD.gn
+@@ -23,6 +23,7 @@ config("faultloggertest_config") {
+     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+     "genfault.h",
+   ]
++  cflags = [ "-O0" ]
+ }
+ ohos_moduletest_suite("ActsFaultLoggerTest") {
+   module_out_path = module_output_path
+@@ -33,6 +34,7 @@ ohos_moduletest_suite("ActsFaultLoggerTest") {
+   deps = [
+     "../../utils/native:utilskit",
+     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
++    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
+     "//third_party/googletest:gtest_main",
+     "//utils/native/base:utils",
+   ]
+diff --git a/hiviewdfx/faultloggertest/faultloggercpptest/faultloggertest.cpp b/hiviewdfx/faultloggertest/faultloggercpptest/faultloggertest.cpp
+index 5870de2257c1..ff00cffddf9f 100755
+--- a/hiviewdfx/faultloggertest/faultloggercpptest/faultloggertest.cpp
++++ b/hiviewdfx/faultloggertest/faultloggercpptest/faultloggertest.cpp
+@@ -22,6 +22,8 @@
+ #include "hilog/log_c.h"
+ #include "hilog/log_cpp.h"
+ 
++#include "dfx_signal_handler.h"
++
+ #undef LOG_DOMAIN
+ #undef LOG_TAG
+ #define LOG_DOMAIN 0xD003200
+@@ -60,6 +62,7 @@ pid_t faultloggertest::DoTestProcess(int faulttype)
+ {
+     printf("DoTestProcess, param is %d\r\n", faulttype);
+     pid_t pid;
++    static int installed = 0;
+     pid = fork();
+     printf("pid is %d\r\n", pid);
+     switch (pid) {
+@@ -70,6 +73,11 @@ pid_t faultloggertest::DoTestProcess(int faulttype)
+             GenFault(faulttype);
+             break;
+         default:
++          if (installed == 0) {
++            DFX_InstallSignalHandler();
++            std::cout << "DFX signal handler installed"<<std::endl;
++            installed = 1;
++          }
+             break;
+     }
+     wait(&status);
+@@ -130,9 +138,9 @@ HWTEST_F(faultloggertest, Faultlogger_Faultdetect1, Function|MediumTest|Level1)
+     string fileinfo;
+     fileinfo = ReadFile("/data/log/faultlog/temp/" + faultloggerfile);
+     std::vector<std::string> para = {"Pid:" + to_string(pid), "Uid:0",
+-                            "Process name:", "/data/local/tmp/faultloggertest",
++                            "Process name:", "/data/local/tmp/ActsFaultLoggerTest",
+                             "Reason:Signal:SIGILL", "Fault thread Info:",
+-                            "Tid:" + to_string(pid), "Name:faultloggertest"};
++                            "Tid:" + to_string(pid), "Name:ActsFaultLoggerTest"};
+     if (!fileinfo.empty()) {
+         result = CheckInfo(para, fileinfo);
+     } else {

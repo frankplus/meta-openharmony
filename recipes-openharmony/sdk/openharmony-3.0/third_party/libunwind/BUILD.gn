@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import("//build/ohos.gni")
+import("//oniro/third_party.gni")
+
+ohos_prebuilt_shared_library("libunwind") {
+  source = "//oniro/sysroots/target/usr/lib/libunwind.so.1.0"
+  subsystem_name = "hiviewdfx"
+  part_name = "faultloggerd"
+  install_enable = install_oniro_third_party
+  install_images = [ "system", "updater" ]
+}

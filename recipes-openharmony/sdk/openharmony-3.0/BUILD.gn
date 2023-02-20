@@ -9,6 +9,7 @@ group("third_party") {
     deps = [
       "//third_party/openssl:libcrypto",
       "//third_party/openssl:libssl",
+      "//third_party/libunwind:libunwind",
     ]
   }
 }
