@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/hiviewdfx/faultloggerd git repository of OpenHarmony 3.0 codebase.
+
+This fixes warning about unused variables when using musl, which (depending on
+compiler version) can be promoted to an error, and thus break compilation.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+--- a/base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler/dfx_signal_handler.c	2023-02-20 10:19:50.406718524 +0100
++++ b/base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler/dfx_signal_handler.c	2023-02-20 10:20:41.980303697 +0100
+@@ -79,8 +79,10 @@
+ static struct ProcessDumpRequest g_request;
+ static void *g_reservedChildStack;
+ static pthread_mutex_t g_signalHandlerMutex = PTHREAD_MUTEX_INITIALIZER;
++#ifndef DFX_LOCAL_UNWIND
+ static pthread_mutex_t g_dumpMutex = PTHREAD_MUTEX_INITIALIZER;
+ static int g_pipefd[2] = {-1, -1};
++#endif
+ static BOOL g_hasInit = FALSE;
+ 
+ enum DumpPreparationStage {
