@@ -1972,6 +1972,16 @@ do_install:append:df-acts() {
 FILES:${PN}-acts = "${libexecdir}/${PN}/acts"
 INSANE_SKIP:${PN}-acts = "file-rdeps"
 
+PACKAGES =+ "${PN}-hits"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hits/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hits ${D}${libdir}/${BPN}-hits/ptest/moduletest
+    mv ${D}${PTEST_PATH}/moduletest/hit/* ${D}${libdir}/${BPN}-hits/ptest/moduletest
+}
+FILES:${PN}-hits = "${libdir}/${BPN}-hits/ptest"
+RDEPENDS:${PN}-hits += "musl libcxx"
+RDEPENDS:${PN}-hits += "${PN}-hicollie ${PN}-libutils ${PN}-hisysevent ${PN}-hiview ${PN}-hitrace ${PN}-hilog ${PN}-faultlogger"
+
 EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables
