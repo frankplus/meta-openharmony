@@ -1962,6 +1962,26 @@ do_install_ptest:append() {
     done
 }
 
+PACKAGES:prepend:df-acts = "${PN}-acts "
+do_install:append:df-acts() {
+    mkdir -p ${D}${libexecdir}/${PN}/acts
+    for d in config testcases ; do
+        cp -dR --no-preserve=ownership ${B}/suites/acts/$d ${D}${libexecdir}/${PN}/acts/
+    done
+}
+FILES:${PN}-acts = "${libexecdir}/${PN}/acts"
+INSANE_SKIP:${PN}-acts = "file-rdeps"
+
+PACKAGES =+ "${PN}-hits"
+do_install_ptest:append() {
+    install -D ${WORKDIR}/run-ptest ${D}${libdir}/${BPN}-hits/ptest/run-ptest
+    mv ${D}${PTEST_PATH}/moduletest/hits ${D}${libdir}/${BPN}-hits/ptest/moduletest
+    mv ${D}${PTEST_PATH}/moduletest/hit/* ${D}${libdir}/${BPN}-hits/ptest/moduletest
+}
+FILES:${PN}-hits = "${libdir}/${BPN}-hits/ptest"
+RDEPENDS:${PN}-hits += "musl libcxx"
+RDEPENDS:${PN}-hits += "${PN}-hicollie ${PN}-libutils ${PN}-hisysevent ${PN}-hiview ${PN}-hitrace ${PN}-hilog ${PN}-faultlogger"
+
 EXCLUDE_FROM_SHLIBS = "1"
 
 # To avoid excessive diskspace blowup, we are stripping our executables

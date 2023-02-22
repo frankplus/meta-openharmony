@@ -8,7 +8,6 @@ LICENSE = "Apache-2.0"
 require sanity-check.inc
 
 TOOLCHAIN_HOST_TASK = "nativesdk-hdc nativesdk-xdevice"
-
 TOOLCHAIN_TARGET_TASK = ""
 
 TOOLCHAIN_OUTPUTNAME = "${PN}-${OPENHARMONY_VERSION}-${TUNE_PKGARCH}-${SDK_VERSION}"
@@ -60,6 +59,16 @@ EOF
 		echo 'echo "$BB_ENV_PASSTHROUGH_ADDITIONS" | grep -q "NO32LIBS"' >>$script
 		echo '[ $? != 0 ] && export BB_ENV_PASSTHROUGH_ADDITIONS="NO32LIBS $BB_ENV_PASSTHROUGH_ADDITIONS"' >>$script
 	fi
+}
+
+TOOLCHAIN_TARGET_TASK:append:df-acts = " openharmony-standard-acts"
+create_sdk_files:append:df-acts () {
+	pwd
+	for f in ${SDK_OUTPUT}/${SDKTARGETSYSROOT}${libexecdir}/openharmony-standard/acts/* ; do
+		f=$(basename $f)
+		ln -sft ${SDK_OUTPUT}/${SDKPATHNATIVE}${libdir_nativesdk}/python* \
+			../../../../${MULTIMACH_TARGET_SYS}${libexecdir}/openharmony-standard/acts/$f
+	done
 }
 
 TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""

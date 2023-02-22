@@ -119,7 +119,8 @@ for more information.
 ## OpenHarmony host tools
 
 To facilitate working with OpenHarmony systems, an image with various host tools
-is provided.
+is provided. The ACTS test suite for testing for OpenHarmony compatibility can
+be included in this image.
 
 See [recipes-openharmony/tools/README.rst](recipes-openharmony/tools/README.rst)
 for more information.
