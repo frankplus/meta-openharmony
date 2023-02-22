@@ -367,6 +367,42 @@ ptest:
     expire_in: 1 month
     when: always
 
+acts:
+  stage: test
+  needs:
+    - job: bitbake-builder
+      artifacts: false
+      optional: true
+    - job: build
+      artifacts: true
+  image:
+    name: $BITBAKE_BUILDER:$BITBAKE_CONTAINER_VERSION
+  extends: .bitbake
+  variables:
+    DISTRO: oniro-openharmony-linux
+    OPENHARMONY_VERSION: "3.0"
+    MACHINE: qemuarma7
+    HDC_CONNECT_ATTEMPTS: 6
+    HDC_CONNECT_DELAY: 10
+    ACTS_TESTS: "ActsFaultLoggerTest ActsHiAppEventJsTest ActsHiCollieCppTest ActsHilogTest ActsLibhilogCPPTest ActsLibhilogCTest ActsHiSysEventCPPTest ActsHitraceCPPTest ActsHitraceCTest ActsStartupJSApiTest ActsPowerMgrBatteryTest ActsOsAccountJSApiTest ActsAppdatamagrJsTest ActsDistributedDatamgrJsTest ActsContextTest ActsAmsDataUriUtilsTest ActsAmsZipfileUnzipfileSTest ActsGetWantAllTest ActsFeatureAbilityTest ActsBmsCheckPermissionTest ActsBmsJsTest ActsBmsKitTest ActsBmsModuleUsageRecordTest ActsBundleManagerTest ActsBundleManagerUninstallTest"
+  script:
+    - sudo ip tuntap add tap0 mode tap
+    - sudo ip addr add dev tap0 192.168.7.1/30
+    - sudo ip link set tap0 up
+    - bitbake qemu-helper-native
+    - runqemu publicvnc serialstdio & sleep 130
+    - ./tmp-*/deploy/sdk/openharmony-tools-*.sh -y -d openharmony-tools
+    - source ./openharmony-tools/environment-setup-$(uname -m)*
+    - i=0 ; while [ "$i" -lt $HDC_CONNECT_ATTEMPTS ] ; do
+        hdc_result="$(hdc tconn 192.168.7.2:35000)" ; echo "hdc:" "$hdc_result" ;
+        if [[ "$hdc_result" == "Connect OK"* ]] ; then break ; fi ;
+      sleep $HDC_CONNECT_DELAY ; let i=i+1 ; done ;
+      if [ "$i" -eq $HDC_CONNECT_ATTEMPTS ] ; then exit 1 ; fi
+    - xdevice run acts -l $(echo "$ACTS_TESTS"|tr ' ' ';')
+  artifacts:
+    paths:
+      - build/reports
+
 # Build OpenHarmony images using CI runner in China.
 #
 # Note, you might want to allow the mirror_ch job to complete before running
