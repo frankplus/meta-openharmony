@@ -1,0 +1,137 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+hicolliecpptest.cpp: fix/improve HiCollieCppTest for verifying process 
+restart in Xcollie tests.
+
+This patch adds a file that indicates whether the monitored process has
+restarted or not.Previously, the tests checked for process restart by
+running ps -A command, which was not always reliable.
+The new file is created by the child process when it restarts after
+blocking, and is checked for in the test. If the file exists, the test
+considers the restart to have been successful. Additionally, the patch
+adds code to remove the file after it is checked, so that the next test
+run will not produce a false positive. This provides a more reliable
+and consistent way to verify that the monitored process has restarted
+after blocking, and avoids false positives that could occur due to
+processes with similar names.
+
+Upstream-Status: Pending
+Signed-off-by: Kareem Zarka <kareem.zarka@huawei.com>
+
+diff --git a/hiviewdfx/hicollietest/hicolliecpptest/HiCollieCppTest.cpp b/hiviewdfx/hicollietest/hicolliecpptest/HiCollieCppTest.cpp
+index 13ef8e00..bc1aa00b 100644
+--- a/hiviewdfx/hicollietest/hicolliecpptest/HiCollieCppTest.cpp
++++ b/hiviewdfx/hicollietest/hicolliecpptest/HiCollieCppTest.cpp
+@@ -102,15 +102,33 @@ void HiCollieCppTest::DoXCollieTest()
+ {
+     pid_t pid;
+     int status;
++    std::string child_dir_path = "/tmp/ActsHiColliCppTest_child";
++    std::string child_file_path = child_dir_path +"/x_collie_watchdog_test_file";
+     // Fork a child process for leak injection
+     pid = fork();
+     if (pid == -1) {
+         cout<<"fail to fork!"<<endl;
+         exit(1);
+     } else if (pid == 0) {
++        // Create the child directory if it does not exist
++        if (!std::filesystem::exists(child_dir_path)) {
++            std::filesystem::create_directory(child_dir_path);
++        } else if (std::filesystem::exists(child_file_path)){
++            // Remove the file if it already exists
++            std::filesystem::remove(child_file_path);
++        }
+         XcollieTestInstance("WATCHDOG");
+         sleep(g_blockTime);
+-        exit(0);
++        // Child process creates file to indicate process restart
++        std::ofstream outfile(child_file_path);
++        if (outfile.is_open()) {
++            outfile << "Process restarted\n";
++            outfile.close();
++            exit(0);
++        } else {
++            cout<<"failed to create file in child process!"<<endl;
++            exit(1);
++        }
+     } else {
+         wait(&status);
+     }
+@@ -152,17 +170,16 @@ HWTEST_F(HiCollieCppTest, Xcollie_watchdog_test, Function|MediumTest|Level1) {
+     g_blockTime = 61;
+     g_waitTime = 20;
+     DoXCollieTest();
+-    string cmd = "";
+     bool result = false;
++    std::string child_dir_path = "/tmp/ActsHiColliCppTest_child";
++    std::string child_file_path = child_dir_path +"/x_collie_watchdog_test_file";
+     sleep(90);
+-    std::vector<std::string> cmdret;
+-    cmd = "ps -A |grep HiCollieCppTest";
+-    unsigned long cmdretlen;
+-    cmdretlen = ExecCmdWithRet(cmd, cmdret);
+-    if (cmdretlen == 1) {
++    // Check for file to verify process restart
++    if (std::ifstream(child_file_path)) {
+         result = true;
++        std::filesystem::remove_all(child_dir_path);
+     } else {
+-        GTEST_LOG_(INFO) << "failed to get xcollie log." << endl;
++        GTEST_LOG_(INFO) << "File not found, process did not restart." << endl;
+     }
+     ASSERT_TRUE(result);
+     GTEST_LOG_(INFO) << "Xcollie_watchdog_test end" << endl;
+@@ -175,21 +192,20 @@ HWTEST_F(HiCollieCppTest, Xcollie_watchdog_test, Function|MediumTest|Level1) {
+ */
+ HWTEST_F(HiCollieCppTest, Xcollie_watchdog_test1, Function|MediumTest|Level1) {
+     GTEST_LOG_(INFO) << "Xcollie_watchdog_test1 start" << endl;
+-    string cmd = "";
+     bool result = false;
+     g_type = XCOLLIE_LOCK|XCOLLIE_THREAD;
+     g_blockTime = 61;
+     g_waitTime = 20;
+     DoXCollieTest();
++    std::string child_dir_path = "/tmp/ActsHiColliCppTest_child";
++    std::string child_file_path = child_dir_path +"/x_collie_watchdog_test_file";
+     sleep(90);
+-    std::vector<std::string> cmdret;
+-    cmd = "ps -A |grep HiCollieCppTest";
+-    unsigned long cmdretlen;
+-    cmdretlen = ExecCmdWithRet(cmd, cmdret);
+-    if (cmdretlen == 1) {
++    // Check for file to verify process restart
++    if (std::ifstream(child_file_path)) {
+         result = true;
++        std::filesystem::remove_all(child_dir_path);
+     } else {
+-        GTEST_LOG_(INFO) << "failed to get xcollie log." << endl;
++        GTEST_LOG_(INFO) << "File not found, process did not restart." << endl;
+     }
+     ASSERT_TRUE(result);
+     GTEST_LOG_(INFO) << "Xcollie_watchdog_test1 end" << endl;
+@@ -206,17 +222,16 @@ HWTEST_F(HiCollieCppTest, Xcollie_watchdog_test2, Function|MediumTest|Level1) {
+     g_blockTime = 30;
+     g_waitTime = 75;
+     DoXCollieTest();
+-    string cmd = "";
++    std::string child_dir_path = "/tmp/ActsHiColliCppTest_child";
++    std::string child_file_path = child_dir_path +"/x_collie_watchdog_test_file";
+     bool result = false;
+     sleep(110);
+-    std::vector<std::string> cmdret;
+-    cmd = "ps -A |grep HiCollieCppTest";
+-    unsigned long cmdretlen;
+-    cmdretlen = ExecCmdWithRet(cmd, cmdret);
+-    if (cmdretlen == 1) {
++    // Check for file to verify process restart
++    if (std::ifstream(child_file_path)) {
+         result = true;
++        std::filesystem::remove_all(child_dir_path);
+     } else {
+-        GTEST_LOG_(INFO) << "failed to get xcollie log." << endl;
++        GTEST_LOG_(INFO) << "File not found, process did not restart." << endl;
+     }
+     ASSERT_TRUE(result);
+     GTEST_LOG_(INFO) << "Xcollie_watchdog_test2 end" << endl;
