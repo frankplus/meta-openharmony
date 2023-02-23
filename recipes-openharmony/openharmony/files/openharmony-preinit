@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# Don't print out kernel messages below warning levels to console
+dmesg -n 4
+
 mkdir -p /data/backup
 mkdir -p /data/bootchart
 mkdir -p /data/cache
