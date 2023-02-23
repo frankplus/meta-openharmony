@@ -76,6 +76,7 @@ SRC_URI += "file://test-xts-acts-timeout-increment.patch;patchdir=${S}/test/xts/
 SRC_URI += "file://start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 
