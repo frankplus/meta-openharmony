@@ -113,6 +113,7 @@ setparam persist.ace.trace.enabled 0
 # - init stage
 
 if systemctl -q is-enabled samgr.service; then
+	echo >/dev/console "Starting OpenHarmony samgr service"
 	/system/bin/samgr &
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -145,6 +146,7 @@ fi
 # "exec /system/bin/udevadm trigger",
 # "exec /system/bin/udevadm settle --timeout=30"
 if systemctl -q is-enabled weston.service; then
+	echo >/dev/console "Starting weston"
 	/system/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman &
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -156,6 +158,7 @@ fi
 # "uid" : "root",
 # "gid" : ["root"]
 if systemctl -q is-enabled installs.service; then
+	echo >/dev/console "Starting OpenHarmony installs service"
 	/system/bin/installs & # saId 511
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -167,6 +170,7 @@ fi
 # "uid" : "root",
 # "gid" : ["root"]
 if systemctl -q is-enabled appspawn.service; then
+	echo >/dev/console "Starting OpenHarmony appspawn service"
 	/system/bin/appspawn & # SA: 1401 180 3703 3008
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -181,6 +185,7 @@ fi
 #   "hilogControl seqpacket 0600 logd logd false"
 # ]
 if systemctl -q is-enabled hilogd.service; then
+	echo >/dev/console "Starting OpenHarmony hilogd service"
 	/system/bin/hilogd &
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -191,6 +196,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled huks.service; then
+	echo >/dev/console "Starting OpenHarmony huks service"
 	su system -c '/system/bin/sa_main /system/profile/huks_service.xml &' # SA: 3510
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -201,6 +207,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled deviceauth.service; then
+	echo >/dev/console "Starting OpenHarmony deviceauth service"
 	su system -c '/system/bin/deviceauth_service &' # SA: 4701 | Required SA: 3510
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -216,6 +223,7 @@ fi
 # "/dev/blkio/foreground/tasks"
 # ]
 if systemctl -q is-enabled accountmgr.service; then
+	echo >/dev/console "Starting OpenHarmony accountmgr service"
 	su system -c '/system/bin/sa_main /system/profile/accountmgr.xml &' # SA: 200
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -226,6 +234,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled dsoftbus.service; then
+	echo >/dev/console "Starting OpenHarmony dsoftbus service"
 	su system -c '/system/bin/sa_main /system/profile/softbus_server.xml &' # SA: 1401 4700 | Required SA: 3299
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -240,6 +249,7 @@ fi
 # "uid" : "system",
 # "gid" : ["system", "shell"]
 if systemctl -q is-enabled distributedsched.service; then
+	echo >/dev/console "Starting OpenHarmony distributedsched service"
 	su system -c '/system/bin/sa_main /system/profile/distributedsched.xml &' # SA: 1401
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -256,6 +266,7 @@ fi
 # "/dev/blkio/foreground/tasks"
 # ]
 if systemctl -q is-enabled distributed_data.service; then
+	echo >/dev/console "Starting OpenHarmony distributeddata service"
 	su system -c '/system/bin/sa_main /system/profile/distributeddata.xml &' # SA: 1301
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -267,6 +278,7 @@ fi
 # "gid" : ["system", "shell"],
 # "caps" : ["SYS_TIME", "WAKE_ALARM"]
 if systemctl -q is-enabled time.service; then
+	echo >/dev/console "Starting OpenHarmony time service"
 	su system -c '/system/bin/sa_main /system/profile/time_service.xml &' # SA: 1401 180 3702
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -279,6 +291,7 @@ fi
 # "gid" : ["system"],
 # "caps" : ["SYS_PTRACE", "KILL"]
 if systemctl -q is-enabled foundation.service; then
+	echo >/dev/console "Starting OpenHarmony foundation service"
 	su system -c '/system/bin/sa_main /system/profile/foundation.xml &' # SA: 180 182 3203 3299 3301 3308 3501 4010 | Required SA: 4700
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -289,6 +302,7 @@ fi
 # "uid" : "system",
 # "gid" : ["media_rw", "system"]
 if systemctl -q is-enabled media.service; then
+	echo >/dev/console "Starting OpenHarmony media service"
 	su system -c '/system/bin/sa_main /system/profile/media_service.xml &'
 	sleep "$STARTUP_CMD_SLEEP"
 fi
@@ -300,11 +314,13 @@ fi
 # "gid" : ["system", "shell"],
 # "caps" : ["SYS_TIME"]
 if systemctl -q is-enabled inputmethod.service; then
+	echo >/dev/console "Starting OpenHarmony inputmethod service"
 	su system -c '/system/bin/sa_main /system/profile/inputmethod_service.xml &' # SA: 180 1401 3703
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
 if systemctl -q is-enabled faultloggerd.service; then
+    echo >/dev/console "Starting OpenHarmony faultlogger service"
     setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
     /system/bin/faultloggerd &
 fi
@@ -317,12 +333,12 @@ fi
 # ],
 # "disabled" : 1
 if systemctl -q is-enabled hdcd.service; then
+	echo >/dev/console "Starting OpenHarmony hdcd service"
 	setparam persist.hdc.port 35000
 	setparam persist.hdc.root 1 # We are running hdcd as root
 	setparam ro.hdc.secure 0 # Do not enable secure mode
 	sleep "$STARTUP_CMD_SLEEP"
-
 	/system/bin/hdcd -t &
 fi
 
-echo "All OpenHarmony services started"
+echo "All OpenHarmony services started" >/dev/console
