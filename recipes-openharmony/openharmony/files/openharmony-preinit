@@ -1,8 +1,8 @@
+#!/bin/sh
+
 # SPDX-FileCopyrightText: Huawei Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/sh
 
 mkdir -p /data/backup
 mkdir -p /data/bootchart
