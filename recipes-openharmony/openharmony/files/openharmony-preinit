@@ -301,6 +301,11 @@ if systemctl -q is-enabled inputmethod.service; then
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
+if systemctl -q is-enabled faultloggerd.service; then
+    setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
+    /system/bin/faultloggerd &
+fi
+
 # trigger: boot?
 # "name" : "hdcd",
 # "path" : ["/system/bin/hdcd"],
@@ -317,7 +322,4 @@ if systemctl -q is-enabled hdcd.service; then
 	/system/bin/hdcd -t &
 fi
 
-if systemctl -q is-enabled faultloggerd.service; then
-	setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
-	/system/bin/faultloggerd &
-fi
+echo "All OpenHarmony services started"
