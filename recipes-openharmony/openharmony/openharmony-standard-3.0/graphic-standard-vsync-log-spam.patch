@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+graphic-standard: Comment out some very noisy log messages
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/frameworks/vsync/src/vsync_manager.cpp b/frameworks/vsync/src/vsync_manager.cpp
+index 56071849488d..2d8782ca1bb4 100644
+--- a/frameworks/vsync/src/vsync_manager.cpp
++++ b/frameworks/vsync/src/vsync_manager.cpp
+@@ -97,7 +97,7 @@ VsyncError VsyncManager::GetVsyncFrequency(uint32_t &freq)
+ 
+ void VsyncManager::Callback(int64_t timestamp)
+ {
+-    VLOGI("call callback");
++    //VLOGI("call callback");
+     std::lock_guard<std::mutex> lock(callbacksMutex_);
+ 
+     using sptrIVsyncCallback = sptr<IVsyncCallback>;
+diff --git a/frameworks/vsync/src/vsync_module_impl.cpp b/frameworks/vsync/src/vsync_module_impl.cpp
+index db87aebf5356..4f33ff62fa67 100644
+--- a/frameworks/vsync/src/vsync_module_impl.cpp
++++ b/frameworks/vsync/src/vsync_module_impl.cpp
+@@ -64,7 +64,7 @@ VsyncError VsyncModuleImpl::Trigger()
+         return VSYNC_ERROR_INVALID_OPERATING;
+     }
+ 
+-    VLOG_SUCCESS("Trigger");
++    //VLOG_SUCCESS("Trigger");
+     const auto &now = std::chrono::steady_clock::now().time_since_epoch();
+     int64_t occurTimestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count();
+ 

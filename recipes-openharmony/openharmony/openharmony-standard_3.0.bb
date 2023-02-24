@@ -57,6 +57,7 @@ SRC_URI += "file://ivi-input-controller.c-Fix-g_ctx-declaration-causing-segfault
 SRC_URI += "file://xf86drm.c-Add-drmWaitVBlank-hack.patch;patchdir=${S}/third_party/libdrm"
 
 SRC_URI += "file://graphic-standard-Add-missing-entry-for-libwms_client.patch;patchdir=${S}/foundation/graphic/standard"
+SRC_URI += "file://graphic-standard-vsync-log-spam.patch;patchdir=${S}/foundation/graphic/standard"
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
