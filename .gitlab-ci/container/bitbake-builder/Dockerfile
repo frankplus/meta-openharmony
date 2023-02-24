@@ -47,6 +47,9 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections \
 # suid to get it working
 RUN chmod u+s $(command -v ping)
 
+# Allow password-less sudo
+RUN echo 'builder ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/toolbox
+
 RUN useradd --create-home --uid 1000 --shell /usr/bin/bash builder
 COPY --chown=builder:builder .gitconfig /home/builder/.gitconfig
 USER builder
