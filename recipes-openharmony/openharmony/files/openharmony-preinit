@@ -104,6 +104,10 @@ STARTUP_CMD_SLEEP=2
 if systemctl -q is-enabled param.service; then
 	/system/bin/param_service &
 	sleep "$STARTUP_CMD_SLEEP"
+        while [ "$(setparam foobar 42)" != "setparam foobar 42 success" ] ; do
+            echo "param_service not ready"
+            sleep 1
+        done
 fi
 
 # Explicitly set default value to silence error message about parameter not being set
