@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ParagraphTxt::ComputeLineBreaks() is causing a segmentation fault for some reasons. 
+This is causing hap applications to crash, including ACTS test suites
+and status bar.
+As a temporary solution we skip the part of the code that
+is raising the segfault. The side effect of this is that texts are 
+not properly rendered.
+
+Apply to third_party/flutter
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+diff --git a/engine/flutter/third_party/txt/src/txt/paragraph_txt.cc b/engine/flutter/third_party/txt/src/txt/paragraph_txt.cc
+index 49594991..ed22d885 100644
+--- a/engine/flutter/third_party/txt/src/txt/paragraph_txt.cc
++++ b/engine/flutter/third_party/txt/src/txt/paragraph_txt.cc
+@@ -250,6 +250,10 @@ void ParagraphTxt::SetInlinePlaceholders(
+ }
+ 
+ bool ParagraphTxt::ComputeLineBreaks() {
++
++  // skipping ComputeLineBreaks execution because it is source of segfault problems.
++  return true;
++
+   line_ranges_.clear();
+   line_widths_.clear();
+   max_intrinsic_width_ = 0;
