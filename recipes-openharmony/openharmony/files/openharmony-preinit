@@ -98,7 +98,7 @@ export XDG_RUNTIME_DIR=/data/weston
 export XKB_CONFIG_ROOT=/etc/openharmony/xkb
 export XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb
 
-STARTUP_CMD_SLEEP=2
+STARTUP_CMD_SLEEP=4
 
 # trigger: part of the init process itself
 if systemctl -q is-enabled param.service; then
