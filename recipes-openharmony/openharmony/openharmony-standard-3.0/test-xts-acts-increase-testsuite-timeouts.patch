@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+test/xts/acts: increase testsuite timeouts
+
+sometimes testsuites execution are timing out because
+the execution takes longer to finish.
+Increasing some testsuite timeouts.
+
+Apply to test/xts/acts
+
+Upstream-Status: Pending
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+diff --git a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/Test.json b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/Test.json
+index 2de9a3580..25fe0a1cc 100755
+--- a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/Test.json
++++ b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/Test.json
+@@ -2,7 +2,7 @@
+     "description": "Configuration for hjunit demo Tests",
+     "driver": {
+         "type": "JSUnitTest",
+-        "test-timeout": "180000",
++        "test-timeout": "500000",
+         "package": "com.example.actsfeatureabilitytest",
+         "shell-timeout": "60000"
+     },
+diff --git a/aafwk/aafwk_standard/want/actsgetwantalltest/Test.json b/aafwk/aafwk_standard/want/actsgetwantalltest/Test.json
+index 663d15bb3..12ac403be 100644
+--- a/aafwk/aafwk_standard/want/actsgetwantalltest/Test.json
++++ b/aafwk/aafwk_standard/want/actsgetwantalltest/Test.json
+@@ -2,7 +2,7 @@
+     "description": "Configuration for hjunit demo Tests",
+     "driver": {
+         "type": "JSUnitTest",
+-        "test-timeout": "60000",
++        "test-timeout": "600000",
+         "package": "com.example.actsgetwantalltest",
+         "shell-timeout": "60000"
+     },
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/Test.json b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/Test.json
+index c64f3635d..e5ec8be9a 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/Test.json
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbundlemanagertest/Test.json
+@@ -2,7 +2,7 @@
+     "description": "Configuration for hjunit demo Tests",
+     "driver": {
+         "type": "JSUnitTest",
+-        "test-timeout": "300000",
++        "test-timeout": "600000",
+         "package": "com.example.actsbundlemanagertest",
+         "shell-timeout": "60000"
+     },

@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+ 
+test/xts/acts/ActsGetWantTest: wait 10 seconds between each testcase
+
+sometimes feature abilities fail to start because the previous testcase
+still has't completely started or terminated its feature ability.
+Adding a 10 seconds wait time between each testcase.
+ 
+Upstream-Status: Pending 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+diff --git a/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/test/ActsGetWantAllTest.js b/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/test/ActsGetWantAllTest.js
+index 81a92cc7e..e75f90039 100644
+--- a/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/test/ActsGetWantAllTest.js
++++ b/aafwk/aafwk_standard/want/actsgetwantalltest/entry/src/main/js/test/ActsGetWantAllTest.js
+@@ -34,6 +34,14 @@ describe('ActsGetWantTest', function () {
+         done();
+     })
+ 
++    beforeEach(async (done) => {
++        console.debug("waiting 10 seconds between testcases");
++        setTimeout(function(){
++            console.debug("beforeEach end");
++            done();
++        },10000);
++    })
++
+     //  @tc.number: ACTS_GetWant_0100
+     //  @tc.name: getWant : get want in current ability
+     //  @tc.desc:Start the ability through startabilityforresult,

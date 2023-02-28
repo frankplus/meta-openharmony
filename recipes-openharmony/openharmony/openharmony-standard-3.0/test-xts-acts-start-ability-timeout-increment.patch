@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+ 
+current START_ABILITY_TIMEOUT is too short, causing some  
+testcases in ActsBmsModuleUsageRecordTest and FeatureAbilityJsunit to 
+exceed timeout.
+Increasing the timeout to 15 seconds. 
+
+Apply to test/xts/acts
+ 
+Upstream-Status: Pending 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+
+diff --git a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/test/FeatureAbilityJsunit.test.js b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/test/FeatureAbilityJsunit.test.js
+index b2a603467..50d9ac07d 100644
+--- a/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/test/FeatureAbilityJsunit.test.js
++++ b/aafwk/aafwk_standard/featureability/actsfeatureabilitytest/entry/src/main/js/test/FeatureAbilityJsunit.test.js
+@@ -17,7 +17,7 @@ import wantconstant from '@ohos.ability.wantConstant'
+ import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from 'deccjsunit/index'
+ import commonEvent from '@ohos.commonevent'
+ 
+-const START_ABILITY_TIMEOUT = 4000;
++const START_ABILITY_TIMEOUT = 15000;
+ const TERMINATE_ABILITY_TIMEOUT = 1000;
+ const TIMEOUT = 1000;
+ var subscriberInfo_ACTS_StartAbility_0100 = {
+diff --git a/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/test/ActsBmsModuleUsageRecordTest.test.js b/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/test/ActsBmsModuleUsageRecordTest.test.js
+index d4068900a..1510b6608 100644
+--- a/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/test/ActsBmsModuleUsageRecordTest.test.js
++++ b/appexecfwk/bundle_standard/bundlemanager/actsbmsmoduleusagerecordtest/entry/src/main/js/test/ActsBmsModuleUsageRecordTest.test.js
+@@ -24,7 +24,7 @@ const BUNDLE_NAME = 'com.example.third1';
+ const NUM_TWO = 2;
+ const NUM_TEN = 10;
+ const INVALID_NUM = -1;
+-const START_ABILITY_TIMEOUT = 3000;
++const START_ABILITY_TIMEOUT = 15000;
+ const START_RECORD = 900;
+ const TIMEOUT = 3000;
+ 
