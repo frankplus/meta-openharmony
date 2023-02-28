@@ -336,6 +336,7 @@ OPENHARMONY_PARTS += "hiviewdfx:hilog"
 OPENHARMONY_PARTS += "hiviewdfx:hilog_native"
 OPENHARMONY_PARTS += "hiviewdfx:hilog_service"
 OPENHARMONY_PARTS += "hiviewdfx:hisysevent_native"
+OPENHARMONY_PARTS += "hiviewdfx:hiappevent_js"
 OPENHARMONY_PARTS += "hiviewdfx:hiviewdfx_hilog_native"
 OPENHARMONY_PARTS += "hiviewdfx:hiview"
 OPENHARMONY_PARTS += "hiviewdfx:hiview_L2"
@@ -1171,6 +1172,16 @@ do_install_ptest:append() {
 RDEPENDS:${PN}-hisysevent-ptest += "musl libcxx"
 RDEPENDS:${PN}-hisysevent-ptest += "${PN}-hisysevent ${PN}-hilog"
 RDEPENDS:${PN}-ptest += "${PN}-hisysevent-ptest"
+
+# //base/hiviewdfx/hiappevent
+PACKAGES =+ "${PN}-hiappevent"
+FILES:${PN}-hiappevent = " \
+    ${libdir}/libhiappevent*${SOLIBS} \
+    ${libdir}/module/libhiappevent*${SOLIBS} \
+"
+RDEPENDS:${PN}-hiappevent += "musl libcxx"
+RDEPENDS:${PN}-hiappevent += "${PN}-hilog ${PN}-ace-napi ${PN}-ipc ${PN}-dmsfwk ${PN}-libutils"
+RDEPENDS:${PN} += "${PN}-hiappevent"
 
 # //base/powermgr/power_manager
 PACKAGES =+ "${PN}-powermgr"
