@@ -2023,3 +2023,6 @@ FILES:${PN}-systemhaps = " \
     /system/app/* \
 "
 RDEPENDS:${PN} += "${PN}-systemhaps"
+
+# install missing resources of ACTS tests from openharmony-acts-resources recipe
+RDEPENDS:${PN}-acts += "openharmony-acts-resources"
