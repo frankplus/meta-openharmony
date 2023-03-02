@@ -17,4 +17,5 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-openembedded/meta-python \
   ##OEROOT##/../meta-openharmony \
   ##OEROOT##/../meta-java \
+  ##OEROOT##/../meta-raspberrypi \
   "

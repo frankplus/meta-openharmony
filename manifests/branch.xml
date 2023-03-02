@@ -18,5 +18,6 @@ SPDX-FileCopyrightText: Huawei Inc.
   <project name="meta-openembedded" remote="openembedded" revision="master" />
   <project name="meta-clang" remote="kraj" />
   <project name="meta-java" remote="yocto" />
+  <project name="meta-raspberrypi" remote="yocto" />
   
 </manifest>

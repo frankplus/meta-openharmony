@@ -13,5 +13,6 @@ SPDX-FileCopyrightText: Huawei Inc.
   <extend-project name="meta-openembedded" revision="8f2dc1023482863e2630d1b94052c41ce748b38f" />
   <extend-project name="meta-clang" revision="d669d873edf68dc7440bb07096737203bb7ec505" />
   <extend-project name="meta-java" revision="1a8059f6b257ebe6fcae6416e499784d976afd24" />
+  <extend-project name="meta-raspberrypi" revision="dacad9302a92b0b7edf8546cdcad1f8ef753e462" />
 
 </manifest>
