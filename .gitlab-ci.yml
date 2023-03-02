@@ -240,7 +240,7 @@ fetch:
     - export DISTRO MACHINE
     - for DISTRO in oniro-openharmony-linux ; do
       for OPENHARMONY_VERSION in 3.0 ; do
-      for MACHINE in qemuarma7 ; do
+      for MACHINE in qemuarma7 raspberrypi4-64 ; do
         RECIPES="oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests" ;
         echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE ;
         sed -r "s/^OPENHARMONY_VERSION.*/OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"/" -i conf/auto.conf ;
@@ -330,7 +330,7 @@ build:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
         OPENHARMONY_VERSION: ["3.0"]
-        MACHINE: [qemuarma7]
+        MACHINE: [qemuarma7, raspberrypi4-64]
         RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image, openharmony-tools]
   artifacts:
     paths:
