@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Allow usb initialization to fail. This allows using hdc compiled with USB
+support to work in environments without usbfs (e.g. in a non-privileged
+container). It will of-course not allow access to USB devices, but no reason to
+not allow connecting over network because of USB not being available.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/src/host/server.cpp b/src/host/server.cpp
+index 26d51d0d1404..75f13c76b40c 100644
+--- a/src/host/server.cpp
++++ b/src/host/server.cpp
+@@ -86,15 +86,18 @@ bool HdcServer::Initial(const char *listenString)
+     clsServerForClient = new HdcServerForClient(true, listenString, this, &loopMain);
+     clsTCPClt = new HdcHostTCP(true, this);
+     clsUSBClt = new HdcHostUSB(true, this, ctxUSB);
+-    if (!clsServerForClient || !clsTCPClt || !clsUSBClt) {
+-        WRITE_LOG(LOG_FATAL, "Class init failed");
+-        return false;
++    if (!clsServerForClient || !clsTCPClt) {
++      WRITE_LOG(LOG_FATAL, "Class init failed");
++      return false;
+     }
+     (static_cast<HdcServerForClient *>(clsServerForClient))->Initial();
+-    if (clsUSBClt->Initial() != RET_SUCCESS) {
+-        return false;
++    if (clsUSBClt && clsUSBClt->Initial() != RET_SUCCESS) {
++      delete clsUSBClt;
++      clsUSBClt = nullptr;
++    }
++    if (!clsUSBClt) {
++      WRITE_LOG(LOG_WARN, "USB init failed");
+     }
+-
+ #ifdef HDC_SUPPORT_UART
+     clsUARTClt = new HdcHostUART(*this);
+     if (!clsUARTClt) {
+@@ -748,6 +751,10 @@ int HdcServer::CreateConnect(const string &connectKey)
+ #endif
+     else { // USB
+         connType = CONN_USB;
++        if (!clsUSBClt) {
++          WRITE_LOG(LOG_WARN, "USB not initialized");
++          return ERR_NO_SUPPORT;
++        }
+     }
+     HDaemonInfo hdi = nullptr;
+     if (connectKey == "any") {
