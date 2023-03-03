@@ -2,9 +2,11 @@
 Description=OpenHarmony Param Service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Param Service"
-RemainAfterExit=yes
+Type=notify
+ExecStartPre=install -m 755 -d /dev/unix/socket
+ExecStartPre=install -m 755 -d /data/param
+ExecStartPre=install -m 755 -d /dev/__parameters__
+ExecStart=/usr/bin/param_service
 
 [Install]
 WantedBy=multi-user.target

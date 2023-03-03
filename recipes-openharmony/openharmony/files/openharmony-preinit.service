@@ -1,5 +1,7 @@
 [Unit]
 Description=OpenHarmony pre-init setup
+After=param.service
+Requires=param.service
 
 [Service]
 Type=oneshot
