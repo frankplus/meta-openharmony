@@ -400,8 +400,11 @@ acts:
       if [ "$i" -eq $HDC_CONNECT_ATTEMPTS ] ; then exit 1 ; fi
     - xdevice run acts -l $(echo "$ACTS_TESTS"|tr ' ' ';')
   artifacts:
+    when: always
     paths:
       - build/reports
+    reports:
+      junit: build/reports/latest/summary_report.xml
 
 # Build OpenHarmony images using CI runner in China.
 #
