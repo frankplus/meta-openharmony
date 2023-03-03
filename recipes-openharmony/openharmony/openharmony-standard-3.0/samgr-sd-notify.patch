@@ -1,0 +1,36 @@
+diff --git a/services/samgr/native/BUILD.gn b/services/samgr/native/BUILD.gn
+index 9b7e4a4e6301..48c512f430e6 100755
+--- a/services/samgr/native/BUILD.gn
++++ b/services/samgr/native/BUILD.gn
+@@ -67,6 +67,7 @@ ohos_executable("samgr") {
+     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+     "//utils/native/base:utils",
+   ]
++  libs = [ "systemd" ]
+   
+   configs = [
+     ":sam_config",
+diff --git a/services/samgr/native/source/sa_main.cpp b/services/samgr/native/source/sa_main.cpp
+index 820b6b8d67f9..387abad8d8b8 100755
+--- a/services/samgr/native/source/sa_main.cpp
++++ b/services/samgr/native/source/sa_main.cpp
+@@ -20,6 +20,8 @@
+ #include "sam_log.h"
+ #include "system_ability_manager.h"
+ 
++#include <systemd/sd-daemon.h>
++
+ using namespace OHOS;
+ 
+ int main(int argc, char *argv[])
+@@ -32,6 +34,8 @@ int main(int argc, char *argv[])
+     IPCSkeleton::SetContextObject(serv);
+ 
+     HILOGI("start System Ability Manager Loop");
++    sd_notify(0, "READY=1");
+     OHOS::IPCSkeleton::JoinWorkThread();
++    sd_notify(0, "STOPPING=1");
+     return -1;
+-}
+\ No newline at end of file
++}

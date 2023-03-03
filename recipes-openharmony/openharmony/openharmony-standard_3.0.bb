@@ -72,6 +72,8 @@ SRC_URI += "file://param_service-sd-notify.patch;patchdir=${S}/base/startup/init
 SRC_URI += "file://param-paths.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
+SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
+
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
@@ -779,7 +781,7 @@ do_install:append() {
     install -m 644 ${WORKDIR}/samgr.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/samgr_standard.cfg
 }
-RDEPENDS:${PN}-samgr += "musl libcxx"
+RDEPENDS:${PN}-samgr += "musl libcxx libsystemd"
 RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-samgr"
 
