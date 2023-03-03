@@ -413,6 +413,16 @@ copy_subsystem_config_json_file() {
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
+SRC_URI += "file://40-binder.rules"
+SRC_URI += "file://40-ashmem.rules"
+do_install_udev_rules() {
+    mkdir -p ${D}${nonarch_base_libdir}/udev/rules.d
+    install -m 644 -t ${D}${nonarch_base_libdir}/udev/rules.d \
+            ${WORKDIR}/40-binder.rules \
+            ${WORKDIR}/40-ashmem.rules
+}
+do_install[postfuncs] += "do_install_udev_rules"
+
 # OpenHarmony pre-init package and its systemd service
 # Used to create folders needed by OH services and components
 PACKAGES =+ "${PN}-openharmony-preinit"
