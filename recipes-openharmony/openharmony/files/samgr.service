@@ -1,10 +1,15 @@
 [Unit]
 Description=OpenHarmony SystemAbilityFramework service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony SystemAbilityFramework Service"
-RemainAfterExit=yes
+Type=notify
+ExecStartPre=!install -m 755 -o system -g system -d /data/sadata_de /data/sadata_de/samgr
+User=system
+Group=system
+ExecStart=/usr/bin/samgr
 
 [Install]
 WantedBy=multi-user.target

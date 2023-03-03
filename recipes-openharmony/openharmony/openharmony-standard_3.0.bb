@@ -771,7 +771,6 @@ FILES:${PN}-samgr = " \
     ${bindir}/samgr \
     ${libdir}/libsamgr*${SOLIBS} \
     ${libdir}/liblsamgr*${SOLIBS} \
-    ${systemd_unitdir}/samgr.service \
 "
 SYSTEMD_PACKAGES += "${PN}-samgr"
 SYSTEMD_SERVICE:${PN}-samgr = "samgr.service"

@@ -104,12 +104,6 @@ setparam persist.ace.trace.enabled 0
 # - pre-init stage
 # - init stage
 
-if systemctl -q is-enabled samgr.service; then
-	echo >/dev/console "Starting OpenHarmony samgr service"
-	/system/bin/samgr &
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
 # - post-init stage
 #   - "trigger early-fs",
 #   - "trigger fs",

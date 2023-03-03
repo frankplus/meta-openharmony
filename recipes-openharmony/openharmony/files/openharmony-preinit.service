@@ -2,6 +2,8 @@
 Description=OpenHarmony pre-init setup
 After=param.service
 Requires=param.service
+After=samgr.service
+Requires=samgr.service
 
 [Service]
 Type=oneshot

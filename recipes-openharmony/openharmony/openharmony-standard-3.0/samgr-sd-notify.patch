@@ -1,3 +1,15 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/distributedschedule/samgr of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to samgr service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
 diff --git a/services/samgr/native/BUILD.gn b/services/samgr/native/BUILD.gn
 index 9b7e4a4e6301..48c512f430e6 100755
 --- a/services/samgr/native/BUILD.gn
