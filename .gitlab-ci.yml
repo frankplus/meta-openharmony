@@ -240,7 +240,7 @@ fetch:
     - export DISTRO MACHINE
     - for DISTRO in oniro-openharmony-linux ; do
       for OPENHARMONY_VERSION in 3.0 ; do
-      for MACHINE in qemuarma7 ; do
+      for MACHINE in qemuarma7 raspberrypi4-64 ; do
         RECIPES="oniro-openharmony-bundle openharmony-standard-image openharmony-standard-image-tests" ;
         echo Fetching DISTRO=$DISTRO OPENHARMONY_VERSION=$OPENHARMONY_VERSION MACHINE=$MACHINE ;
         sed -r "s/^OPENHARMONY_VERSION.*/OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"/" -i conf/auto.conf ;
@@ -330,7 +330,7 @@ build:
     matrix:
       - DISTRO: [oniro-openharmony-linux]
         OPENHARMONY_VERSION: ["3.0"]
-        MACHINE: [qemuarma7]
+        MACHINE: [qemuarma7, raspberrypi4-64]
         RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image, openharmony-tools]
   artifacts:
     paths:
@@ -391,7 +391,7 @@ acts:
     - sudo ip link set tap0 up
     - bitbake qemu-helper-native
     - runqemu publicvnc serialstdio & sleep 130
-    - ./tmp-*/deploy/sdk/openharmony-tools-*.sh -y -d openharmony-tools
+    - ./tmp-*/deploy/sdk/openharmony-tools-${OPENHARMONY_VERSION}-cortexa7-neon-vfpv4-*.sh -y -d openharmony-tools
     - source ./openharmony-tools/environment-setup-$(uname -m)*
     - i=0 ; while [ "$i" -lt $HDC_CONNECT_ATTEMPTS ] ; do
         hdc_result="$(hdc tconn 192.168.7.2:35000)" ; echo "hdc:" "$hdc_result" ;
@@ -524,7 +524,7 @@ ohos:
   script:
     - tar xfz $TARBALL_FILE
     - cd $(basename $TARBALL_FILE .tar.gz)/OpenHarmony
-    - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-*.sh -y -d oniro
+    - ../../build/tmp-*/deploy/sdk/${PREBUILT_IMAGE}-${OPENHARMONY_VERSION}-cortexa7-neon-vfpv4-*.sh -y -d oniro
     - ./oniro/setup.sh
     - MAX_JOBS="${CI_ONIRO_PARALLEL_BUILD_MAX_JOBS:-$(nproc)}"
     - NINJA_ARGS="--ninja-args -j$MAX_JOBS"
