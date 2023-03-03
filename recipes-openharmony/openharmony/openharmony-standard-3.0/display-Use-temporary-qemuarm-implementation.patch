@@ -31,7 +31,7 @@ index a232730b..80f03706 100644
    group("hdi_display") {
      public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
    }
-+} else if (product_name == "yocto-ohos-qemuarm") {
++} else if (product_name == "oniro-oh-qemuarm") {
 +  config("display_hdi_public_config") {
 +    visibility = [ ":*" ]
 +    include_dirs = [

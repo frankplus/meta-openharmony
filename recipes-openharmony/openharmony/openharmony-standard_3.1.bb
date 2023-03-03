@@ -46,7 +46,7 @@ SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsf
 SRC_URI += "file://third_party_jsframework-path-posix.patch;patchdir=${S}/third_party/jsframework"
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 
-SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=f7ba03c8f0d90b0b12998b26e4ce0d7bac8e6a03;destsuffix=${S}/vendor/oniro"
+SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=97aa6fa3d101378a728e4da284b95aedde38d844;destsuffix=${S}/vendor/oniro"
 
 SRC_URI += "file://display-Mock-interface-for-standard-system.patch"
 SRC_URI += "file://display_device.c;subdir=${S}/drivers/peripheral/display/hal/default/standard_system"
@@ -102,7 +102,7 @@ COMPATIBLE_MACHINE = "qemuarm"
 OHOS_DEVICE_CPU_ARCH = "arm"
 OHOS_DEVICE_NAME = "qemuarm"
 OHOS_DEVICE_COMPANY = "oniro"
-OHOS_PRODUCT_NAME = "yocto-ohos-${OHOS_DEVICE_NAME}"
+OHOS_PRODUCT_NAME = "oniro-oh-${OHOS_DEVICE_NAME}"
 OHOS_PRODUCT_COMPANY = "oniro"
 # For some reason platform type has to be phone
 OHOS_PRODUCT_PLATFORM_TYPE = "phone"

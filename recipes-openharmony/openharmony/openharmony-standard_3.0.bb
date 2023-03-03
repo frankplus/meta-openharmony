@@ -46,7 +46,7 @@ SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_js_assets.patch;patchdir=${S}/build"
 
 SRC_URI += "file://vendor-qemu-uhdf-files.patch;patchdir=${S}/drivers/peripheral"
-SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=c7f69115d7af1a37f81bd4fc0462100d0aa87c2d;destsuffix=${S}/vendor/oniro"
+SRC_URI += "git://gitlab.eclipse.org/eclipse/oniro-core/openharmony-vendor-oniro.git;protocol=https;branch=main;rev=97aa6fa3d101378a728e4da284b95aedde38d844;destsuffix=${S}/vendor/oniro"
 
 SRC_URI += "file://peripherals-Limit-drivers-list-to-supported-by-the-qemuarm.patch;patchdir=${S}/drivers/adapter"
 SRC_URI += "file://display_device.c;subdir=src/drivers/peripheral/display/hal/default/standard_system"
@@ -112,7 +112,7 @@ def get_ohos_libdirs(d):
 OHOS_DEVICE_CPU_ARCH = "${@get_ohos_arch(d)}"
 OHOS_DEVICE_NAME = "qemuarm"
 OHOS_DEVICE_COMPANY = "oniro"
-OHOS_PRODUCT_NAME = "yocto-ohos-${OHOS_DEVICE_NAME}"
+OHOS_PRODUCT_NAME = "oniro-oh-${OHOS_DEVICE_NAME}"
 OHOS_PRODUCT_COMPANY = "oniro"
 # For some reason platform type has to be phone
 OHOS_PRODUCT_PLATFORM_TYPE = "phone"
