@@ -19,6 +19,9 @@ DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
 DEPENDS += "packing-tool-native"
 
+# We are adding sd_notify(3) calls to OpenHarmony services
+DEPENDS += "systemd"
+
 # Note: Using include instead of require to avoid parser error skipping recipe
 include ${PN}-sources-${OPENHARMONY_VERSION}.inc
 
@@ -65,6 +68,7 @@ SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patch
 
 SRC_URI += "file://init_lite-silence-GetControlFromEnv-spam.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service_standalone.patch;patchdir=${S}/base/startup/init_lite"
+SRC_URI += "file://param_service-sd-notify.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
@@ -1796,7 +1800,7 @@ FILES:${PN}-param-service = " \
     ${bindir}/setparam \
     ${bindir}/param_service \
 "
-RDEPENDS:${PN}-param-service += "musl libcxx"
+RDEPENDS:${PN}-param-service += "musl libcxx libsystemd"
 RDEPENDS:${PN} += "${PN}-param-service"
 
 # Third Party Components (//third_party/*)
