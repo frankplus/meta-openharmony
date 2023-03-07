@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: MIT
+
+example ceshitwo.txt file
+Faucibus interdum posuere lorem ipsum dolor sit amet consectetur. Sagittis orci a scelerisque purus semper. 
+Dictum varius duis at consectetur lorem donec massa sapien faucibus. Arcu bibendum at varius vel. Turpis nunc 
+eget lorem dolor sed viverra ipsum. Ut venenatis tellus in metus vulputate eu scelerisque felis. Interdum 
+velit euismod in pellentesque. Tristique senectus et netus et malesuada fames ac. Venenatis urna cursus 
+eget nunc scelerisque. In vitae turpis massa sed. Netus et malesuada fames ac turpis.
