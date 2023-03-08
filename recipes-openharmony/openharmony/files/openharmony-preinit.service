@@ -4,6 +4,8 @@ After=param.service
 Requires=param.service
 After=samgr.service
 Requires=samgr.service
+After=hilogd.service
+Requires=hilogd.service
 
 [Service]
 Type=oneshot

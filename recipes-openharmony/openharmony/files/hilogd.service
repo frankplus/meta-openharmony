@@ -1,10 +1,15 @@
 [Unit]
 Description=OpenHarmony hilog daemon
+Requires=hilogd-input.socket hilogd-control.socket
+After=hilogd-input.socket hilogd-control.socket
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony hilog Service"
-RemainAfterExit=yes
+Type=notify
+ExecStartPre=!install -o system -g log -m 0770 -d /data/log
+ExecStartPre=!install -o logd -g log -m 0750 -d /data/log/hilog
+User=logd
+Group=log
+ExecStart=/usr/bin/hilogd
 
 [Install]
 WantedBy=multi-user.target

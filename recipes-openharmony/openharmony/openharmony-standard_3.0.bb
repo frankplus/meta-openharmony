@@ -35,6 +35,8 @@ SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d
 
 # TODO: we probably want these
 SRC_URI += "file://hilog-Add-tests.patch;patchdir=${S}/base/hiviewdfx/hilog"
+SRC_URI += "file://hilog-socket-paths.patch;patchdir=${S}/base/hiviewdfx/hilog"
+SRC_URI += "file://hilog-sd-notify.patch;patchdir=${S}/base/hiviewdfx/hilog"
 
 SRC_URI += "file://bison_parser.patch;patchdir=${S}/third_party/libxkbcommon"
 SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
@@ -465,11 +467,14 @@ RDEPENDS:${PN}-ptest += "${PN}-libutils-ptest"
 # //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog"
 SYSTEMD_PACKAGES += "${PN}-hilog"
-SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
-SRC_URI += "file://hilogd.service"
+SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service hilogd-input.socket hilogd-control.socket"
+SRC_URI += "file://hilogd.service file://hilogd-input.socket file://hilogd-control.socket"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
-    install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/hilogd.service \
+            ${WORKDIR}/hilogd-input.socket \
+            ${WORKDIR}/hilogd-control.socket
     rm -f ${D}${sysconfdir}/openharmony/init/hilogd.cfg
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
@@ -478,9 +483,8 @@ FILES:${PN}-hilog = " \
     ${bindir}/hilog* \
     ${libdir}/libhilog*${SOLIBS} \
     ${sysconfdir}/openharmony/hilog*.conf \
-    ${systemd_unitdir}/hilogd.service \
 "
-RDEPENDS:${PN}-hilog += "musl libcxx"
+RDEPENDS:${PN}-hilog += "musl libcxx libsystemd"
 RDEPENDS:${PN}-hilog += "${PN}-libutilsecurec"
 RDEPENDS:${PN} += "${PN}-hilog"
 
@@ -2026,6 +2030,8 @@ inherit useradd
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"
+USERADD_PARAM:${PN}:append = ";-u 1007 -U -s /bin/false log"
+USERADD_PARAM:${PN}:append = ";-u 1036 -U -s /bin/false logd"
 
 # system haps
 PACKAGES =+ "${PN}-systemhaps"

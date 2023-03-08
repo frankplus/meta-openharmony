@@ -76,7 +76,6 @@ mkdir -p /data/vendor_ce
 mkdir -p /data/vendor_de
 mkdir -p /data/vendor/hardware
 mkdir -p /data/weston
-mkdir -p /data/log/hilog
 mkdir -p /data/log/faultlog/faultlogger
 mkdir -p /data/log/faultlog/temp
 mkdir -p /usr/lib/dri
@@ -154,21 +153,6 @@ fi
 if systemctl -q is-enabled appspawn.service; then
 	echo >/dev/console "Starting OpenHarmony appspawn service"
 	/system/bin/appspawn & # SA: 1401 180 3703 3008
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: post-fs-data
-# "mkdir /data/log/ 0770 system log",
-# "mkdir /data/log/hilog/ 0750 logd log",
-# "uid" : "logd",
-# "gid" : "log",
-# "socket" : [
-#   "hilogInput dgram 0666 logd logd passcred",
-#   "hilogControl seqpacket 0600 logd logd false"
-# ]
-if systemctl -q is-enabled hilogd.service; then
-	echo >/dev/console "Starting OpenHarmony hilogd service"
-	/system/bin/hilogd &
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
