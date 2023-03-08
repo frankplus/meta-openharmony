@@ -10,6 +10,7 @@ ExecStartPre=!install -m 755 -o system -g system -d /data/sadata_de /data/sadata
 User=system
 Group=system
 ExecStart=/usr/bin/samgr
+LimitNICE=40
 
 [Install]
 WantedBy=multi-user.target

@@ -11,6 +11,7 @@ Type=notify
 User=system
 Group=system
 SupplementaryGroups=shell
+LimitNICE=40
 ExecStart=/usr/bin/sa_main /system/profile/huks_service.xml
 
 [Install]
