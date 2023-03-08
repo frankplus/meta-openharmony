@@ -75,6 +75,7 @@ SRC_URI += "file://param-paths.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
+SRC_URI += "file://safwk-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
 
@@ -820,7 +821,7 @@ FILES:${PN}-safwk = "\
     ${bindir}/sa_main \
     ${libdir}/libsystem_ability_fwk*${SOLIBS} \
 "
-RDEPENDS:${PN}-safwk += "musl libcxx"
+RDEPENDS:${PN}-safwk += "musl libcxx libsystemd"
 RDEPENDS:${PN}-safwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
 RDEPENDS:${PN}-safwk += "${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-safwk"

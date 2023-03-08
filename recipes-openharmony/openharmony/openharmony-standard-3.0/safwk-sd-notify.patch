@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/distributedschedule/safwk of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to sa_main command for better
+integration of OpenHarmony system abilities with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/interfaces/innerkits/safwk/BUILD.gn b/interfaces/innerkits/safwk/BUILD.gn
+index 6f14e14ab191..934cb01d78fb 100755
+--- a/interfaces/innerkits/safwk/BUILD.gn
++++ b/interfaces/innerkits/safwk/BUILD.gn
+@@ -53,6 +53,7 @@ ohos_shared_library("system_ability_fwk") {
+     ]
+     public_deps = [ "//third_party/libxml2:libxml2" ]
+   }
++  libs = [ "systemd" ]
+ 
+   part_name = "safwk"
+   subsystem_name = "distributedschedule"
+diff --git a/services/safwk/src/local_ability_manager.cpp b/services/safwk/src/local_ability_manager.cpp
+index 5e29f327da60..3fcd1acf9a5a 100755
+--- a/services/safwk/src/local_ability_manager.cpp
++++ b/services/safwk/src/local_ability_manager.cpp
+@@ -22,6 +22,8 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
++#include <systemd/sd-daemon.h>
++
+ #include "datetime_ex.h"
+ #include "errors.h"
+ #include "ipc_skeleton.h"
+@@ -775,7 +777,8 @@ bool LocalAbilityManager::Run()
+ 
+     FindAndStartPhaseTasks();
+     RegisterOnDemandSystemAbility();
++    sd_notify(0, "READY=1");
+     pool_.Stop();
+     return true;
+ }
+ 
