@@ -2033,6 +2033,7 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"
 USERADD_PARAM:${PN}:append = ";-u 1007 -U -s /bin/false log"
 USERADD_PARAM:${PN}:append = ";-u 1036 -U -s /bin/false logd"
+USERADD_PARAM:${PN}:append = ";-u 2000 -U -s /bin/false shell"
 
 # system haps
 PACKAGES =+ "${PN}-systemhaps"

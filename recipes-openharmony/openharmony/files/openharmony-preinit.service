@@ -6,6 +6,8 @@ After=samgr.service
 Requires=samgr.service
 After=hilogd.service
 Requires=hilogd.service
+After=huks.service
+Requires=huks.service
 
 [Service]
 Type=oneshot

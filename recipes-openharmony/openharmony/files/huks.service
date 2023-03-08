@@ -1,10 +1,17 @@
 [Unit]
-Description=OpenHarmony huks service
+Description=OpenHarmony huks service (SA: 3510)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Huks Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell
+ExecStart=/usr/bin/sa_main /system/profile/huks_service.xml
 
 [Install]
 WantedBy=multi-user.target

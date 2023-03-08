@@ -157,17 +157,6 @@ if systemctl -q is-enabled appspawn.service; then
 fi
 
 # trigger: post-fs-data
-# "name" : "huks_service",
-# "path" : ["/system/bin/sa_main", "/system/profile/huks_service.xml"],
-# "uid" : "system",
-# "gid" : ["system", "shell"]
-if systemctl -q is-enabled huks.service; then
-	echo >/dev/console "Starting OpenHarmony huks service"
-	su system -c '/system/bin/sa_main /system/profile/huks_service.xml &' # SA: 3510
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: post-fs-data
 # "name" : "deviceauth_service",
 # "path" : ["/system/bin/deviceauth_service"],
 # "uid" : "system",
