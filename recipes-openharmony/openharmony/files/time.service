@@ -1,10 +1,19 @@
 [Unit]
-Description=OpenHarmony Time service
+Description=OpenHarmony Time service (SA: 1401 180 3702)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Time Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell
+CapabilityBoundingSet=CAP_SYS_TIME CAP_WAKE_ALARM
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/time_service.xml
 
 [Install]
 WantedBy=multi-user.target
