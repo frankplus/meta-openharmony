@@ -1,10 +1,32 @@
 [Unit]
-Description=OpenHarmony foundation service
+Description=OpenHarmony foundation service (SA: 180 182 401 403 501 3203 3299 3301 3302 3308 3501 3702 4010 4802)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
+# Requires SA: 4700
+Wants=dsoftbus.service
+# Requires SA: 4701
+Wants=deviceauth.service
+# Requires SA: 511
+Wants=installs.service
+# Requires SA: 3510
+Wants=huks.service
+# Requires SA: 1301
+Wants=distributed_data.service
+# Requires SA: 3202 5001 -- but from where?
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony foundation Service"
-RemainAfterExit=yes
+Type=notify
+Environment="XDG_RUNTIME_DIR=/data/weston"
+Environment="XKB_CONFIG_ROOT=/etc/openharmony/xkb"
+Environment="XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb"
+User=system
+Group=system
+CapabilityBoundingSet=CAP_SYS_PTRACE CAP_KILL
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/foundation.xml
 
 [Install]
 WantedBy=multi-user.target
