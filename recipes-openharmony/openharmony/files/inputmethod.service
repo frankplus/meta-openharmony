@@ -1,10 +1,19 @@
 [Unit]
-Description=OpenHarmony input method services
+Description=OpenHarmony input method services (SA: 180 1401 3703)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Input Method Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell
+CapabilityBoundingSet=CAP_SYS_TIME
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/inputmethod_service.xml
 
 [Install]
 WantedBy=multi-user.target

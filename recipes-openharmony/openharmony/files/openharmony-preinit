@@ -136,18 +136,6 @@ fi
 #sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
 #sleep "$STARTUP_CMD_SLEEP"
 
-# trigger: boot
-# "name" : "inputmethod_service",
-# "path" : ["/system/bin/sa_main", "/system/profile/inputmethod_service.xml"],
-# "uid" : "system",
-# "gid" : ["system", "shell"],
-# "caps" : ["SYS_TIME"]
-if systemctl -q is-enabled inputmethod.service; then
-	echo >/dev/console "Starting OpenHarmony inputmethod service"
-	su system -c '/system/bin/sa_main /system/profile/inputmethod_service.xml &' # SA: 180 1401 3703
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
 if systemctl -q is-enabled faultloggerd.service; then
     echo >/dev/console "Starting OpenHarmony faultlogger service"
     setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
