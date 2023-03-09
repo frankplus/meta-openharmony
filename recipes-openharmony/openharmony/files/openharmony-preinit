@@ -132,23 +132,6 @@ if systemctl -q is-enabled weston.service; then
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
-# trigger: post-fs-data
-# "name" : "accountmgr",
-# "path" : ["/system/bin/sa_main", "/system/profile/accountmgr.xml"],
-# "uid" : "system",
-# "gid" : ["system", "shell"],
-# "writepid" : [
-# "/dev/cpuset/foreground/tasks",
-# "/dev/stune/foreground/tasks",
-# "/dev/blkio/foreground/tasks"
-# ]
-if systemctl -q is-enabled accountmgr.service; then
-	echo >/dev/console "Starting OpenHarmony accountmgr service"
-	su system -c '/system/bin/sa_main /system/profile/accountmgr.xml &' # SA: 200
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: post-fs-data
 # "name" : "softbus_server",
 # "path" : ["/system/bin/sa_main", "/system/profile/softbus_server.xml"],
 # "uid" : "system",
