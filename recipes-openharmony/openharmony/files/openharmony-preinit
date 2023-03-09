@@ -136,20 +136,4 @@ fi
 #sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
 #sleep "$STARTUP_CMD_SLEEP"
 
-# trigger: boot?
-# "name" : "hdcd",
-# "path" : ["/system/bin/hdcd"],
-# "socket" : [
-# "hdcd seqpacket 660 system system false"
-# ],
-# "disabled" : 1
-if systemctl -q is-enabled hdcd.service; then
-	echo >/dev/console "Starting OpenHarmony hdcd service"
-	setparam persist.hdc.port 35000
-	setparam persist.hdc.root 1 # We are running hdcd as root
-	setparam ro.hdc.secure 0 # Do not enable secure mode
-	sleep "$STARTUP_CMD_SLEEP"
-	/system/bin/hdcd -t &
-fi
-
 echo "All OpenHarmony services started" >/dev/console

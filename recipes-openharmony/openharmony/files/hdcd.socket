@@ -1,0 +1,9 @@
+[Unit]
+Description=OpenHarmony Device Connector Daemon socket
+
+[Socket]
+ExecStartPre=install -o system -g system -m 775 -d /run/openharmony/hdc
+ListenSequentialPacket=/run/openharmony/hdc/FOOBAR
+SocketUser=system
+SocketGroup=system
+SocketMode=0660

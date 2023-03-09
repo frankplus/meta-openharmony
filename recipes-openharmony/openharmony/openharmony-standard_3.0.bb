@@ -1796,7 +1796,6 @@ RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager-ptest"
 PACKAGES =+ "${PN}-hdc"
 FILES:${PN}-hdc = " \
     ${bindir}/hdcd \
-    ${systemd_unitdir}/hdcd.service \
 "
 SYSTEMD_PACKAGES += "${PN}-hdc"
 SYSTEMD_SERVICE:${PN}-hdc = "hdcd.service"
