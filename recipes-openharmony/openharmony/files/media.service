@@ -1,10 +1,18 @@
 [Unit]
-Description=OpenHarmony media service
+Description=OpenHarmony media service (SA: 3002)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Media Service"
-RemainAfterExit=yes
+Type=notify
+ExecStart=/usr/bin/sa_main /system/profile/media_service.xml
+User=system
+Group=media_rw
+SupplementaryGroups=system
+LimitNICE=40
 
 [Install]
 WantedBy=multi-user.target

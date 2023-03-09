@@ -137,17 +137,6 @@ fi
 #sleep "$STARTUP_CMD_SLEEP"
 
 # trigger: boot
-# "name" : "media_service",
-# "path" : ["/system/bin/sa_main", "/system/profile/media_service.xml"],
-# "uid" : "system",
-# "gid" : ["media_rw", "system"]
-if systemctl -q is-enabled media.service; then
-	echo >/dev/console "Starting OpenHarmony media service"
-	su system -c '/system/bin/sa_main /system/profile/media_service.xml &'
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: boot
 # "name" : "inputmethod_service",
 # "path" : ["/system/bin/sa_main", "/system/profile/inputmethod_service.xml"],
 # "uid" : "system",
