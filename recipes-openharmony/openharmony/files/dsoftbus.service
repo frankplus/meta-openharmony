@@ -1,10 +1,24 @@
 [Unit]
-Description=OpenHarmony DSoftBus services
+Description=OpenHarmony DSoftBus services (SA: 1401 4700)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
+# Requires SA: 3299
+Wants=foundation.service
+# Requires SA: 3510
+Wants=huks.service
+# Requires SA: 4701
+Wants=deviceauth.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony DSoftBus Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
 
 [Install]
 WantedBy=multi-user.target
