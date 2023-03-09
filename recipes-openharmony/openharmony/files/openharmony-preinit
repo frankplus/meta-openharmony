@@ -137,23 +137,6 @@ fi
 #sleep "$STARTUP_CMD_SLEEP"
 
 # trigger: boot
-# "name" : "distributeddata",
-# "path" : ["/system/bin/sa_main","/system/profile/distributeddata.xml"],
-# "caps" : ["DAC_READ_SEARCH"],
-# "uid" : "system",
-# "gid" : ["system","shell","readproc"],
-# "writepid":[
-# "/dev/cpuset/foreground/tasks",
-# "/dev/stune/foreground/tasks",
-# "/dev/blkio/foreground/tasks"
-# ]
-if systemctl -q is-enabled distributed_data.service; then
-	echo >/dev/console "Starting OpenHarmony distributeddata service"
-	su system -c '/system/bin/sa_main /system/profile/distributeddata.xml &' # SA: 1301
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: boot
 # "name" : "time_service",
 # "path" : ["/system/bin/sa_main", "/system/profile/time_service.xml"],
 # "uid" : "system",

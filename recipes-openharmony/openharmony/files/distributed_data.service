@@ -1,10 +1,21 @@
 [Unit]
-Description=OpenHarmony Distributed Data service
+Description=OpenHarmony Distributed Data service (SA: 1301)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
+# Requires SA: 4700
+Wants=dsoftbus.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Distributed Data Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell readproc
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/distributeddata.xml
 
 [Install]
 WantedBy=multi-user.target
