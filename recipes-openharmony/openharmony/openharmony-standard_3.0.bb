@@ -79,6 +79,7 @@ SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base
 SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
 SRC_URI += "file://safwk-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 SRC_URI += "file://installs-sd-notify.patch;patchdir=${S}/foundation/appexecfwk/standard"
+SRC_URI += "file://deviceauth-sd-notify.patch;patchdir=${S}/base/security/deviceauth"
 
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
 
@@ -1066,7 +1067,7 @@ FILES:${PN}-security-deviceauth = " \
     ${bindir}/deviceauth_service \
     ${libdir}/libdeviceauth*${SOLIBS} \
 "
-RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto"
+RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto libsystemd"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-security-huks ${PN}-syspara ${PN}-dsoftbus"
 RDEPENDS:${PN} += "${PN}-security-deviceauth"

@@ -133,17 +133,6 @@ if systemctl -q is-enabled weston.service; then
 fi
 
 # trigger: post-fs-data
-# "name" : "deviceauth_service",
-# "path" : ["/system/bin/deviceauth_service"],
-# "uid" : "system",
-# "gid" : ["system", "shell"]
-if systemctl -q is-enabled deviceauth.service; then
-	echo >/dev/console "Starting OpenHarmony deviceauth service"
-	su system -c '/system/bin/deviceauth_service &' # SA: 4701 | Required SA: 3510
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: post-fs-data
 # "name" : "accountmgr",
 # "path" : ["/system/bin/sa_main", "/system/profile/accountmgr.xml"],
 # "uid" : "system",

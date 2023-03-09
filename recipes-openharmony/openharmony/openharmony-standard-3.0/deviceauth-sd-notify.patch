@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/security/deviceauth of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to deviceauth service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/frameworks/src/ipc_service.c b/frameworks/src/ipc_service.c
+index 46bd82dd8969..48972f55c9d4 100644
+--- a/frameworks/src/ipc_service.c
++++ b/frameworks/src/ipc_service.c
+@@ -25,6 +25,8 @@
+ #include "ipc_sdk.h"
+ #include "securec.h"
+ 
++#include <systemd/sd-daemon.h>
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -1323,9 +1325,11 @@ int32_t main(int32_t argc, char const *argv[])
+     }
+     (void)AddMethodMap(serviceCtx);
+     LOGI("device authentication service register to IPC manager done, service running...");
++    sd_notify(0, "READY=1");
+     (void)memset_s(&cond, sizeof(cond), 0, sizeof(cond));
+     InitHcCond(&cond, NULL);
+     cond.wait(&cond);
++    sd_notify(0, "STOPPING=1");
+     DestroyHcCond(&cond);
+     return 0;
+ }
+diff --git a/services/BUILD.gn b/services/BUILD.gn
+index d6bd3557f656..83db1b07278b 100644
+--- a/services/BUILD.gn
++++ b/services/BUILD.gn
+@@ -219,6 +219,8 @@ if (defined(ohos_lite)) {
+       "safwk:system_ability_fwk",
+       "samgr_L2:samgr_proxy",
+     ]
++
++    libs = [ "systemd" ]
+   }
+ 
+   ohos_shared_library("deviceauth_sdk") {
