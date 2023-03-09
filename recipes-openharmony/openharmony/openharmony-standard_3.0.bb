@@ -82,6 +82,8 @@ SRC_URI += "file://installs-sd-notify.patch;patchdir=${S}/foundation/appexecfwk/
 SRC_URI += "file://deviceauth-sd-notify.patch;patchdir=${S}/base/security/deviceauth"
 
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://faultloggerd-socket-path.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
+SRC_URI += "file://faultloggerd-sd-notify.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
@@ -1623,7 +1625,7 @@ FILES:${PN}-faultlogger = " \
     ${libdir}/libfaultloggerd*${SOLIBS} \
     ${libdir}/libdfx_signalhandler*${SOLIBS} \
 "
-RDEPENDS:${PN}-faultlogger += "musl libcxx"
+RDEPENDS:${PN}-faultlogger += "musl libcxx libsystemd"
 RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-faultlogger"
 

@@ -136,12 +136,6 @@ fi
 #sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
 #sleep "$STARTUP_CMD_SLEEP"
 
-if systemctl -q is-enabled faultloggerd.service; then
-    echo >/dev/console "Starting OpenHarmony faultlogger service"
-    setparam ro.logsystem.usertype 6 # UserType::OVERSEAS_COMMERCIAL
-    /system/bin/faultloggerd &
-fi
-
 # trigger: boot?
 # "name" : "hdcd",
 # "path" : ["/system/bin/hdcd"],
