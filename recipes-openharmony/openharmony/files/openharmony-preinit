@@ -136,17 +136,6 @@ fi
 #sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
 #sleep "$STARTUP_CMD_SLEEP"
 
-# trigger: post-fs-data
-# "name" : "distributedsched",
-# "path" : ["/system/bin/sa_main", "/system/profile/distributedsched.xml"],
-# "uid" : "system",
-# "gid" : ["system", "shell"]
-if systemctl -q is-enabled distributedsched.service; then
-	echo >/dev/console "Starting OpenHarmony distributedsched service"
-	su system -c '/system/bin/sa_main /system/profile/distributedsched.xml &' # SA: 1401
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
 # trigger: boot
 # "name" : "distributeddata",
 # "path" : ["/system/bin/sa_main","/system/profile/distributeddata.xml"],
