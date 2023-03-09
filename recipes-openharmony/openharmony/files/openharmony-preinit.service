@@ -10,6 +10,8 @@ After=huks.service
 Requires=huks.service
 After=installs.service
 Requires=installs.service
+After=appspawn.service
+Requires=appspawn.service
 
 [Service]
 Type=oneshot

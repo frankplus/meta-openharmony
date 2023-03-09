@@ -132,18 +132,6 @@ if systemctl -q is-enabled weston.service; then
 	sleep "$STARTUP_CMD_SLEEP"
 fi
 
-# trigger: late-fs
-# "name" : "appspawn",
-# "path" : ["/system/bin/appspawn"],
-# "importance" : -20,
-# "uid" : "root",
-# "gid" : ["root"]
-if systemctl -q is-enabled appspawn.service; then
-	echo >/dev/console "Starting OpenHarmony appspawn service"
-	/system/bin/appspawn & # SA: 1401 180 3703 3008
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
 # trigger: post-fs-data
 # "name" : "deviceauth_service",
 # "path" : ["/system/bin/deviceauth_service"],

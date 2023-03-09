@@ -66,6 +66,8 @@ SRC_URI += "file://graphic-standard-vsync-log-spam.patch;patchdir=${S}/foundatio
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://appspawn-sd-notify.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://appspawn-socket-path.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patchdir=${S}/test/xts/acts"
 
 SRC_URI += "file://init_lite-silence-GetControlFromEnv-spam.patch;patchdir=${S}/base/startup/init_lite"
@@ -515,9 +517,8 @@ do_install:append() {
 FILES:${PN}-appspawn = " \
     ${bindir}/appspawn \
     ${libdir}/libappspawn*${SOLIBS} \
-    ${systemd_unitdir}/appspawnd.service \
 "
-RDEPENDS:${PN}-appspawn += "musl libcxx"
+RDEPENDS:${PN}-appspawn += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appspawn += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN} += "${PN}-appspawn"
 
@@ -533,7 +534,7 @@ do_install_ptest:append() {
 }
 FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
-RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
+RDEPENDS:${PN}-appspawn-ptest += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
 
