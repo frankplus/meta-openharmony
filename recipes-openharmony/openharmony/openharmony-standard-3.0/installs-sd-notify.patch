@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //foundation/appexecfwk/standard of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to installd service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/services/bundlemgr/BUILD.gn b/services/bundlemgr/BUILD.gn
+index 4d227c32c520..305ddd13e279 100755
+--- a/services/bundlemgr/BUILD.gn
++++ b/services/bundlemgr/BUILD.gn
+@@ -200,6 +200,7 @@ ohos_executable("installs") {
+     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+     "//third_party/jsoncpp:jsoncpp",
+   ]
++  libs = [ "systemd" ]
+ 
+   external_deps = [
+     "hiviewdfx_hilog_native:libhilog",
+diff --git a/services/bundlemgr/src/installd/installd_main.cpp b/services/bundlemgr/src/installd/installd_main.cpp
+index 7f03862f1e9d..600664463c26 100644
+--- a/services/bundlemgr/src/installd/installd_main.cpp
++++ b/services/bundlemgr/src/installd/installd_main.cpp
+@@ -18,6 +18,8 @@
+ #include "app_log_wrapper.h"
+ #include "installd/installd_service.h"
+ 
++#include <systemd/sd-daemon.h>
++
+ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
+ {
+     using namespace OHOS::AppExecFwk;
+@@ -35,8 +37,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
+             std::exit(EXIT_FAILURE);
+         }
+     }
++    sd_notify(0, "READY=1");
+     OHOS::IPCSkeleton::JoinWorkThread();
++    sd_notify(0, "STOPPING=1");
+     service->Stop();
+     APP_LOGE("installd service stopped");
+     return EXIT_SUCCESS;
+-}
+\ No newline at end of file
++}

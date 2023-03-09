@@ -133,18 +133,6 @@ if systemctl -q is-enabled weston.service; then
 fi
 
 # trigger: late-fs
-# "name" : "installs",
-# "path" : ["/system/bin/installs"],
-# "importance" : -20,
-# "uid" : "root",
-# "gid" : ["root"]
-if systemctl -q is-enabled installs.service; then
-	echo >/dev/console "Starting OpenHarmony installs service"
-	/system/bin/installs & # saId 511
-	sleep "$STARTUP_CMD_SLEEP"
-fi
-
-# trigger: late-fs
 # "name" : "appspawn",
 # "path" : ["/system/bin/appspawn"],
 # "importance" : -20,

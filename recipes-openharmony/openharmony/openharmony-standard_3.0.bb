@@ -76,6 +76,7 @@ SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base
 
 SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
 SRC_URI += "file://safwk-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/safwk"
+SRC_URI += "file://installs-sd-notify.patch;patchdir=${S}/foundation/appexecfwk/standard"
 
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
 
@@ -564,7 +565,7 @@ FILES:${PN}-appexecfwk = "\
     ${libdir}/module/libnapi_app_mgr*${SOLIBS} \
     ${libdir}/openharmony/profile/foundation.xml \
 "
-RDEPENDS:${PN}-appexecfwk += "musl libcxx"
+RDEPENDS:${PN}-appexecfwk += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-appverify ${PN}-distributeddatamgr ${PN}-notification-ces"
 RDEPENDS:${PN}-appexecfwk += "${PN}-security-permission ${PN}-appspawn ${PN}-safwk ${PN}-timeservice ${PN}-powermgr ${PN}-dmsfwk ${PN}-resmgr"
 RDEPENDS:${PN}-appexecfwk += "${PN}-aafwk ${PN}-ace-napi"
