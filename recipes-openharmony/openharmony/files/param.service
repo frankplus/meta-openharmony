@@ -5,6 +5,7 @@ Description=OpenHarmony Param Service
 Type=notify
 ExecStartPre=install -m 755 -d /run/openharmony/param
 ExecStartPre=install -m 755 -d /data/param
+StandardError=journal
 ExecStart=/usr/bin/param_service
 
 [Install]

@@ -74,6 +74,7 @@ SRC_URI += "file://init_lite-silence-GetControlFromEnv-spam.patch;patchdir=${S}/
 SRC_URI += "file://param_service_standalone.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-sd-notify.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param-paths.patch;patchdir=${S}/base/startup/init_lite"
+SRC_URI += "file://init_lite-log-to-stderr.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
 SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
