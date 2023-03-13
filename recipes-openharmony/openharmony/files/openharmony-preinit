@@ -87,10 +87,6 @@ if [ -c /dev/dri/card0 ]; then
 	chmod 666 /dev/dri/card0
 fi
 
-export XDG_RUNTIME_DIR=/data/weston
-export XKB_CONFIG_ROOT=/etc/openharmony/xkb
-export XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb
-
 STARTUP_CMD_SLEEP=4
 
 # Explicitly set default value to silence error message about parameter not being set
@@ -109,28 +105,6 @@ setparam persist.ace.trace.enabled 0
 #   - "trigger firmware_mounts_complete",
 #   - "trigger early-boot",
 #   - "trigger boot"
-
-# trigger: post-fs
-# "start udevd_service",
-# "sleep 1",
-# "start multimodalinputservice",
-# "start mmi_uinput_service",
-# "sleep 2",
-# "export XDG_RUNTIME_DIR /data/weston",
-# "export XKB_CONFIG_ROOT /etc/xkb",
-# "export XKB_CONFIG_EXTRA_PATH /etc/xkb",
-# "mkdir /data/weston",
-# "chmod 777 /data/weston",
-# "start weston",
-# "trigger weston_start",
-# "sleep 2",
-# "exec /system/bin/udevadm trigger",
-# "exec /system/bin/udevadm settle --timeout=30"
-if systemctl -q is-enabled weston.service; then
-	echo >/dev/console "Starting weston"
-	/system/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman &
-	sleep "$STARTUP_CMD_SLEEP"
-fi
 
 # trigger: not used?
 #sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502

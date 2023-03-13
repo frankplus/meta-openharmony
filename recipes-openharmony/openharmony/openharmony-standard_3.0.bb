@@ -1361,7 +1361,6 @@ FILES:${PN}-graphic = " \
     ${libdir}/module/libdisplay*${SOLIBS} \
     ${libdir}/module/libwindow*${SOLIBS} \
     ${bindir}/bootanimation \
-    ${systemd_unitdir}/weston.service \
 "
 SYSTEMD_PACKAGES += "${PN}-graphic"
 SYSTEMD_SERVICE:${PN}-graphic = "weston.service"

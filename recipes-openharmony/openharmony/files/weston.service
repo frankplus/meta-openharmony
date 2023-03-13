@@ -1,10 +1,18 @@
 [Unit]
 Description=OpenHarmony Weston window manager service
+Requires=samgr.service
+After=samgr.service
+Wants=hilogd.service
+After=hilogd.service
+Wants=openharmony-preinit.service
+After=openharmony-preinit.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Weston Service"
-RemainAfterExit=yes
+Type=exec
+Environment="XDG_RUNTIME_DIR=/data/weston"
+Environment="XKB_CONFIG_ROOT=/etc/openharmony/xkb"
+Environment="XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb"
+ExecStart=/usr/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman
 
 [Install]
 WantedBy=multi-user.target
