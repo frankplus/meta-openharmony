@@ -1,17 +1,7 @@
 [Unit]
 Description=OpenHarmony pre-init setup
+Wants=param.service
 After=param.service
-Requires=param.service
-After=samgr.service
-Requires=samgr.service
-After=hilogd.service
-Requires=hilogd.service
-After=huks.service
-Requires=huks.service
-After=installs.service
-Requires=installs.service
-After=appspawn.service
-Requires=appspawn.service
 
 [Service]
 Type=oneshot

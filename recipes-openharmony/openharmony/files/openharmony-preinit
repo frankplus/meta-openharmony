@@ -4,9 +4,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Don't print out kernel messages below warning levels to console
-dmesg -n 4
-
 mkdir -p /data/backup
 mkdir -p /data/bootchart
 mkdir -p /data/cache
@@ -87,27 +84,5 @@ if [ -c /dev/dri/card0 ]; then
 	chmod 666 /dev/dri/card0
 fi
 
-STARTUP_CMD_SLEEP=4
-
 # Explicitly set default value to silence error message about parameter not being set
 setparam persist.ace.trace.enabled 0
-
-# - pre-init stage
-# - init stage
-
-# - post-init stage
-#   - "trigger early-fs",
-#   - "trigger fs",
-#   - "trigger post-fs",
-#   - "trigger late-fs",
-#   - "trigger post-fs-data",
-#   - "trigger load_persist_props_action",
-#   - "trigger firmware_mounts_complete",
-#   - "trigger early-boot",
-#   - "trigger boot"
-
-# trigger: not used?
-#sa_main /system/profile/dps_service.xml & # SA: 1401 180 3502
-#sleep "$STARTUP_CMD_SLEEP"
-
-echo "All OpenHarmony services started" >/dev/console

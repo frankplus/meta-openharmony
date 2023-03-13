@@ -3,6 +3,10 @@ Description=OpenHarmony SystemAbilityFramework service
 # Logging to hilogd, but seems to work without it
 Wants=hilogd.service
 After=hilogd.service
+# HACK: this dependency is just to have it openharmony-preinit run before most
+# other OH services until we have gotten rid of it completely.
+Wants=openharmony-preinit.service
+After=openharmony-preinit.service
 
 [Service]
 Type=notify
