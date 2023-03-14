@@ -212,6 +212,8 @@ symlink_python3() {
     ln -sf $(which python3) ${STAGING_BINDIR_NATIVE}/python
 }
 
+SRC_URI += "file://start_service file://stop_service"
+
 do_install () {
     OHOS_PACKAGE_OUT_DIR="${B}/packages/${OHOS_PRODUCT_PLATFORM_TYPE}"
 
@@ -249,6 +251,12 @@ do_install () {
     # Avoid file-conflict on /usr/bin/udevadm with //third_party/eudev and udev
     # recipe
     rm ${D}${bindir}/udevadm
+
+    # Wrapper scripts for systemctl, which is at least used by ACTS
+    mkdir -p ${D}${sbindir}
+    install -t ${D}${sbindir} -m 0755 \
+            ${WORKDIR}/start_service \
+            ${WORKDIR}/stop_service
 }
 
 PACKAGES =+ "${PN}-configs ${PN}-fonts"
