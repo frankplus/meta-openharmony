@@ -7,6 +7,8 @@ After=param.service
 # Logging to hilogd, but seems to work without it
 Wants=hilogd.service
 After=hilogd.service
+Requires=dev-dri-card0.device
+After=dev-dri-card0.device
 
 [Service]
 Type=notify

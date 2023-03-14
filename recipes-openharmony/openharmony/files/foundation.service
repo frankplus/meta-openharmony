@@ -16,6 +16,8 @@ Wants=huks.service
 # Requires SA: 1301
 Wants=distributed_data.service
 # Requires SA: 3202 5001 -- but from where?
+Requires=dev-dri-card0.device
+After=dev-dri-card0.device
 
 [Service]
 Type=notify

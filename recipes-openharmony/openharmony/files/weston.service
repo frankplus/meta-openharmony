@@ -6,6 +6,8 @@ Wants=hilogd.service
 After=hilogd.service
 Wants=openharmony-preinit.service
 After=openharmony-preinit.service
+Requires=dev-dri-card0.device
+After=dev-dri-card0.device
 
 [Service]
 Type=exec
