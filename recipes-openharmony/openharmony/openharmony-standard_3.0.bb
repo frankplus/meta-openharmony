@@ -425,11 +425,13 @@ SYSTEMD_AUTO_ENABLE = "enable"
 
 SRC_URI += "file://40-binder.rules"
 SRC_URI += "file://40-ashmem.rules"
+SRC_URI += "file://40-drm.rules"
 do_install_udev_rules() {
     mkdir -p ${D}${nonarch_base_libdir}/udev/rules.d
     install -m 644 -t ${D}${nonarch_base_libdir}/udev/rules.d \
             ${WORKDIR}/40-binder.rules \
-            ${WORKDIR}/40-ashmem.rules
+            ${WORKDIR}/40-ashmem.rules \
+            ${WORKDIR}/40-drm.rules
 }
 do_install[postfuncs] += "do_install_udev_rules"
 
