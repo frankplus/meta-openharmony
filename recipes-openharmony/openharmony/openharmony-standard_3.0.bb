@@ -213,6 +213,7 @@ symlink_python3() {
 }
 
 SRC_URI += "file://start_service file://stop_service"
+SRC_URI += "file://param"
 
 do_install () {
     OHOS_PACKAGE_OUT_DIR="${B}/packages/${OHOS_PRODUCT_PLATFORM_TYPE}"
@@ -257,6 +258,10 @@ do_install () {
     install -t ${D}${sbindir} -m 0755 \
             ${WORKDIR}/start_service \
             ${WORKDIR}/stop_service
+
+    # Wrapper script for setparam/getparam, used by hdc (3.1 version)
+    install -t ${D}${sbindir} -m 0755 \
+            ${WORKDIR}/param
 }
 
 PACKAGES =+ "${PN}-configs ${PN}-fonts"
