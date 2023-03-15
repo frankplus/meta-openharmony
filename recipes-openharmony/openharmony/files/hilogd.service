@@ -10,6 +10,7 @@ ExecStartPre=!install -o logd -g log -m 0750 -d /data/log/hilog
 User=logd
 Group=log
 ExecStart=/usr/bin/hilogd
+ExecStartPost=hilog -G 16M
 
 [Install]
 WantedBy=multi-user.target
