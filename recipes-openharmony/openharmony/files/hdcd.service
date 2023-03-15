@@ -10,7 +10,7 @@ Type=exec
 ExecStartPre=setparam persist.hdc.port 35000
 ExecStartPre=setparam persist.hdc.root 1
 ExecStartPre=setparam ro.hdc.secure 0
-ExecStart=/usr/bin/hdcd -t
+ExecStart=/usr/bin/hdcd -t -l 3
 
 [Install]
 WantedBy=multi-user.target
