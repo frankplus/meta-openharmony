@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenHarmony multimodalinput service (SA: ?)
+Requires=samgr.service
+After=samgr.service
+Wants=hilogd.service
+After=hilogd.service
+
+[Service]
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell uhid
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/multimodalinputservice.xml
+
+[Install]
+WantedBy=multi-user.target

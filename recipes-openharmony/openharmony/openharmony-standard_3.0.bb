@@ -1112,6 +1112,15 @@ RDEPENDS:${PN}-ptest += "${PN}-security-deviceauth-ptest"
 
 # //foundation/multimodalinput/input
 PACKAGES =+ "${PN}-multimodalinput"
+SYSTEMD_PACKAGES += "${PN}-multimodalinput"
+SYSTEMD_SERVICE:${PN}-multimodalinput = "multimodalinput.service mmi-uinput.service"
+SRC_URI += "file://multimodalinput.service file://mmi-uinput.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/multimodalinput.service \
+            ${WORKDIR}/mmi-uinput.service
+}
 FILES:${PN}-multimodalinput = " \
     ${bindir}/uinput_inject \
     ${libdir}/libmmi_*${SOLIBS} \
@@ -2072,6 +2081,7 @@ USERADD_PARAM:${PN}:append = ";-u 1023 -U -s /bin/false media_rw"
 USERADD_PARAM:${PN}:append = ";-u 1036 -U -s /bin/false logd"
 USERADD_PARAM:${PN}:append = ";-u 2000 -U -s /bin/false shell"
 USERADD_PARAM:${PN}:append = ";-u 3009 -U -s /bin/false readproc"
+USERADD_PARAM:${PN}:append = ";-u 3011 -U -s /bin/false uhid"
 
 # system haps
 PACKAGES =+ "${PN}-systemhaps"
