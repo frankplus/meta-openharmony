@@ -46,6 +46,7 @@ SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsf
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
+SRC_URI += "file://hdc-log-message-cleanup.patch;patchdir=${S}/developtools/hdc_standard"
 SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_js_assets.patch;patchdir=${S}/build"

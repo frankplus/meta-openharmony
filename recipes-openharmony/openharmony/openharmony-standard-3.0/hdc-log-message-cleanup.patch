@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Downgrade log level for 3 very noice, and not very informative log messages from
+warning to debug. They were never warning messages anyway.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/src/common/session.cpp b/src/common/session.cpp
+index b691ed4fa0af..15e337cc3d6d 100644
+--- a/src/common/session.cpp
++++ b/src/common/session.cpp
+@@ -731,20 +731,20 @@ int HdcSessionBase::SendByProtocol(HSession hSession, uint8_t *bufPtr, const int
+     int ret = 0;
+     switch (hSession->connType) {
+         case CONN_TCP: {
+-            WRITE_LOG(LOG_WARN, "CONN_TCP serverOrDaemon:%d", hSession->serverOrDaemon);
++            WRITE_LOG(LOG_DEBUG, "CONN_TCP serverOrDaemon:%d", hSession->serverOrDaemon);
+             if (echo && !hSession->serverOrDaemon) {
+                 ret = Base::SendToStreamEx((uv_stream_t *)&hSession->hChildWorkTCP, bufPtr, bufLen,
+                                            nullptr, (void *)FinishWriteSessionTCP, bufPtr);
+             } else {
+                 if (hSession->hWorkThread == uv_thread_self()) {
+ 
+-                    WRITE_LOG(LOG_WARN, "CONN_TCP:%s serverOrDaemon:%d", bufPtr,
++                    WRITE_LOG(LOG_DEBUG, "CONN_TCP:%s serverOrDaemon:%d", bufPtr,
+                               hSession->serverOrDaemon);
+                     WRITE_LOG(LOG_WARN, "SendByProtocol %p  size:%lu", hSession->hWorkTCP, bufLen);
+                     ret = Base::SendToStreamEx((uv_stream_t *)&hSession->hWorkTCP, bufPtr, bufLen,
+                                                nullptr, (void *)FinishWriteSessionTCP, bufPtr);
+                 } else if (hSession->hWorkChildThread == uv_thread_self()) {
+-                    WRITE_LOG(LOG_WARN, "CONN_TCP 2:%s serverOrDaemon:%d", bufPtr,
++                    WRITE_LOG(LOG_DEBUG, "CONN_TCP 2:%s serverOrDaemon:%d", bufPtr,
+                               hSession->serverOrDaemon);
+                     ret = Base::SendToStreamEx((uv_stream_t *)&hSession->hChildWorkTCP, bufPtr,
+                                                bufLen, nullptr, (void *)FinishWriteSessionTCP,
