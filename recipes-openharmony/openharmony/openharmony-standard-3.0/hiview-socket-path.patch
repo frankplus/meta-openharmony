@@ -1,0 +1,17 @@
+diff --git a/core/event_server.cpp b/core/event_server.cpp
+index 438b01ed59ea..081ecdcd9936 100644
+--- a/core/event_server.cpp
++++ b/core/event_server.cpp
+@@ -34,11 +34,7 @@ extern "C" {
+ #include "logger.h"
+ #include "socket_util.h"
+ 
+-#ifdef USE_MUSL
+-#define SOCKET_FILE_DIR "/dev/unix/socket/hisysevent"
+-#else
+-#define SOCKET_FILE_DIR "/dev/socket/hisysevent"
+-#endif
++#define SOCKET_FILE_DIR "/run/openharmony/hiview/hisysevent"
+ 
+ namespace OHOS {
+ namespace HiviewDFX {

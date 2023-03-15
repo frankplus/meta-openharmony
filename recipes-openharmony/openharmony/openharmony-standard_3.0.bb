@@ -87,6 +87,10 @@ SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${
 SRC_URI += "file://faultloggerd-socket-path.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
 SRC_URI += "file://faultloggerd-sd-notify.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
 
+SRC_URI += "file://hiview-sd-notify.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://hiview-socket-path.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://hisysevent-socket-path.patch;patchdir=${S}/base/hiviewdfx/hisysevent"
+
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
@@ -1672,11 +1676,20 @@ RDEPENDS:${PN} += "${PN}-thirdparty-ejdb"
 
 # //base/hiviewdfx/hiview
 PACKAGES =+ "${PN}-hiview"
+SYSTEMD_PACKAGES += "${PN}-hiview"
+SYSTEMD_SERVICE:${PN}-hiview = "hiview.service"
+SRC_URI += "file://hiview.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/hiview.service
+    rm -f ${D}${sysconfdir}/openharmony/init/hiview.cfg
+}
 FILES:${PN}-hiview = " \
     ${bindir}/hiview \
     ${libdir}/libhiviewbase*${SOLIBS} \
 "
-RDEPENDS:${PN}-hiview += "musl libcxx"
+RDEPENDS:${PN}-hiview += "musl libcxx libsystemd"
 RDEPENDS:${PN}-hiview += " \
     ${PN}-libutils \
     ${PN}-hilog \
