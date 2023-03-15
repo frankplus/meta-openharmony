@@ -78,6 +78,3 @@ mkdir -p /data/log/faultlog/temp
 mkdir -p /usr/lib/dri
 
 chmod -R 777 /data
-
-# Explicitly set default value to silence error message about parameter not being set
-setparam persist.ace.trace.enabled 0

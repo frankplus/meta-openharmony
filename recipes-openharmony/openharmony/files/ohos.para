@@ -1,0 +1,54 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+build_version = 2.0
+
+hw_sc.build.os.enable=true
+hw_sc.build.os.apiversion=6
+hw_sc.build.os.version=3.0.1
+hw_sc.build.os.devicetype=headless
+hw_sc.build.os.releasetype=Canary1
+
+ro.actionable_compatible_property.enabled=false
+ro.postinstall.fstab.prefix=/system
+ro.secure=1
+security.perf_harden=1
+ro.allow.mock.location=0
+ro.debuggable=1
+ro.build.characteristics=default
+
+# There is some kind of special handling if this is "OHOS"
+ro.product.model=OHOS
+ro.product.name=OpenHarmony 3.0.1
+ro.product.locale=en-US
+
+# 1: COMMERCIAL
+# 2: FANS 
+# 3: BETA
+# 4: TEST
+# 5: OVERSEAS_BETA
+# 6: OVERSEAS_COMMERCIAL
+ro.logsystem.usertype=4
+
+# user: General public
+# userdebug: like user, but with root
+# eng: build for testing ROMS not for public
+ro.build.type=user
+
+persist.sys.usb.config=hdc
+
+ro.hdc.secure=0
+persist.hdc.port=35000
+persist.hdc.root=1
+
+persist.ace.trace.enabled=0

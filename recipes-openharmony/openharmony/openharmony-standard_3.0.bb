@@ -219,6 +219,7 @@ symlink_python3() {
 
 SRC_URI += "file://start_service file://stop_service"
 SRC_URI += "file://param"
+SRC_URI += "file://ohos.para"
 
 do_install () {
     OHOS_PACKAGE_OUT_DIR="${B}/packages/${OHOS_PRODUCT_PLATFORM_TYPE}"
@@ -248,6 +249,8 @@ do_install () {
     mkdir -p ${D}${sysconfdir}/openharmony
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
     ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
+    # Overwrite the OpenHarmony provideded parameter file
+    install -m 0644 -t ${D}${sysconfdir}/openharmony ${WORKDIR}/ohos.para
 
     # OpenHarmony font files
     mkdir -p ${D}${datadir}/fonts/openharmony

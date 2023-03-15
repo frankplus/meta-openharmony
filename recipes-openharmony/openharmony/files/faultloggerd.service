@@ -3,8 +3,6 @@ Description=OpenHarmony FaultLogger daemon
 
 [Service]
 Type=notify
-# UserType::OVERSEAS_COMMERCIAL
-ExecStartPre=setparam ro.logsystem.usertype 6
 ExecStartPre=!install -o root -g system -m 0755 -d /run/openharmony/faultlogger
 ExecStartPre=!install -o system -g log -m 0770 -d /data/log
 ExecStartPre=!install -o system -g system -m 0770 -d /data/log/faultlog
