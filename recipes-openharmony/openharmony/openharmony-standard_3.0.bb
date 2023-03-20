@@ -212,6 +212,9 @@ do_install () {
     # For now, this fix is sufficient.
     [ "${@get_ohos_libdir(d)}" != "lib" ] && ln -s ${@get_ohos_libdir(d)} ${D}/system/lib
 
+    # There is also a few files in /system/usr
+    cp -r -t ${D}/system/ ${OHOS_PACKAGE_OUT_DIR}/system/usr
+
     # system ability configurations
     mkdir -p ${D}${libdir}/openharmony/profile
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/profile/* ${D}${libdir}/openharmony/profile
@@ -254,7 +257,7 @@ FILES:${PN}:remove = "${libdir}/${BPN}/*"
 FILES:${PN}-configs = "${sysconfdir}"
 FILES:${PN}-fonts = "${datadir}/fonts"
 
-FILES:${PN} += "/system/bin ${@get_ohos_libdirs(d)} /system/profile"
+FILES:${PN} += "/system/bin ${@get_ohos_libdirs(d)} /system/profile /system/usr"
 FILES:${PN}-configs += "/system/etc"
 FILES:${PN}-fonts += "/system/fonts"
 
