@@ -376,6 +376,7 @@ OPENHARMONY_PARTS += "global:resmgr_standard"
 OPENHARMONY_PARTS += "graphic:graphic_standard"
 OPENHARMONY_PARTS += "hdf:hdf"
 OPENHARMONY_PARTS += "hdf:display_device_driver"
+OPENHARMONY_PARTS += "hdf:wlan_device_driver"
 OPENHARMONY_PARTS += "hiviewdfx:faultloggerd"
 OPENHARMONY_PARTS += "hiviewdfx:hilog"
 OPENHARMONY_PARTS += "hiviewdfx:hilog_native"
@@ -1186,6 +1187,24 @@ FILES:${PN}-peripheral-input = "${libdir}/libhdi_input*${SOLIBS}"
 RDEPENDS:${PN}-peripheral-input += "musl libcxx"
 RDEPENDS:${PN}-peripheral-input += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2"
 RDEPENDS:${PN} += "${PN}-peripheral-input"
+
+# //drivers/peripheral/wlan
+PACKAGES =+ "${PN}-peripheral-wlan"
+do_install:append() {
+    install -m 644 ${B}/hdf/hdf/libwifi_driver_client.z.so ${D}${libdir}/
+    install -m 644 ${B}/hdf/hdf/libwifi_hal.z.so ${D}${libdir}/
+    install -m 644 ${B}/hdf/hdf/libwifi_hdi_c_device.z.so ${D}${libdir}/
+    install -m 644 ${B}/hdf/hdf/libwifi_hdi_device.z.so ${D}${libdir}/
+}
+FILES:${PN}-peripheral-wlan = " \
+    ${libdir}/libwifi_driver_client*${SOLIBS} \
+    ${libdir}/libwifi_hal*${SOLIBS} \
+    ${libdir}/libwifi_hdi_c_device*${SOLIBS} \
+    ${libdir}/libwifi_hdi_device*${SOLIBS} \
+"
+RDEPENDS:${PN}-peripheral-wlan += "musl libcxx"
+RDEPENDS:${PN}-peripheral-wlan += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2 ${PN}-ipc"
+RDEPENDS:${PN} += "${PN}-peripheral-wlan"
 
 # //base/miscservices/time
 PACKAGES =+ "${PN}-timeservice"

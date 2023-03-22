@@ -11,7 +11,7 @@ diff --git a/uhdf2/ohos.build b/uhdf2/ohos.build
 index f56e333..38db541 100644
 --- a/uhdf2/ohos.build
 +++ b/uhdf2/ohos.build
-@@ -6,43 +6,17 @@
+@@ -6,43 +6,25 @@
          "//drivers/adapter/uhdf2/osal:libhdf_utils",
          "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
          "//drivers/adapter/uhdf2/hdi:libhdi",
@@ -61,6 +61,14 @@ index f56e333..38db541 100644
 +      "module_list": [
 +        "//drivers/peripheral/display/hal:hdi_display",
 +        "//device/hihope/hardware/display:display_gralloc"
++      ]
++    },
++    "wlan_device_driver": {
++      "module_list": [
++        "//drivers/peripheral/wlan/client:wifi_driver_client",
++        "//drivers/peripheral/wlan/hal:wifi_hal",
++        "//drivers/peripheral/wlan/hdi_service:wifi_hdi_device",
++        "//drivers/peripheral/wlan/hdi_service:wifi_hdi_c_device"
        ]
      }
    }
