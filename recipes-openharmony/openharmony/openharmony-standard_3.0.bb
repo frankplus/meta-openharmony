@@ -410,6 +410,7 @@ OPENHARMONY_PARTS += "startup:startup_l2"
 OPENHARMONY_PARTS += "telephony:core_service"
 OPENHARMONY_PARTS += "telephony:ril_adapter"
 OPENHARMONY_PARTS += "utils:utils_base"
+OPENHARMONY_PARTS += "wpa_supplicant-2.9:wpa_supplicant-2.9"
 
 OPENHARMONY_PARTS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'xts:phone_tests', '', d)}"
 export XTS_SUITENAME = "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'acts', '', d)}"
@@ -2060,6 +2061,17 @@ RDEPENDS:${PN}-thirdparty-weston += "musl libcxx"
 RDEPENDS:${PN}-thirdparty-weston += "${PN}-hilog ${PN}-libutils ${PN}-thirdparty-libxml2 ${PN}-thirdparty-libffi ${PN}-thirdparty-libdrm ${PN}-graphic"
 RDEPENDS:${PN}-thirdparty-weston += "${PN}-thirdparty-libinput ${PN}-thirdparty-libevdev ${PN}-thirdparty-eudev ${PN}-thirdparty-pixman ${PN}-display-gralloc"
 RDEPENDS:${PN} += "${PN}-thirdparty-weston"
+
+PACKAGES =+ "${PN}-thirdparty-wpa-supplicant"
+FILES:${PN}-thirdparty-wpa-supplicant = " \
+    ${bindir}/hostapd \
+    ${bindir}/wpa_cli \
+    ${bindir}/wpa_supplicant \
+    ${libdir}/libwpa*${SOLIBS} \
+"
+RDEPENDS:${PN}-thirdparty-wpa-supplicant += "musl libcxx"
+RDEPENDS:${PN}-thirdparty-wpa-supplicant += "${PN}-peripheral-wlan"
+RDEPENDS:${PN} += "${PN}-thirdparty-wpa-supplicant"
 
 # Disable all ptest suites that are know to not work for now. When the x-bit is
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
