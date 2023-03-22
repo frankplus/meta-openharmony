@@ -361,6 +361,8 @@ OPENHARMONY_PARTS += "common:common"
 OPENHARMONY_PARTS += "communication:dsoftbus_standard"
 OPENHARMONY_PARTS += "communication:ipc"
 OPENHARMONY_PARTS += "communication:ipc_js"
+OPENHARMONY_PARTS += "communication:wifi_standard"
+OPENHARMONY_PARTS += "communication:wifi_native_js"
 OPENHARMONY_PARTS += "developtools:bytrace_standard"
 OPENHARMONY_PARTS += "developtools:hdc_standard"
 OPENHARMONY_PARTS += "distributeddatamgr:appdatamgr_jskits"
@@ -811,6 +813,40 @@ do_install_ptest:append() {
 RDEPENDS:${PN}-dsoftbus-ptest += "musl libcxx"
 RDEPENDS:${PN}-dsoftbus-ptest += "${PN}-dsoftbus ${PN}-hilog"
 RDEPENDS:${PN}-ptest += "${PN}-dsoftbus-ptest"
+
+# //foundation/communication/wifi
+PACKAGES =+ "${PN}-wifi"
+SYSTEMD_PACKAGES += "${PN}-wifi"
+SYSTEMD_SERVICE:${PN}-wifi = "wifi_standard.service wifi_hal.service"
+SRC_URI += "file://wifi_standard.service file://wifi_hal.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/wifi_standard.service ${D}${systemd_unitdir}/system/
+    install -m 644 ${WORKDIR}/wifi_hal.service ${D}${systemd_unitdir}/system/
+    rm -f ${D}${sysconfdir}/openharmony/init/wifi_standard.cfg
+    rm -f ${D}${sysconfdir}/openharmony/init/wifi_hal_service.cfg
+}
+FILES:${PN}-wifi = " \
+    ${libdir}/libwifi*${SOLIBS} \
+    ${libdir}/libdhcp_manager_service*${SOLIBS} \
+    ${bindir}/dhcp_server \
+    ${bindir}/dhcp_client_service \
+    ${libdir}/openharmony/profile/wifi_manager_service.xml \
+    ${bindir}/wifi_hal_service \
+"
+RDEPENDS:${PN} += "${PN}-wifi"
+RDEPENDS:${PN}-wifi += "musl libcxx"
+RDEPENDS:${PN}-wifi += "${PN}-samgr ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk"
+RDEPENDS:${PN}-wifi += "${PN}-thirdparty-wpa-supplicant"
+
+# //foundation/communication/wifi_native_js
+PACKAGES =+ "${PN}-wifi-native-js"
+FILES:${PN}-wifi-native-js = " \
+    ${libdir}/module/libwifi_native_js*${SOLIBS} \
+"
+RDEPENDS:${PN} += "${PN}-wifi-native-js"
+RDEPENDS:${PN}-wifi-native-js += "musl libcxx ${PN}-wifi"
+RDEPENDS:${PN}-wifi-native-js += "${PN}-samgr ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk ${PN}-ace-napi"
 
 # //foundation/distributedschedule/samgr
 PACKAGES =+ "${PN}-samgr"
