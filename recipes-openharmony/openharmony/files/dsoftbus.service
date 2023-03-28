@@ -11,6 +11,8 @@ Wants=foundation.service
 Wants=huks.service
 # Requires SA: 4701
 Wants=deviceauth.service
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=notify
