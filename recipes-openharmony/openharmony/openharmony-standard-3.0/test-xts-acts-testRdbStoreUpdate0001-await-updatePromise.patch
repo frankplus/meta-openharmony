@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+ 
+The testRdbStoreUpdate0001 testcase which is part of ActsAppdatamagrJsTest 
+sometimes fails (in our case on raspberrypi4-64). The reason is that  
+the values in rdbStore are inspected before the update is completed. 
+The `await updatePromise` command that is clearly needed was commented out 
+for some unknown reason. Reintroducing the await command to avoid race  
+conditions. 
+ 
+Apply to test/xts/acts 
+ 
+Upstream-Status: Pending 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+
+diff --git a/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/test/RdbstoreUpdateJsunit.test.js b/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/test/RdbstoreUpdateJsunit.test.js
+index ce3da461e..b3db7a2ae 100644
+--- a/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/test/RdbstoreUpdateJsunit.test.js
++++ b/distributeddatamgr/appdatamgrjstest/hap/src/main/js/default/test/RdbstoreUpdateJsunit.test.js
+@@ -88,7 +88,7 @@ describe('rdbStoreUpdateTest', function () {
+                 console.log(TAG + "update error");
+                 expect(null).assertFail();
+             })
+-            //await updatePromise
++            await updatePromise
+         }
+         //查询
+         {
+@@ -262,4 +262,4 @@ describe('rdbStoreUpdateTest', function () {
+     })
+     console.log(TAG + "*************Unit Test End*************");
+ })
+-  
+\ No newline at end of file
++  
