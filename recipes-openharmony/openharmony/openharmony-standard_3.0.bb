@@ -94,6 +94,8 @@ SRC_URI += "file://hisysevent-socket-path.patch;patchdir=${S}/base/hiviewdfx/his
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
+SRC_URI += "file://appdatamgr-IsColumnNull-initialize-result.patch;patchdir=${S}/foundation/distributeddatamgr/appdatamgr"
+
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
