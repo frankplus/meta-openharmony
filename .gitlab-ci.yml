@@ -195,7 +195,7 @@ eca:
     - echo "RM_WORK_EXCLUDE += \"${RECIPE}\"" >> conf/auto.conf
     - echo "OPENHARMONY_VERSION = \"${OPENHARMONY_VERSION}\"" >> conf/auto.conf
   script:
-    - time bitbake "${RECIPE}"
+    - time bitbake ${RECIPE}
   after_script:
     # Update sstate-cache mirror
     - if [ -n "$CI_ONIRO_RUNNER_PERSISTENT_STORAGE" -a -d build/sstate-cache ] ; then
@@ -309,12 +309,9 @@ mirror_ch:
         fi ;
       done
 
-# Build OpenHarmony images using normal CI runners
-build:
+# Build using normal CI runners
+.build:
   stage: build
-  needs:
-    - job: fetch
-      artifacts: false
   rules:
     - if: $CHINA_CI != null
       # Don't use CI resources on normal builds when doing China builds
@@ -323,15 +320,42 @@ build:
   extends: .bitbake
   after_script:
     - !reference [.bitbake, after_script]
-    - time repo/oe-core/scripts/pybootchartgui/pybootchartgui.py build/tmp-*/buildstats/* -o build/tmp-*/buildstats
+    - repo/oe-core/scripts/pybootchartgui/pybootchartgui.py build/tmp-*/buildstats/* -o build/tmp-*/buildstats
   tags:
     - cpu.heavy
+
+# Build OpenHarmony toolchain recipes
+toolchain:
+  extends: .build
+  needs:
+    - job: fetch
+      artifacts: false
+  variables:
+    DISTRO: oniro-openharmony-linux
+    OPENHARMONY_VERSION: "3.0"
+    RECIPE: oniro-openharmony-toolchain oniro-openharmony-bundle
   parallel:
     matrix:
-      - DISTRO: [oniro-openharmony-linux]
-        OPENHARMONY_VERSION: ["3.0"]
-        MACHINE: [qemuarma7, raspberrypi4-64]
-        RECIPE: [oniro-openharmony-toolchain, oniro-openharmony-bundle, openharmony-standard-image, openharmony-tools]
+      - MACHINE: [qemuarma7, raspberrypi4-64]
+  artifacts:
+    paths:
+      - build/tmp-*/deploy/sdk
+      - build/tmp-*/buildstats*
+    expire_in: 1 month
+
+# Build OpenHarmony images
+build:
+  extends: .build
+  needs:
+    - job: toolchain
+      artifacts: false
+  variables:
+    DISTRO: oniro-openharmony-linux
+    OPENHARMONY_VERSION: "3.0"
+    RECIPE: openharmony-standard-image openharmony-tools
+  parallel:
+    matrix:
+      - MACHINE: [qemuarma7, raspberrypi4-64]
   artifacts:
     paths:
       - build/tmp-*/deploy/images/${MACHINE}
@@ -355,12 +379,13 @@ ptest:
   extends: .bitbake
   tags:
     - cpu.heavy
+  variables:
+      DISTRO: oniro-openharmony-linux
+      OPENHARMONY_VERSION: "3.0"
+      RECIPE: openharmony-standard-image-tests
   parallel:
     matrix:
-      - DISTRO: [oniro-openharmony-linux]
-        OPENHARMONY_VERSION: ["3.0"]
-        MACHINE: [qemuarma7]
-        RECIPE: [openharmony-standard-image-tests]
+      - MACHINE: [qemuarma7]
   artifacts:
     paths:
       - build/tmp-*/work/*/*/*/testimage
