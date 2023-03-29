@@ -102,6 +102,7 @@ SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xt
 SRC_URI += "file://test-xts-acts-increase-testsuite-timeouts.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://actsgetwantalltest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://actsfeatureabilitytest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdir=${S}/foundation/ace/ace_engine"
 
 inherit python3native gn_base ptest
 
