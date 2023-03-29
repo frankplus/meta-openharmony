@@ -94,14 +94,10 @@ SRC_URI += "file://hisysevent-socket-path.patch;patchdir=${S}/base/hiviewdfx/his
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
-SRC_URI += "file://test-xts-acts-testcase-timeout-increment.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://test-xts-acts-start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-increase-testsuite-timeouts.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://actsgetwantalltest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://actsfeatureabilitytest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdir=${S}/foundation/ace/ace_engine"
 
 inherit python3native gn_base ptest
