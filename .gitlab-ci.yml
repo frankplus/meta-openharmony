@@ -535,7 +535,7 @@ ohos:
       optional: true
     - job: ohos_fetch
       artifacts: true
-    - job: build
+    - job: toolchain
       artifacts: true
   parallel:
     matrix:
