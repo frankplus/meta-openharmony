@@ -2,9 +2,11 @@
 Description=OpenHarmony Param Service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Param Service"
-RemainAfterExit=yes
+Type=notify
+ExecStartPre=install -m 755 -d /run/openharmony/param
+ExecStartPre=install -m 755 -d /data/param
+StandardError=journal
+ExecStart=/usr/bin/param_service
 
 [Install]
 WantedBy=multi-user.target

@@ -1,10 +1,22 @@
 [Unit]
-Description=OpenHarmony Distributed Schedule service
+Description=OpenHarmony Distributed Schedule service (SA: 1401)
+Requires=samgr.service
+After=samgr.service
+#Wants=param.service
+#After=param.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
+# Requires SA: 4700
+Wants=dsoftbus.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Distributed Schedule Service"
-RemainAfterExit=yes
+Type=notify
+User=system
+Group=system
+SupplementaryGroups=shell
+LimitNICE=40
+ExecStart=/usr/bin/sa_main /system/profile/distributedsched.xml
 
 [Install]
 WantedBy=multi-user.target

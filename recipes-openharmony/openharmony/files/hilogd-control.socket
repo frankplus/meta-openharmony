@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenHarmony hilog control socket
+
+[Socket]
+ExecStartPre=install -o logd -g logd -m 775 -d /run/openharmony/hilog
+ListenSequentialPacket=/run/openharmony/hilog/control
+SocketUser=logd
+SocketGroup=logd
+# This mimics OHOS init config, although hilogd changes it to 0666 on startup
+SocketMode=0600
+Service=hilogd.service

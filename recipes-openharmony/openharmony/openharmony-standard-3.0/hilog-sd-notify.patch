@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/hiviewdfx/hilog of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to hilogd service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/frameworks/native/BUILD.gn b/frameworks/native/BUILD.gn
+index 28a55a72e3f6..04ef88045c3a 100644
+--- a/frameworks/native/BUILD.gn
++++ b/frameworks/native/BUILD.gn
+@@ -67,7 +67,6 @@ ohos_shared_library("libhilogutil") {
+     "dgram_socket_server.cpp",
+     "format.cpp",
+     "seq_packet_socket_client.cpp",
+-    "seq_packet_socket_server.cpp",
+     "socket.cpp",
+     "socket_client.cpp",
+     "socket_server.cpp",
+diff --git a/frameworks/native/seq_packet_socket_server.cpp b/frameworks/native/seq_packet_socket_server.cpp
+index c8665b22dbde..a7f4a2e2e1b9 100644
+--- a/frameworks/native/seq_packet_socket_server.cpp
++++ b/frameworks/native/seq_packet_socket_server.cpp
+@@ -18,6 +18,8 @@
+ #include <thread>
+ #include <iostream>
+ 
++#include <systemd/sd-daemon.h>
++
+ namespace OHOS {
+ namespace HiviewDFX {
+ int SeqPacketSocketServer::AcceptConnection(AcceptingHandler func)
+@@ -30,7 +32,9 @@ int SeqPacketSocketServer::AcceptConnection(AcceptingHandler func)
+         return ret;
+     }
+ 
++    sd_notify(0, "READY=1");
+     AcceptingThread(func);
++    sd_notify(0, "STOPPING=1");
+ 
+     return ret;
+ }
+diff --git a/services/hilogd/BUILD.gn b/services/hilogd/BUILD.gn
+index e241cd5b412b..7e4e9cca157f 100644
+--- a/services/hilogd/BUILD.gn
++++ b/services/hilogd/BUILD.gn
+@@ -31,6 +31,7 @@ ohos_executable("hilogd") {
+     "log_querier.cpp",
+     "log_reader.cpp",
+     "main.cpp",
++    "//base/hiviewdfx/hilog/frameworks/native/seq_packet_socket_server.cpp",
+   ]
+   configs = [ ":hilogd_config" ]
+   defines = [ "__RECV_MSG_WITH_UCRED_" ]
+@@ -41,6 +42,7 @@ ohos_executable("hilogd") {
+     "//third_party/zlib:libz",
+     "//utils/native/base:utilsecurec_shared",
+   ]
++  libs = [ "systemd" ]
+ 
+   deps += [ "etc:hilogd_etc" ]
+ 

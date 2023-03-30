@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/appspawn_standard of OpenHarmony 3.0 codebase
+
+Configure appspawn service to place Unix socket in /run instead of /dev (where
+they obviously does not belong).
+
+Having a dedicated directory for this makes it easier to handle permissions in a
+safe way.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/include/appspawn_socket.h b/include/appspawn_socket.h
+index 6edf8b728085..9896cd8a52bf 100644
+--- a/include/appspawn_socket.h
++++ b/include/appspawn_socket.h
+@@ -102,11 +102,7 @@ protected:
+     std::string socketName_ {};
+     struct sockaddr_un socketAddr_ {};
+     socklen_t socketAddrLen_ = 0;
+-#ifdef __MUSL__
+-    const std::string socketDir_ = "/dev/unix/socket/";
+-#else
+-    const std::string socketDir_ = "/dev/socket/";
+-#endif
++    const std::string socketDir_ = "/run/openharmony/appspawn/";
+     const unsigned int listenBacklog_ = 50;                   // 50: max num of clients
+     static constexpr struct timeval SOCKET_TIMEOUT = {5, 0};  // 5, 0: { 5 sec, 0 msec } for timeout
+ };

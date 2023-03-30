@@ -1,10 +1,14 @@
 [Unit]
-Description=OpenHarmony Installs service
+Description=OpenHarmony installd service (SA: 511)
+Requires=samgr.service
+After=samgr.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Installs Service"
-RemainAfterExit=yes
+Type=notify
+ExecStart=/usr/bin/installs
 
 [Install]
 WantedBy=multi-user.target

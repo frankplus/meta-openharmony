@@ -1,0 +1,20 @@
+[Unit]
+Description=OpenHarmony hiview service (SA: 1201 1202)
+Wants=param.service
+After=param.service
+Requires=samgr.service
+After=samgr.service
+Wants=hilogd.service
+After=hilogd.service
+
+[Service]
+Type=notify
+ExecStartPre=!install -o system -g system -m 0755 -d /run/openharmony/hiview
+User=system
+Group=system
+SupplementaryGroups=log
+LimitNICE=40
+ExecStart=/usr/bin/hiview
+
+#[Install]
+#WantedBy=multi-user.target

@@ -1,0 +1,33 @@
+diff --git a/adapter/service/idl/BUILD.gn b/adapter/service/idl/BUILD.gn
+index 1120463e2264..320a8809472c 100644
+--- a/adapter/service/idl/BUILD.gn
++++ b/adapter/service/idl/BUILD.gn
+@@ -43,6 +43,7 @@ ohos_source_set("hiview_service_impl") {
+     "$hiview_base:hiviewbase",
+     "//utils/native/base:utils",
+   ]
++  libs = [ "systemd"]
+ 
+   external_deps = [
+     "hilog_native:libhilog",
+diff --git a/adapter/service/idl/src/hiview_service_ability.cpp b/adapter/service/idl/src/hiview_service_ability.cpp
+index 757c0dbfd575..a2f1cc58845e 100644
+--- a/adapter/service/idl/src/hiview_service_ability.cpp
++++ b/adapter/service/idl/src/hiview_service_ability.cpp
+@@ -18,6 +18,8 @@
+ #include <cstdio>
+ #include <unistd.h>
+ 
++#include <systemd/sd-daemon.h>
++
+ #include "system_ability_definition.h"
+ #include "iservice_registry.h"
+ #include "ipc_skeleton.h"
+@@ -89,6 +91,7 @@ void HiviewServiceAbility::StartServiceAbility(int sleepS)
+     if (ret == false) {
+         HIVIEW_LOGE("AddDeathRecipient == false");
+     }
++    sd_notify(0, "READY=1");
+ }
+ 
+ void HiviewServiceAbility::StartService(HiviewService *service)

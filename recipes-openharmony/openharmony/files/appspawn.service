@@ -1,10 +1,23 @@
 [Unit]
-Description=OpenHarmony Appspawn service
+Description=OpenHarmony Appspawn service (SA: 1401 180 3703 3008)
+Requires=samgr.service
+After=samgr.service
+Wants=param.service
+After=param.service
+# Logging to hilogd, but seems to work without it
+Wants=hilogd.service
+After=hilogd.service
+Requires=dev-dri-card0.device
+After=dev-dri-card0.device
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Appspawn Service"
-RemainAfterExit=yes
+Type=notify
+Environment="XDG_RUNTIME_DIR=/data/weston"
+Environment="XKB_CONFIG_ROOT=/etc/openharmony/xkb"
+Environment="XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb"
+ExecStartPre=install -m 0755 -d /run/openharmony/appspawn
+LimitNICE=40
+ExecStart=/usr/bin/appspawn
 
 [Install]
 WantedBy=multi-user.target

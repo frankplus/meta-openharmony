@@ -19,6 +19,9 @@ DEPENDS += "bison-native"
 DEPENDS += "ruby-native"
 DEPENDS += "packing-tool-native"
 
+# We are adding sd_notify(3) calls to OpenHarmony services
+DEPENDS += "systemd"
+
 # Note: Using include instead of require to avoid parser error skipping recipe
 include ${PN}-sources-${OPENHARMONY_VERSION}.inc
 
@@ -32,6 +35,8 @@ SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d
 
 # TODO: we probably want these
 SRC_URI += "file://hilog-Add-tests.patch;patchdir=${S}/base/hiviewdfx/hilog"
+SRC_URI += "file://hilog-socket-paths.patch;patchdir=${S}/base/hiviewdfx/hilog"
+SRC_URI += "file://hilog-sd-notify.patch;patchdir=${S}/base/hiviewdfx/hilog"
 
 SRC_URI += "file://bison_parser.patch;patchdir=${S}/third_party/libxkbcommon"
 SRC_URI += "file://flexlexer.patch;patchdir=${S}/base/update/updater"
@@ -41,6 +46,7 @@ SRC_URI += "file://jsframwork-use-yocto-node.patch;patchdir=${S}/third_party/jsf
 SRC_URI += "file://ts2abc-don-t-set-node_path-for-Linux-host-toolchain.patch;patchdir=${S}/ark/ts2abc"
 
 SRC_URI += "file://hdc-build-system-files.patch;patchdir=${S}/developtools/hdc_standard"
+SRC_URI += "file://hdc-log-message-cleanup.patch;patchdir=${S}/developtools/hdc_standard"
 SRC_URI += "file://build_packing-tool-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_node-path.patch;patchdir=${S}/build"
 SRC_URI += "file://build_js_assets.patch;patchdir=${S}/build"
@@ -61,26 +67,38 @@ SRC_URI += "file://graphic-standard-vsync-log-spam.patch;patchdir=${S}/foundatio
 
 SRC_URI += "file://appspawn-procps.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://base_startup_appspawn_standard-disable-longProcName-resetting.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://appspawn-sd-notify.patch;patchdir=${S}/base/startup/appspawn_standard"
+SRC_URI += "file://appspawn-socket-path.patch;patchdir=${S}/base/startup/appspawn_standard"
 SRC_URI += "file://test_xts_acts-Align-tests-list-with-mandatory-set.patch;patchdir=${S}/test/xts/acts"
 
 SRC_URI += "file://init_lite-silence-GetControlFromEnv-spam.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service_standalone.patch;patchdir=${S}/base/startup/init_lite"
+SRC_URI += "file://param_service-sd-notify.patch;patchdir=${S}/base/startup/init_lite"
+SRC_URI += "file://param-paths.patch;patchdir=${S}/base/startup/init_lite"
+SRC_URI += "file://init_lite-log-to-stderr.patch;patchdir=${S}/base/startup/init_lite"
 SRC_URI += "file://param_service-Add-to-startup-l2-part.patch;patchdir=${S}/base/startup/appspawn_standard"
 
+SRC_URI += "file://samgr-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/samgr"
+SRC_URI += "file://safwk-sd-notify.patch;patchdir=${S}/foundation/distributedschedule/safwk"
+SRC_URI += "file://installs-sd-notify.patch;patchdir=${S}/foundation/appexecfwk/standard"
+SRC_URI += "file://deviceauth-sd-notify.patch;patchdir=${S}/base/security/deviceauth"
+
 SRC_URI += "file://base_hiviewdfx_hiview-libfaultlogger-static.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://faultloggerd-socket-path.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
+SRC_URI += "file://faultloggerd-sd-notify.patch;patchdir=${S}/base/hiviewdfx/faultloggerd"
+
+SRC_URI += "file://hiview-sd-notify.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://hiview-socket-path.patch;patchdir=${S}/base/hiviewdfx/hiview"
+SRC_URI += "file://hisysevent-socket-path.patch;patchdir=${S}/base/hiviewdfx/hisysevent"
 
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
-SRC_URI += "file://test-xts-acts-testcase-timeout-increment.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://test-xts-acts-start-ability-timeout-increment.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://ace_engine-disable-create-component.patch;patchdir=${S}/foundation/ace/ace_engine"
 SRC_URI += "file://test-xts-acts-increase-testsuite-timeouts.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://actsgetwantalltest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
-SRC_URI += "file://actsfeatureabilitytest-wait-between-testcases.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdir=${S}/foundation/ace/ace_engine"
 
 inherit python3native gn_base ptest
 
@@ -195,6 +213,10 @@ symlink_python3() {
     ln -sf $(which python3) ${STAGING_BINDIR_NATIVE}/python
 }
 
+SRC_URI += "file://start_service file://stop_service"
+SRC_URI += "file://param"
+SRC_URI += "file://ohos.para"
+
 do_install () {
     OHOS_PACKAGE_OUT_DIR="${B}/packages/${OHOS_PRODUCT_PLATFORM_TYPE}"
 
@@ -223,6 +245,8 @@ do_install () {
     mkdir -p ${D}${sysconfdir}/openharmony
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
     ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
+    # Overwrite the OpenHarmony provideded parameter file
+    install -m 0644 -t ${D}${sysconfdir}/openharmony ${WORKDIR}/ohos.para
 
     # OpenHarmony font files
     mkdir -p ${D}${datadir}/fonts/openharmony
@@ -232,6 +256,16 @@ do_install () {
     # Avoid file-conflict on /usr/bin/udevadm with //third_party/eudev and udev
     # recipe
     rm ${D}${bindir}/udevadm
+
+    # Wrapper scripts for systemctl, which is at least used by ACTS
+    mkdir -p ${D}${sbindir}
+    install -t ${D}${sbindir} -m 0755 \
+            ${WORKDIR}/start_service \
+            ${WORKDIR}/stop_service
+
+    # Wrapper script for setparam/getparam, used by hdc (3.1 version)
+    install -t ${D}${sbindir} -m 0755 \
+            ${WORKDIR}/param
 }
 
 PACKAGES =+ "${PN}-configs ${PN}-fonts"
@@ -406,6 +440,18 @@ copy_subsystem_config_json_file() {
 inherit systemd
 SYSTEMD_AUTO_ENABLE = "enable"
 
+SRC_URI += "file://40-binder.rules"
+SRC_URI += "file://40-ashmem.rules"
+SRC_URI += "file://40-drm.rules"
+do_install_udev_rules() {
+    mkdir -p ${D}${nonarch_base_libdir}/udev/rules.d
+    install -m 644 -t ${D}${nonarch_base_libdir}/udev/rules.d \
+            ${WORKDIR}/40-binder.rules \
+            ${WORKDIR}/40-ashmem.rules \
+            ${WORKDIR}/40-drm.rules
+}
+do_install[postfuncs] += "do_install_udev_rules"
+
 # OpenHarmony pre-init package and its systemd service
 # Used to create folders needed by OH services and components
 PACKAGES =+ "${PN}-openharmony-preinit"
@@ -448,11 +494,14 @@ RDEPENDS:${PN}-ptest += "${PN}-libutils-ptest"
 # //base/hiviewdfx/hilog component
 PACKAGES =+ "${PN}-hilog"
 SYSTEMD_PACKAGES += "${PN}-hilog"
-SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service"
-SRC_URI += "file://hilogd.service"
+SYSTEMD_SERVICE:${PN}-hilog = "hilogd.service hilogd-input.socket hilogd-control.socket"
+SRC_URI += "file://hilogd.service file://hilogd-input.socket file://hilogd-control.socket"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
-    install -m 644 ${WORKDIR}/hilogd.service ${D}${systemd_unitdir}/system/
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/hilogd.service \
+            ${WORKDIR}/hilogd-input.socket \
+            ${WORKDIR}/hilogd-control.socket
     rm -f ${D}${sysconfdir}/openharmony/init/hilogd.cfg
     install -d ${D}${sysconfdir}/sysctl.d
     echo "net.unix.max_dgram_qlen=600" > ${D}${sysconfdir}/sysctl.d/hilogd.conf
@@ -461,9 +510,8 @@ FILES:${PN}-hilog = " \
     ${bindir}/hilog* \
     ${libdir}/libhilog*${SOLIBS} \
     ${sysconfdir}/openharmony/hilog*.conf \
-    ${systemd_unitdir}/hilogd.service \
 "
-RDEPENDS:${PN}-hilog += "musl libcxx"
+RDEPENDS:${PN}-hilog += "musl libcxx libsystemd"
 RDEPENDS:${PN}-hilog += "${PN}-libutilsecurec"
 RDEPENDS:${PN} += "${PN}-hilog"
 
@@ -492,9 +540,8 @@ do_install:append() {
 FILES:${PN}-appspawn = " \
     ${bindir}/appspawn \
     ${libdir}/libappspawn*${SOLIBS} \
-    ${systemd_unitdir}/appspawnd.service \
 "
-RDEPENDS:${PN}-appspawn += "musl libcxx"
+RDEPENDS:${PN}-appspawn += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appspawn += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN} += "${PN}-appspawn"
 
@@ -510,7 +557,7 @@ do_install_ptest:append() {
 }
 FILES:${PN}-appspawn-ptest = "${libdir}/${BPN}-appspawn/ptest"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-appspawn"
-RDEPENDS:${PN}-appspawn-ptest += "musl libcxx"
+RDEPENDS:${PN}-appspawn-ptest += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appspawn-ptest += "${PN}-libutils ${PN}-hilog ${PN}-appexecfwk"
 RDEPENDS:${PN}-ptest += "${PN}-appspawn-ptest"
 
@@ -542,7 +589,7 @@ FILES:${PN}-appexecfwk = "\
     ${libdir}/module/libnapi_app_mgr*${SOLIBS} \
     ${libdir}/openharmony/profile/foundation.xml \
 "
-RDEPENDS:${PN}-appexecfwk += "musl libcxx"
+RDEPENDS:${PN}-appexecfwk += "musl libcxx libsystemd"
 RDEPENDS:${PN}-appexecfwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc ${PN}-appverify ${PN}-distributeddatamgr ${PN}-notification-ces"
 RDEPENDS:${PN}-appexecfwk += "${PN}-security-permission ${PN}-appspawn ${PN}-safwk ${PN}-timeservice ${PN}-powermgr ${PN}-dmsfwk ${PN}-resmgr"
 RDEPENDS:${PN}-appexecfwk += "${PN}-aafwk ${PN}-ace-napi"
@@ -764,7 +811,6 @@ FILES:${PN}-samgr = " \
     ${bindir}/samgr \
     ${libdir}/libsamgr*${SOLIBS} \
     ${libdir}/liblsamgr*${SOLIBS} \
-    ${systemd_unitdir}/samgr.service \
 "
 SYSTEMD_PACKAGES += "${PN}-samgr"
 SYSTEMD_SERVICE:${PN}-samgr = "samgr.service"
@@ -774,7 +820,7 @@ do_install:append() {
     install -m 644 ${WORKDIR}/samgr.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/samgr_standard.cfg
 }
-RDEPENDS:${PN}-samgr += "musl libcxx"
+RDEPENDS:${PN}-samgr += "musl libcxx libsystemd"
 RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-samgr"
 
@@ -800,7 +846,7 @@ FILES:${PN}-safwk = "\
     ${bindir}/sa_main \
     ${libdir}/libsystem_ability_fwk*${SOLIBS} \
 "
-RDEPENDS:${PN}-safwk += "musl libcxx"
+RDEPENDS:${PN}-safwk += "musl libcxx libsystemd"
 RDEPENDS:${PN}-safwk += "${PN}-libutils ${PN}-hilog ${PN}-samgr ${PN}-ipc"
 RDEPENDS:${PN}-safwk += "${PN}-thirdparty-libxml2"
 RDEPENDS:${PN} += "${PN}-safwk"
@@ -1043,7 +1089,7 @@ FILES:${PN}-security-deviceauth = " \
     ${bindir}/deviceauth_service \
     ${libdir}/libdeviceauth*${SOLIBS} \
 "
-RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto"
+RDEPENDS:${PN}-security-deviceauth += "musl libcxx libcrypto libsystemd"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-samgr"
 RDEPENDS:${PN}-security-deviceauth += "${PN}-security-huks ${PN}-syspara ${PN}-dsoftbus"
 RDEPENDS:${PN} += "${PN}-security-deviceauth"
@@ -1062,6 +1108,15 @@ RDEPENDS:${PN}-ptest += "${PN}-security-deviceauth-ptest"
 
 # //foundation/multimodalinput/input
 PACKAGES =+ "${PN}-multimodalinput"
+SYSTEMD_PACKAGES += "${PN}-multimodalinput"
+SYSTEMD_SERVICE:${PN}-multimodalinput = "multimodalinput.service mmi-uinput.service"
+SRC_URI += "file://multimodalinput.service file://mmi-uinput.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/multimodalinput.service \
+            ${WORKDIR}/mmi-uinput.service
+}
 FILES:${PN}-multimodalinput = " \
     ${bindir}/uinput_inject \
     ${libdir}/libmmi_*${SOLIBS} \
@@ -1334,7 +1389,6 @@ FILES:${PN}-graphic = " \
     ${libdir}/module/libdisplay*${SOLIBS} \
     ${libdir}/module/libwindow*${SOLIBS} \
     ${bindir}/bootanimation \
-    ${systemd_unitdir}/weston.service \
 "
 SYSTEMD_PACKAGES += "${PN}-graphic"
 SYSTEMD_SERVICE:${PN}-graphic = "weston.service"
@@ -1599,7 +1653,7 @@ FILES:${PN}-faultlogger = " \
     ${libdir}/libfaultloggerd*${SOLIBS} \
     ${libdir}/libdfx_signalhandler*${SOLIBS} \
 "
-RDEPENDS:${PN}-faultlogger += "musl libcxx"
+RDEPENDS:${PN}-faultlogger += "musl libcxx libsystemd"
 RDEPENDS:${PN}-faultlogger += "${PN}-libutils ${PN}-hilog"
 RDEPENDS:${PN} += "${PN}-faultlogger"
 
@@ -1630,11 +1684,20 @@ RDEPENDS:${PN} += "${PN}-thirdparty-ejdb"
 
 # //base/hiviewdfx/hiview
 PACKAGES =+ "${PN}-hiview"
+SYSTEMD_PACKAGES += "${PN}-hiview"
+SYSTEMD_SERVICE:${PN}-hiview = "hiview.service"
+SRC_URI += "file://hiview.service"
+do_install:append() {
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 -t ${D}${systemd_unitdir}/system/ \
+            ${WORKDIR}/hiview.service
+    rm -f ${D}${sysconfdir}/openharmony/init/hiview.cfg
+}
 FILES:${PN}-hiview = " \
     ${bindir}/hiview \
     ${libdir}/libhiviewbase*${SOLIBS} \
 "
-RDEPENDS:${PN}-hiview += "musl libcxx"
+RDEPENDS:${PN}-hiview += "musl libcxx libsystemd"
 RDEPENDS:${PN}-hiview += " \
     ${PN}-libutils \
     ${PN}-hilog \
@@ -1770,7 +1833,6 @@ RDEPENDS:${PN}-ptest += "${PN}-distributedhardware-devicemanager-ptest"
 PACKAGES =+ "${PN}-hdc"
 FILES:${PN}-hdc = " \
     ${bindir}/hdcd \
-    ${systemd_unitdir}/hdcd.service \
 "
 SYSTEMD_PACKAGES += "${PN}-hdc"
 SYSTEMD_SERVICE:${PN}-hdc = "hdcd.service"
@@ -1796,7 +1858,7 @@ FILES:${PN}-param-service = " \
     ${bindir}/setparam \
     ${bindir}/param_service \
 "
-RDEPENDS:${PN}-param-service += "musl libcxx"
+RDEPENDS:${PN}-param-service += "musl libcxx libsystemd"
 RDEPENDS:${PN} += "${PN}-param-service"
 
 # Third Party Components (//third_party/*)
@@ -2010,6 +2072,12 @@ inherit useradd
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-u 1000 -U -s /bin/sh system"
+USERADD_PARAM:${PN}:append = ";-u 1007 -U -s /bin/false log"
+USERADD_PARAM:${PN}:append = ";-u 1023 -U -s /bin/false media_rw"
+USERADD_PARAM:${PN}:append = ";-u 1036 -U -s /bin/false logd"
+USERADD_PARAM:${PN}:append = ";-u 2000 -U -s /bin/false shell"
+USERADD_PARAM:${PN}:append = ";-u 3009 -U -s /bin/false readproc"
+USERADD_PARAM:${PN}:append = ";-u 3011 -U -s /bin/false uhid"
 
 # system haps
 PACKAGES =+ "${PN}-systemhaps"

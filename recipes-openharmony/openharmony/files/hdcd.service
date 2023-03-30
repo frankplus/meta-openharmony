@@ -1,10 +1,13 @@
 [Unit]
 Description=OpenHarmony Device Connector Daemon service
+Wants=hdcd.socket
+After=hdcd.socket
+Wants=param.service
+After=param.service
 
 [Service]
-Type=oneshot
-ExecStart=/bin/echo "OpenHarmony Device Connector Daemon Service"
-RemainAfterExit=yes
+Type=exec
+ExecStart=/usr/bin/hdcd -t -l 3
 
 [Install]
 WantedBy=multi-user.target

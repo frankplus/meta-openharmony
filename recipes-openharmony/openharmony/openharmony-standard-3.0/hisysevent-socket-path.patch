@@ -1,0 +1,17 @@
+diff --git a/interfaces/native/innerkits/hisysevent.cpp b/interfaces/native/innerkits/hisysevent.cpp
+index 473e84241605..2309158193fe 100644
+--- a/interfaces/native/innerkits/hisysevent.cpp
++++ b/interfaces/native/innerkits/hisysevent.cpp
+@@ -49,11 +49,7 @@ static constexpr unsigned int MAX_PARAM_NUMBER = 128;
+ static constexpr unsigned int MAX_STRING_LENGTH = 256 * 1024;
+ static constexpr unsigned int MAX_JSON_SIZE = 384 * 1024;
+ 
+-#ifdef USE_MUSL
+-static constexpr char SOCKET_FILE_DIR[] = "/dev/unix/socket/hisysevent";
+-#else
+-static constexpr char SOCKET_FILE_DIR[] = "/dev/socket/hisysevent";
+-#endif
++static constexpr char SOCKET_FILE_DIR[] = "/run/openharmony/hiview/hisysevent";
+ 
+ static constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002D08, "HISYSEVENT" };
+ 

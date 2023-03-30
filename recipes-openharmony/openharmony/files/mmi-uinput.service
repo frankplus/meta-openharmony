@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenHarmony multimodalinput service (SA: ?)
+Requires=samgr.service
+After=samgr.service
+Wants=hilogd.service
+After=hilogd.service
+
+[Service]
+Type=exec
+User=root
+Group=system
+SupplementaryGroups=shell uhid
+LimitNICE=40
+ExecStart=/usr/bin/uinput_inject
+
+[Install]
+WantedBy=multi-user.target

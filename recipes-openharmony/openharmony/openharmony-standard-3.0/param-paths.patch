@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/init_lite of OpenHarmony 3.0 codebase
+
+Configure param service and getparam/setparam commands to place files and pipes
+in /run instead of /dev (where they obviously does not belong).
+
+Having a dedicated directory for this makes it easier to handle permissions in a
+safe way.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/services/param/include/param_manager.h b/services/param/include/param_manager.h
+index ad605b0c2741..7edad26d777a 100644
+--- a/services/param/include/param_manager.h
++++ b/services/param/include/param_manager.h
+@@ -43,17 +43,10 @@ typedef enum {
+ 
+ #define LABEL_STRING_LEN 128
+ 
+-#ifdef STARTUP_LOCAL
+-#define PIPE_NAME "/tmp/paramservice"
+-#define PARAM_STORAGE_PATH "/media/sf_ubuntu/test/__parameters__/param_storage"
+-#define PARAM_PERSIST_PATH "/media/sf_ubuntu/test/param/persist_parameters"
+-#define PARAM_INFO_PATH "/media/sf_ubuntu/test/__parameters__/param_info"
+-#else
+-#define PIPE_NAME "/dev/unix/socket/paramservice"
+-#define PARAM_STORAGE_PATH "/dev/__parameters__/param_storage"
++#define PIPE_NAME "/run/openharmony/param/pipe"
++#define PARAM_STORAGE_PATH "/run/openharmony/param/storage"
+ #define PARAM_PERSIST_PATH "/data/param/persist_parameters"
+-#define PARAM_INFO_PATH "/dev/__parameters__/param_info"
+-#endif
++#define PARAM_INFO_PATH "/run/openharmony/param/info"
+ 
+ #define SUBSTR_INFO_NAME  0
+ #define SUBSTR_INFO_LABEL 1

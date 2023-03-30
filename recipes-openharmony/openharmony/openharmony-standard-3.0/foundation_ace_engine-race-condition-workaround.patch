@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Apply to foundation/ace/ace_engine repository of OpenHarmony 3.0.1 codebase.
+
+When starting up abilities, there is a race condition between OnSurfaceChanged
+and RunPage, which both are executed as PostTask on the same task executor. This
+executor works in FIFO mode, and if (when) the OnSurfaceChanged comes first, it
+will fail with a nullptr check on runningPage_. This is because the runningPage_
+variable is set by the RunPage PostTask.
+
+This patch is obviously just a workaround, and not a proper fix.  Hopefully, 500
+ms will be enough in all relevant situations, but at least in theory, the
+problem can still appear.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Invalid [workaround]
+
+diff --git a/adapter/ohos/cpp/ace_container.cpp b/adapter/ohos/cpp/ace_container.cpp
+index 9dea6db1e527..ac3e280eacb5 100644
+--- a/adapter/ohos/cpp/ace_container.cpp
++++ b/adapter/ohos/cpp/ace_container.cpp
+@@ -348,8 +366,12 @@ void AceContainer::InitializeCallback()
+ 
+     auto&& viewChangeCallback = [context = pipelineContext_](int32_t width, int32_t height) {
+         ACE_SCOPED_TRACE("ViewChangeCallback(%d, %d)", width, height);
+-        context->GetTaskExecutor()->PostTask(
+-            [context, width, height]() { context->OnSurfaceChanged(width, height); }, TaskExecutor::TaskType::UI);
++        LOGI("context->OnSurfaceChanged [PostTask]");
++        // This has been observed racing with QjsEngineInstance::FireJsEvent(),
++        // so we delay this slightly as a kind of workaround...
++        LOGI("Scheduling OnSurfaceChanged to be run in 500 ms to workaround race condition with RunPage");
++        context->GetTaskExecutor()->PostDelayedTask(
++            [context, width, height]() { context->OnSurfaceChanged(width, height); }, TaskExecutor::TaskType::UI, 500);
+     };
+     aceView_->RegisterViewChangeCallback(viewChangeCallback);
+ 

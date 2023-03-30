@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/appspawn_standard of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to appspawn service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/BUILD.gn b/BUILD.gn
+index cc3a1e8ce045..d20845e644b4 100755
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -64,6 +64,7 @@ ohos_shared_library("appspawn_server") {
+     "hiviewdfx_hilog_native:libhilog",
+     "ipc:ipc_core",
+   ]
++  libs = [ "systemd" ]
+ 
+   subsystem_name = "${subsystem_name}"
+   part_name = "${part_name}"
+diff --git a/src/appspawn_server.cpp b/src/appspawn_server.cpp
+index 2c8e7d11f11c..5e2addf99909 100644
+--- a/src/appspawn_server.cpp
++++ b/src/appspawn_server.cpp
+@@ -23,6 +23,8 @@
+ #include <sys/capability.h>
+ #include <thread>
+ 
++#include <systemd/sd-daemon.h>
++
+ #include "errors.h"
+ #include "hilog/log.h"
+ #include "main_thread.h"
+@@ -181,6 +183,7 @@ bool AppSpawnServer::ServerMain(char *longProcName, int64_t longProcNameLen)
+ 
+     LoadAceLib();
+ 
++    sd_notify(0, "READY=1");
+     while (isRunning_) {
+         std::unique_lock<std::mutex> lock(mut_);
+         dataCond_.wait(lock, [this] { return !this->appQueue_.empty(); });
+@@ -224,6 +227,7 @@ bool AppSpawnServer::ServerMain(char *longProcName, int64_t longProcNameLen)
+         socket_->CloseConnection(connectFd);                          // close socket connection
+         HiLog::Debug(LABEL, "AppSpawnServer::parent process create app finish, pid = %{public}d", pid);
+     }
++    sd_notify(0, "STOPPING=1");
+     return false;
+ }
+ 
+diff --git a/test/unittest/app_spawn_server_test/BUILD.gn b/test/unittest/app_spawn_server_test/BUILD.gn
+index 4ac518e25e6d..f649724656ab 100755
+--- a/test/unittest/app_spawn_server_test/BUILD.gn
++++ b/test/unittest/app_spawn_server_test/BUILD.gn
+@@ -32,6 +32,7 @@ ohos_unittest("AppSpawnServerOverrideTest") {
+   ]
+ 
+   deps = [ "${appspawn_path}/test:appspawn_test_source" ]
++  libs = [ "systemd" ]
+ 
+   external_deps = [
+     "hiviewdfx_hilog_native:libhilog",
+@@ -57,6 +58,7 @@ ohos_unittest("AppSpawnServerMockTest") {
+   ]
+ 
+   deps = [ "${appspawn_path}/test:appspawn_test_source" ]
++  libs = [ "systemd" ]
+ 
+   external_deps = [
+     "hiviewdfx_hilog_native:libhilog",

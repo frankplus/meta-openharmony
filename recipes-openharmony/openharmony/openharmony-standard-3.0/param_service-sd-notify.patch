@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch for //base/startup/init_lite of OpenHarmony 3.0 codebase
+
+This adds sd_notify(3) ready notification to param_service for better
+integration with systemd.
+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Upstream-Status: Pending
+
+diff --git a/services/param/BUILD.gn b/services/param/BUILD.gn
+index 07e1d2784915..d8a8110f0ec6 100644
+--- a/services/param/BUILD.gn
++++ b/services/param/BUILD.gn
+@@ -38,6 +38,7 @@ ohos_static_library("paramservice") {
+     "//third_party/bounds_checking_function:libsec_static",
+     "//third_party/libuv:uv_static",
+   ]
++  libs = [ "systemd" ]
+   part_name = "init"
+   subsystem_name = "startup"
+ }
+diff --git a/services/param/service/param_service.c b/services/param/service/param_service.c
+index cd5d93be3ff6..1b5bb213d257 100644
+--- a/services/param/service/param_service.c
++++ b/services/param/service/param_service.c
+@@ -20,6 +20,8 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
++#include <systemd/sd-daemon.h>
++
+ #include "init_param.h"
+ #include "init_utils.h"
+ #include "param_manager.h"
+@@ -252,7 +254,9 @@ int StartParamService()
+     PARAM_CHECK(ret == 0, return ret, "Failed to chmod %s, err %d. ", PIPE_NAME, errno);
+     ret = uv_listen((uv_stream_t*)&pipeServer, SOMAXCONN, OnConnection);
+     PARAM_CHECK(ret == 0, return ret, "Failed to uv_listen %d %s", ret, uv_err_name(ret));
++    sd_notify(0, "READY=1");
+     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
++    sd_notify(0, "STOPPING=1");
+     PARAM_LOGI("Start service exit.");
+     return 0;
+ }

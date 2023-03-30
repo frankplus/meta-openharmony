@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenHarmony hilog input socket
+
+[Socket]
+ExecStartPre=install -o logd -g logd -m 775 -d /run/openharmony/hilog
+ListenDatagram=/run/openharmony/hilog/input
+SocketUser=logd
+SocketGroup=logd
+SocketMode=0666
+Service=hilogd.service

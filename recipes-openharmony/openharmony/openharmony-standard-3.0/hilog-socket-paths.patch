@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Configure hilogd daemon and hilog command to place Unix sockets in
+/run/openharmony/hilog instead of /dev/unix/socket, thus making it easier to
+handle permissions, and allow doing it in a way that is more safe.
+
+The /run/hilog can be created with permissions so that only hilogd can create
+new files in there, which obviously is not possible with a /dev/unix/socket dir
+shared with other daemons (running with different uid/gid).
+
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/frameworks/native/include/hilog_common.h b/frameworks/native/include/hilog_common.h
+index e6e365f0c888..7bf1ec70d325 100644
+--- a/frameworks/native/include/hilog_common.h
++++ b/frameworks/native/include/hilog_common.h
+@@ -18,14 +18,10 @@
+ 
+ #include <cstdint>
+ 
+-#ifdef HILOG_USE_MUSL
+-#define SOCKET_FILE_DIR "/dev/unix/socket/"
+-#else
+-#define SOCKET_FILE_DIR "/dev/socket/"
+-#endif
+-#define INPUT_SOCKET_NAME "hilogInput"
++#define SOCKET_FILE_DIR "/run/openharmony/hilog/"
++#define INPUT_SOCKET_NAME "input"
+ #define INPUT_SOCKET SOCKET_FILE_DIR INPUT_SOCKET_NAME
+-#define CONTROL_SOCKET_NAME "hilogControl"
++#define CONTROL_SOCKET_NAME "control"
+ #define CONTROL_SOCKET SOCKET_FILE_DIR CONTROL_SOCKET_NAME
+ #define HILOG_FILE_DIR "/data/log/hilog/"
+ 
