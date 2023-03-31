@@ -1351,6 +1351,8 @@ SYSTEMD_PACKAGES += "${PN}-inputmethod"
 SYSTEMD_SERVICE:${PN}-inputmethod = "inputmethod.service"
 SRC_URI += "file://inputmethod.service"
 do_install:append() {
+    install -d ${D}${datadir}/libinput
+    install -m 644 ${S}/third_party/libinput/quirks/* ${D}${datadir}/libinput
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/inputmethod.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/inputmethodservice.cfg
@@ -1359,6 +1361,7 @@ FILES:${PN}-inputmethod = " \
     ${libdir}/libinputmethod_*${SOLIBS} \
     ${libdir}/module/libinputmethodengine*${SOLIBS} \
     ${libdir}/openharmony/profile/inputmethod_service.xml \
+    ${datadir}/libinput \
 "
 RDEPENDS:${PN}-inputmethod += "musl libcxx"
 RDEPENDS:${PN}-inputmethod += "${PN}-resmgr ${PN}-ipc ${PN}-samgr ${PN}-libutils ${PN}-hilog"
