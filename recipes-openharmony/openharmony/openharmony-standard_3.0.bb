@@ -819,6 +819,7 @@ do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/samgr.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/samgr_standard.cfg
+    rm -f ${D}${sysconfdir}/openharmony/init/samgr_L2.cfg
 }
 RDEPENDS:${PN}-samgr += "musl libcxx libsystemd"
 RDEPENDS:${PN}-samgr += "${PN}-hilog ${PN}-ipc ${PN}-libutils ${PN}-thirdparty-libxml2"
