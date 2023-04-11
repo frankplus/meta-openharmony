@@ -6,6 +6,9 @@ Requires=samgr.service
 Type=exec
 # should run as system:system
 ExecStart=/usr/bin/sa_main /system/profile/token_sync_service.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

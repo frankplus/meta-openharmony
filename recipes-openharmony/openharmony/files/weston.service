@@ -15,6 +15,7 @@ Environment="XDG_RUNTIME_DIR=/data/weston"
 Environment="XKB_CONFIG_ROOT=/etc/openharmony/xkb"
 Environment="XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb"
 ExecStart=/usr/bin/weston -c /system/etc/weston.ini -B drm-backend.so --tty=1 --use-pixman
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

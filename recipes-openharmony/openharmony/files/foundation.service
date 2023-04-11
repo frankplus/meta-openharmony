@@ -29,6 +29,9 @@ Group=system
 CapabilityBoundingSet=CAP_SYS_PTRACE CAP_KILL
 LimitNICE=40
 ExecStart=/usr/bin/sa_main /system/profile/foundation.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

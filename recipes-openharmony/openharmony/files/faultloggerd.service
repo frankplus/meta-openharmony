@@ -11,6 +11,9 @@ User=root
 Group=system
 SupplementaryGroups=log
 ExecStart=/usr/bin/faultloggerd
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

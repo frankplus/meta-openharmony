@@ -19,6 +19,9 @@ Group=system
 SupplementaryGroups=shell
 LimitNICE=40
 ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target
