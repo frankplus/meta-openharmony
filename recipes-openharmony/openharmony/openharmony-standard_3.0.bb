@@ -97,6 +97,7 @@ SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.pat
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
+SRC_URI += "file://ace_engine-disable-create-component.patch;patchdir=${S}/foundation/ace/ace_engine"
 SRC_URI += "file://test-xts-acts-increase-testsuite-timeouts.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdir=${S}/foundation/ace/ace_engine"
 
