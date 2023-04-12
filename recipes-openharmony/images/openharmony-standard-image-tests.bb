@@ -22,7 +22,8 @@ QEMU_USE_SLIRP = "1"
 EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
 # ptest requires ptest-runner and sshd to be present in the image
-IMAGE_INSTALL += "sshd ptest-runner"
+EXTRA_IMAGE_FEATURES += "ssh-server-dropbear"
+IMAGE_INSTALL += "ptest-runner"
 
 # install OpenHarmony components and ptests
 IMAGE_INSTALL += "openharmony-standard-ptest"
