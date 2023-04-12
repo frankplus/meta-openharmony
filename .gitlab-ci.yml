@@ -388,6 +388,7 @@ ptest:
       DISTRO: oniro-openharmony-linux
       OPENHARMONY_VERSION: "3.0"
       RECIPE: openharmony-standard-image-tests
+      TAP_ADDR: 192.168.7.1/30
   parallel:
     matrix:
       - MACHINE: [qemuarma7]

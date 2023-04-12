@@ -13,13 +13,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 # ping and ssh are the minimum required test suites dependencies of ptest
 TEST_SUITES = "ping ssh ptest"
 
-# slirp provides networking without the need for sudo to setup TUN/TAP
-TEST_QEMUBOOT_TIMEOUT = "300"
-TEST_SERVER_IP = "127.0.0.1"
-QEMU_USE_SLIRP = "1"
-
-# although not accessible when using slirp, this at least makes target see
-# working graphics devices
+# make target see working graphics device
 TEST_RUNQEMUPARAMS = "publicvnc"
 
 # debug-tweaks provides password-less root account required by testimage
