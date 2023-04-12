@@ -18,6 +18,10 @@ TEST_QEMUBOOT_TIMEOUT = "300"
 TEST_SERVER_IP = "127.0.0.1"
 QEMU_USE_SLIRP = "1"
 
+# although not accessible when using slirp, this at least makes target see
+# working graphics devices
+TEST_RUNQEMUPARAMS = "publicvnc"
+
 # debug-tweaks provides password-less root account required by testimage
 EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
