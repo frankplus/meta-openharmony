@@ -25,3 +25,13 @@ IMAGE_INSTALL += "ptest-runner"
 
 # install OpenHarmony components and ptests
 IMAGE_INSTALL += "openharmony-standard-ptest"
+
+# Pre-generate SSH host keys for quick first time SSH connection
+ROOTFS_POSTPROCESS_COMMAND += "ssh_host_key_gen;"
+SSH_HOST_KEY_TYPES="rsa ecdsa ed25519"
+ssh_host_key_gen() {
+    mkdir -p "${IMAGE_ROOTFS}${sysconfdir}/ssh/"
+    for type in ${SSH_HOST_KEY_TYPES} ; do
+        ssh-keygen -f "${IMAGE_ROOTFS}${sysconfdir}/ssh/ssh_host_"$type"_key" -N '' -t $type
+    done
+}
