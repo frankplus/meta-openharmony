@@ -118,3 +118,7 @@ MIRRORS:prepend = "git://gitee.com/openharmony/ git://github.com/openharmony/ \n
 #OPENHARMONY_VERSION = "3.1"
 
 USER_CLASSES += "buildstats buildstats-summary"
+
+# Uncomment if would like to use the Waveshare "C" 1024×600, 7 inch Capacitive 
+# Touch Screen LCD
+# WAVESHARE_1024X600_C_2_1 = "1"
