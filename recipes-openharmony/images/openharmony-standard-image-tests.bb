@@ -13,16 +13,25 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 # ping and ssh are the minimum required test suites dependencies of ptest
 TEST_SUITES = "ping ssh ptest"
 
-# slirp provides networking without the need for sudo to setup TUN/TAP
-TEST_QEMUBOOT_TIMEOUT = "300"
-TEST_SERVER_IP = "127.0.0.1"
-QEMU_USE_SLIRP = "1"
+# make target see working graphics device
+TEST_RUNQEMUPARAMS = "publicvnc"
 
 # debug-tweaks provides password-less root account required by testimage
 EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
 # ptest requires ptest-runner and sshd to be present in the image
-IMAGE_INSTALL += "sshd ptest-runner"
+EXTRA_IMAGE_FEATURES += "ssh-server-dropbear"
+IMAGE_INSTALL += "ptest-runner"
 
 # install OpenHarmony components and ptests
 IMAGE_INSTALL += "openharmony-standard-ptest"
+
+# Pre-generate SSH host keys for quick first time SSH connection
+ROOTFS_POSTPROCESS_COMMAND += "ssh_host_key_gen;"
+SSH_HOST_KEY_TYPES="rsa ecdsa ed25519"
+ssh_host_key_gen() {
+    mkdir -p "${IMAGE_ROOTFS}${sysconfdir}/ssh/"
+    for type in ${SSH_HOST_KEY_TYPES} ; do
+        ssh-keygen -f "${IMAGE_ROOTFS}${sysconfdir}/ssh/ssh_host_"$type"_key" -N '' -t $type
+    done
+}
