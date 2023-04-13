@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+
+appdatamgr/IsColumnNull: initialize result value
+
+testIsColumnNull0003 ACTS testcase sometimes fail because the
+result value of IsColumnNull is unpredictable when an error is returned.
+This is because AbsSharedResultSet::IsColumnNull does not set any
+value to &isNull when there is an error. The result value is
+not initialized, producing an unpredictable output of IsColumnNull.
+
+Apply to foundation/distributeddatamgr/appdatamgr
+ 
+Upstream-Status: Pending 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+
+diff --git a/frameworks/jskitsimpl/native_rdb/napi_result_set.cpp b/frameworks/jskitsimpl/native_rdb/napi_result_set.cpp
+index 59dd279..000fd87 100644
+--- a/frameworks/jskitsimpl/native_rdb/napi_result_set.cpp
++++ b/frameworks/jskitsimpl/native_rdb/napi_result_set.cpp
+@@ -491,7 +491,7 @@ napi_value ResultSetProxy::IsColumnNull(napi_env env, napi_callback_info info)
+ {
+     LOG_DEBUG("IsColumnNull Begin!");
+     int32_t columnIndex;
+-    bool result;
++    bool result=true;
+     size_t argc = MAX_INPUT_COUNT;
+     napi_value args[MAX_INPUT_COUNT] = { 0 };
+     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);

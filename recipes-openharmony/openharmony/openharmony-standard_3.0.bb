@@ -94,12 +94,16 @@ SRC_URI += "file://hisysevent-socket-path.patch;patchdir=${S}/base/hiviewdfx/his
 # Patch to allow /system/profile and /system/usr to be symlinks to /usr/lib/openharmony
 SRC_URI += "file://foundation_distributedschedule_safwk-slash-system-symlink.patch;patchdir=${S}/foundation/distributedschedule/safwk"
 
+SRC_URI += "file://appdatamgr-IsColumnNull-initialize-result.patch;patchdir=${S}/foundation/distributeddatamgr/appdatamgr"
+SRC_URI += "file://InnerBundleInfo-initialize-installationFree.patch;patchdir=${S}/foundation/appexecfwk/standard"
+
 SRC_URI += "file://test-xts-acts-fix-Defpermission-typo.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-faultloggertest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://test-xts-acts-fix-hicolliecpptest.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://ace_engine-disable-create-component.patch;patchdir=${S}/foundation/ace/ace_engine"
 SRC_URI += "file://test-xts-acts-increase-testsuite-timeouts.patch;patchdir=${S}/test/xts/acts"
 SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdir=${S}/foundation/ace/ace_engine"
+SRC_URI += "file://test-xts-acts-testRdbStoreUpdate0001-await-updatePromise.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 

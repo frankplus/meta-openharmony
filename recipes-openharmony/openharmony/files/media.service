@@ -13,6 +13,9 @@ User=system
 Group=media_rw
 SupplementaryGroups=system
 LimitNICE=40
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

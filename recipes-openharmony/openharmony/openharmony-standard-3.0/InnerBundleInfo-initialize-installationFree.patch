@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+InnerModuleInfo: initialize installationFree to false
+
+uninitialized installationFree property of InnerModuleInfo causes 
+ActsBmsModuleUsageRecordTest to sometimes fail on 
+`expect(data.installationFreeSupported).assertEqual(false);`
+Initializing installationFree property to false.
+
+Apply to foundation/appexecfwk/standard
+
+Upstream-Status: Pending
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+
+diff --git a/services/bundlemgr/include/inner_bundle_info.h b/services/bundlemgr/include/inner_bundle_info.h
+index de34790d..c7e586f2 100644
+--- a/services/bundlemgr/include/inner_bundle_info.h
++++ b/services/bundlemgr/include/inner_bundle_info.h
+@@ -73,7 +73,7 @@ struct InnerModuleInfo {
+     int32_t descriptionId = 0;
+     std::string mainAbility;
+     bool isEntry;
+-    bool installationFree;
++    bool installationFree=false;
+     MetaData metaData;
+     ModuleColorMode colorMode = ModuleColorMode::AUTO;
+     Distro distro;

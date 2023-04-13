@@ -9,6 +9,9 @@ After=hilogd.service
 [Service]
 Type=notify
 ExecStart=/usr/bin/installs
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

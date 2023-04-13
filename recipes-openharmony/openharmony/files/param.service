@@ -7,6 +7,9 @@ ExecStartPre=install -m 755 -d /run/openharmony/param
 ExecStartPre=install -m 755 -d /data/param
 StandardError=journal
 ExecStart=/usr/bin/param_service
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

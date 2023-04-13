@@ -12,6 +12,9 @@ Group=system
 SupplementaryGroups=shell uhid
 LimitNICE=40
 ExecStart=/usr/bin/sa_main /system/profile/multimodalinputservice.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

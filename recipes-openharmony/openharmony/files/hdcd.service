@@ -8,6 +8,9 @@ After=param.service
 [Service]
 Type=exec
 ExecStart=/usr/bin/hdcd -t -l 3
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

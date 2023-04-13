@@ -18,6 +18,9 @@ Environment="XKB_CONFIG_EXTRA_PATH=/etc/openharmony/xkb"
 ExecStartPre=install -m 0755 -d /run/openharmony/appspawn
 LimitNICE=40
 ExecStart=/usr/bin/appspawn
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

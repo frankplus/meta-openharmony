@@ -9,7 +9,11 @@ is essential for the inner workings of the OpenHarmony graphic stack, therefore
 adding a hack that simulates this behaviour until a proper solution is
 provided.
 
+Apply hack also when DRM_IOCTL_WAIT_VBLANK fails for other reasons and returns
+EINVAL (e.g. on Rpi4 with VC4 drm drivers).
+
 Signed-off-by: Esben Haabendal <esben@geanix.com>
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
 Upstream-Status: Pending
 
 diff --git a/xf86drm.c b/xf86drm.c
@@ -20,7 +24,7 @@ index b49d42f70dbe..ab8bb563c344 100644
                     break;
             }
         }
-+       else if (ret && errno == ENOTSUP) {
++       else if (ret && (errno == ENOTSUP || errno == EINVAL)) {
 +           /* Simulate VBLANK @ 60Hz when DRM driver does not support VBLANK */
 +           long delay_us;
 +           clock_gettime(CLOCK_MONOTONIC, &cur);

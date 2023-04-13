@@ -8,6 +8,9 @@ Type=exec
 ExecStartPre=install -m 755 -d /data/service/e10/access_token
 # should run as system:system
 ExecStart=/usr/bin/sa_main /system/profile/accesstoken_service.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

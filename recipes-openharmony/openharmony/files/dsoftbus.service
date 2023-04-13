@@ -11,6 +11,8 @@ Wants=foundation.service
 Wants=huks.service
 # Requires SA: 4701
 Wants=deviceauth.service
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=notify
@@ -19,6 +21,9 @@ Group=system
 SupplementaryGroups=shell
 LimitNICE=40
 ExecStart=/usr/bin/sa_main /system/profile/softbus_server.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

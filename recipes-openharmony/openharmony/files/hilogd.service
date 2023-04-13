@@ -11,6 +11,9 @@ User=logd
 Group=log
 ExecStart=/usr/bin/hilogd
 ExecStartPost=hilog -G 16M
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target
