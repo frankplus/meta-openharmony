@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenHarmony Wi-Fi HAL service
+
+[Service]
+Type=exec
+User=root
+Group=root
+SupplementaryGroups=shell
+ExecStart=/usr/bin/wifi_hal_service
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenHarmony Wi-Fi manager service (SA: 1125 1126 1127 1128)
+Requires=samgr.service
+After=samgr.service
+
+[Service]
+Type=notify
+ExecStartPre=!install -o root -g root -m 0755 -d /data/dhcp
+User=root
+Group=root
+SupplementaryGroups=shell
+ExecStart=/usr/bin/sa_main /system/profile/wifi_manager_service.xml
+Restart=on-failure
+StartLimitInterval=300
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
