@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 
 require sanity-check.inc
 
-TOOLCHAIN_HOST_TASK = "nativesdk-hdc nativesdk-xdevice"
+TOOLCHAIN_HOST_TASK = "nativesdk-hdc nativesdk-xdevice nativesdk-qemu nativesdk-qemu-helper"
 TOOLCHAIN_TARGET_TASK = ""
 
 TOOLCHAIN_OUTPUTNAME = "${PN}-${OPENHARMONY_VERSION}-${TUNE_PKGARCH}-${SDK_VERSION}"
