@@ -380,7 +380,6 @@ OPENHARMONY_PARTS += "global:resmgr_standard"
 OPENHARMONY_PARTS += "graphic:graphic_standard"
 OPENHARMONY_PARTS += "hdf:hdf"
 OPENHARMONY_PARTS += "hdf:display_device_driver"
-OPENHARMONY_PARTS += "hdf:wlan_device_driver"
 OPENHARMONY_PARTS += "hiviewdfx:faultloggerd"
 OPENHARMONY_PARTS += "hiviewdfx:hilog"
 OPENHARMONY_PARTS += "hiviewdfx:hilog_native"
@@ -414,7 +413,6 @@ OPENHARMONY_PARTS += "startup:startup_l2"
 OPENHARMONY_PARTS += "telephony:core_service"
 OPENHARMONY_PARTS += "telephony:ril_adapter"
 OPENHARMONY_PARTS += "utils:utils_base"
-OPENHARMONY_PARTS += "wpa_supplicant-2.9:wpa_supplicant-2.9"
 
 OPENHARMONY_PARTS += "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'xts:phone_tests', '', d)}"
 export XTS_SUITENAME = "${@bb.utils.contains('DISTRO_FEATURES', 'acts', 'acts', '', d)}"
@@ -819,14 +817,12 @@ RDEPENDS:${PN}-ptest += "${PN}-dsoftbus-ptest"
 # //foundation/communication/wifi
 PACKAGES =+ "${PN}-wifi"
 SYSTEMD_PACKAGES += "${PN}-wifi"
-SYSTEMD_SERVICE:${PN}-wifi = "wifi_standard.service wifi_hal.service"
-SRC_URI += "file://wifi_standard.service file://wifi_hal.service"
+SYSTEMD_SERVICE:${PN}-wifi = "wifi_standard.service"
+SRC_URI += "file://wifi_standard.service"
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -m 644 ${WORKDIR}/wifi_standard.service ${D}${systemd_unitdir}/system/
-    install -m 644 ${WORKDIR}/wifi_hal.service ${D}${systemd_unitdir}/system/
     rm -f ${D}${sysconfdir}/openharmony/init/wifi_standard.cfg
-    rm -f ${D}${sysconfdir}/openharmony/init/wifi_hal_service.cfg
 }
 FILES:${PN}-wifi = " \
     ${libdir}/libwifi*${SOLIBS} \
@@ -834,12 +830,10 @@ FILES:${PN}-wifi = " \
     ${bindir}/dhcp_server \
     ${bindir}/dhcp_client_service \
     ${libdir}/openharmony/profile/wifi_manager_service.xml \
-    ${bindir}/wifi_hal_service \
 "
 RDEPENDS:${PN} += "${PN}-wifi"
 RDEPENDS:${PN}-wifi += "musl libcxx"
 RDEPENDS:${PN}-wifi += "${PN}-samgr ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk"
-RDEPENDS:${PN}-wifi += "${PN}-thirdparty-wpa-supplicant"
 
 # //foundation/communication/wifi_native_js
 PACKAGES =+ "${PN}-wifi-native-js"
@@ -1226,24 +1220,6 @@ FILES:${PN}-peripheral-input = "${libdir}/libhdi_input*${SOLIBS}"
 RDEPENDS:${PN}-peripheral-input += "musl libcxx"
 RDEPENDS:${PN}-peripheral-input += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2"
 RDEPENDS:${PN} += "${PN}-peripheral-input"
-
-# //drivers/peripheral/wlan
-PACKAGES =+ "${PN}-peripheral-wlan"
-do_install:append() {
-    install -m 644 ${B}/hdf/hdf/libwifi_driver_client.z.so ${D}${libdir}/
-    install -m 644 ${B}/hdf/hdf/libwifi_hal.z.so ${D}${libdir}/
-    install -m 644 ${B}/hdf/hdf/libwifi_hdi_c_device.z.so ${D}${libdir}/
-    install -m 644 ${B}/hdf/hdf/libwifi_hdi_device.z.so ${D}${libdir}/
-}
-FILES:${PN}-peripheral-wlan = " \
-    ${libdir}/libwifi_driver_client*${SOLIBS} \
-    ${libdir}/libwifi_hal*${SOLIBS} \
-    ${libdir}/libwifi_hdi_c_device*${SOLIBS} \
-    ${libdir}/libwifi_hdi_device*${SOLIBS} \
-"
-RDEPENDS:${PN}-peripheral-wlan += "musl libcxx"
-RDEPENDS:${PN}-peripheral-wlan += "${PN}-hilog ${PN}-libutils ${PN}-uhdf2 ${PN}-ipc"
-RDEPENDS:${PN} += "${PN}-peripheral-wlan"
 
 # //base/miscservices/time
 PACKAGES =+ "${PN}-timeservice"
@@ -2099,17 +2075,6 @@ RDEPENDS:${PN}-thirdparty-weston += "musl libcxx"
 RDEPENDS:${PN}-thirdparty-weston += "${PN}-hilog ${PN}-libutils ${PN}-thirdparty-libxml2 ${PN}-thirdparty-libffi ${PN}-thirdparty-libdrm ${PN}-graphic"
 RDEPENDS:${PN}-thirdparty-weston += "${PN}-thirdparty-libinput ${PN}-thirdparty-libevdev ${PN}-thirdparty-eudev ${PN}-thirdparty-pixman ${PN}-display-gralloc"
 RDEPENDS:${PN} += "${PN}-thirdparty-weston"
-
-PACKAGES =+ "${PN}-thirdparty-wpa-supplicant"
-FILES:${PN}-thirdparty-wpa-supplicant = " \
-    ${bindir}/hostapd \
-    ${bindir}/wpa_cli \
-    ${bindir}/wpa_supplicant \
-    ${libdir}/libwpa*${SOLIBS} \
-"
-RDEPENDS:${PN}-thirdparty-wpa-supplicant += "musl libcxx"
-RDEPENDS:${PN}-thirdparty-wpa-supplicant += "${PN}-peripheral-wlan"
-RDEPENDS:${PN} += "${PN}-thirdparty-wpa-supplicant"
 
 # Disable all ptest suites that are know to not work for now. When the x-bit is
 # not set, the ptest is visible (using `ptest-runner -l`), but no test cases
