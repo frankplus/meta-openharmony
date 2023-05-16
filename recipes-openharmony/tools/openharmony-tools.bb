@@ -4,6 +4,7 @@
 
 SUMMARY = "OpenHarmony development tools"
 LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 require sanity-check.inc
 
@@ -59,6 +60,28 @@ EOF
 		echo 'echo "$BB_ENV_PASSTHROUGH_ADDITIONS" | grep -q "NO32LIBS"' >>$script
 		echo '[ $? != 0 ] && export BB_ENV_PASSTHROUGH_ADDITIONS="NO32LIBS $BB_ENV_PASSTHROUGH_ADDITIONS"' >>$script
 	fi
+}
+
+do_populate_sdk[depends] += "${DEPENDS_QEMU_IMAGES}"
+DEPENDS_QEMU_IMAGES = ""
+DEPENDS_QEMU_IMAGES:qemuarma7 += "openharmony-standard-image:do_image_complete virtual/kernel:do_deploy"
+addtask populate_sdk after do_unpack before do_build
+SRC_URI:append:qemuarma7 = " file://post-relocate-setup.sh"
+create_sdk_files:append:qemuarma7 () {
+        mkdir -p ${SDK_OUTPUT}${SDKPATH}/images/${MACHINE}
+        cp ${DEPLOY_DIR_IMAGE}/openharmony-standard-image-${MACHINE}.ext4 \
+           ${DEPLOY_DIR_IMAGE}/zImage-${MACHINE}.bin \
+           ${SDK_OUTPUT}${SDKPATH}/images/${MACHINE}/
+        cat ${DEPLOY_DIR_IMAGE}/openharmony-standard-image-${MACHINE}.qemuboot.conf | \
+            sed -e 's|^\(deploy_dir_image\) = .*|\1 = @SDKPATH@/images/${MACHINE}|' \
+                -e 's|^\(qb_default_kernel\) = .*|\1 = zImage-${MACHINE}.bin|' \
+                -e 's|^\(staging_bindir_native\) = .*|\1 = @SDKPATH@/sysroots/${SDK_SYS}/usr/bin|' \
+                -e 's|^\(staging_dir_host\) = .*|\1 = @SDKPATH@/sysroots/foobar|' \
+                -e 's|^\(staging_dir_native\) = .*|\1 = @SDKPATH@/sysroots/${SDK_SYS}|' \
+                -e 's|^\(uninative_loader\) = .*|\1 = @SDKPATH@/sysroots/${SDK_SYS}/lib/ld-linux-${SDK_ARCH}.so.2|' \
+                > ${SDK_OUTPUT}${SDKPATH}/images/${MACHINE}/openharmony-standard-image-${MACHINE}.qemuboot.conf
+        mkdir -p ${SDK_OUTPUT}${SDKPATHNATIVE}/post-relocate-setup.d
+        install -m 0755 ${WORKDIR}/post-relocate-setup.sh ${SDK_OUTPUT}${SDKPATH}/post-relocate-setup.sh
 }
 
 TOOLCHAIN_TARGET_TASK:append:df-acts = " openharmony-standard-acts"
