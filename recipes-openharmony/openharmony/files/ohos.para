@@ -14,10 +14,10 @@
 build_version = 2.0
 
 hw_sc.build.os.enable=true
-hw_sc.build.os.apiversion=6
+hw_sc.build.os.apiversion=7
 hw_sc.build.os.version=3.0.1
 hw_sc.build.os.devicetype=headless
-hw_sc.build.os.releasetype=Canary1
+hw_sc.build.os.releasetype=Release
 
 ro.actionable_compatible_property.enabled=false
 ro.postinstall.fstab.prefix=/system
