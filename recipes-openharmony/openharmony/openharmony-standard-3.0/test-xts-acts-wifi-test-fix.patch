@@ -1,0 +1,166 @@
+# SPDX-FileCopyrightText: Huawei Inc. 
+# 
+# SPDX-License-Identifier: Apache-2.0 
+ 
+test/xts/acts: fix wifi acts to wait for async callback execution 
+ 
+in multiple wifi testcases the async callback/promise are not actually executed, 
+therefore the testcases terminate before the asserts inside the callbacks are 
+checked causing the testcases to pass even when things are not actually properly 
+working. Fixing by moving the done() functions inside the callback or in the `.then(...`; 
+Remove sleeps where not necessary; 
+ 
+Apply to test/xts/acts 
+ 
+Upstream-Status: Inappropriate 
+ 
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com> 
+
+diff --git a/communication/wifi_standard/src/main/js/default/test/WifiSta.test.js b/communication/wifi_standard/src/main/js/default/test/WifiSta.test.js
+index efbb19a65c..06647eed0d 100755
+--- a/communication/wifi_standard/src/main/js/default/test/WifiSta.test.js
++++ b/communication/wifi_standard/src/main/js/default/test/WifiSta.test.js
+@@ -72,12 +72,10 @@ describe('ACTS_WifiTest', function () {
+         var active = wifi.isWifiActive();
+         if(!active){
+             var enable = wifi.enableWifi();
+-            sleep(3000);
+             console.log("[wifi_test] wifi open result: " + enable);
+             expect(enable).assertTrue();
+ 
+         }
+-        sleep(3000);
+     })
+ 
+    /**
+@@ -89,7 +87,6 @@ describe('ACTS_WifiTest', function () {
+         console.info("[wifi_test] wifi get signal level test.");
+         var result = wifi.getSignalLevel(1, 1)
+         expect(result).assertEqual(4);
+-        sleep(3000);
+     })
+ 
+    /**
+@@ -100,15 +97,14 @@ describe('ACTS_WifiTest', function () {
+     it('wifi_native_js_unit_test_005', 0, async function (done) {
+         console.info("[wifi_test] Wifi get scan infos callback test[1].");
+         var result = wifi.scan();
+-        sleep(2000);
++        sleep(3000);
+         wifi.getScanInfos(
+             (result) => {
+                 var clen = Object.keys(result).length;
+-                console.log("[wifi_test] wifi received scan info call back: " + clen);
+-                expect(result).assertLarger(0);
+-                console.info("[wifi_test] add device config callback: " + JSON.stringify(result));
++                console.log("[wifi_test] wifi received scan info length: " + clen);
++                expect(clen).assertLarger(0);
++                console.info("[wifi_test] wifi received scan info: " + JSON.stringify(result));
+                 expect(JSON.stringify(result)).assertContain('ssid');
+-                sleep(3000);
+                 for (var j = 0; j < clen; ++j) {
+                     console.info("ssid: " + result[j].ssid);
+                     console.info("bssid: " + result[j].bssid);
+@@ -118,10 +114,9 @@ describe('ACTS_WifiTest', function () {
+                     console.info("frequency: " + result[j].frequency);
+                     console.info("timestamp: " + result[j].timestamp);
+                 }
++                done();
+             });
+-            done();
+     })
+-    sleep(2000);
+ 
+    /**
+     * @tc.number     wifi_native_js_unit_test_006
+@@ -134,11 +129,10 @@ describe('ACTS_WifiTest', function () {
+             .then(result => {
+                 var clen = Object.keys(result).length;
+                 console.log("[wifi_test] wifi received scan promise result: " + clen);
+-                expect(result).assertLarger(0);
++                expect(clen).assertLarger(0);
+                 console.info("[wifi_test] test_006 promise... " + JSON.stringify(result));
+                 expect(JSON.stringify(result)).assertContain('ssid');
+ 
+-                sleep(2000);
+                 for (var j = 0; j < clen; ++j) {
+                     console.info("ssid: " + result[j].ssid);
+                     console.info("bssid: " + result[j].bssid);
+@@ -150,8 +144,8 @@ describe('ACTS_WifiTest', function () {
+                     console.info("capabilities: " + result[j].capabilities);
+                     console.info("channelWidth: " + result[j].channelWidth);
+                 }
++                done();
+             });
+-            done();
+     })
+ 
+   /**
+@@ -162,42 +156,23 @@ describe('ACTS_WifiTest', function () {
+     it('wifi_native_js_unit_test_007', 0, async function (done) {
+         console.info('[wifi_test] wifi add device config  test[1]');
+         var active = wifi.isWifiActive();
+-        sleep(3000);
+         console.log("[wifi_test] wifi active result1: " + active);
+         if(!active){
+             var enable = wifi.enableWifi();
+             sleep(3000);		
+             expect(enable).assertTrue();            
+         }
+-        wifi.addDeviceConfig(wifiDeviceConfig,
+-            (result) => {
++        wifi.addDeviceConfig(wifiDeviceConfig)
++            .then(result => {
+                 expect(result).assertLarger(0);
+                 console.info("[wifi_test] test_007 wifi addDeviceconfig callback: " +JSON.stringify(result));
+                 var conn = wifi.connectToNetwork(result);
+                 expect(conn).assertTrue();
+-                sleep(5000);
+-                console.info("[wifi_test] test_007 wifi addDeviceconfig callback: " + result);
+-                for (var j = 0; j < JSON.stringify(result).length; ++j) {
+-                    console.info("ssid: " + result[j].ssid);
+-                    console.info("bssid: " + result[j].bssid);
+-                    console.info("securityType: " + result[j].securityType);
+-                    console.info("isHiddenSsid: " + result[j].isHiddenSsid);
+-                    console.info("preSharedKey: " + result[j].preSharedKey);
+-                    console.info("ipType: " + result[j].ipType);
+-                    console.info("creatorUid: " + result[j].creatorUid);
+-                    console.info("netId: " + result[j].netId);
+-                    console.info("disableReason: " + result[j].disableReason);
+-                    console.info("randomMacType: " + result[j].randomMacType);
+-                    console.info("randomMacAddr: " + result[j].randomMacAddr);
+-                    console.info("staticIp: " + result[j].staticIp);
+-                }
++                var discon1 = wifi.disconnect();
++                console.log("[wifi_test] wifi discon1 result: " + discon1);
++                expect(discon1).assertTrue();
++                done();
+             });
+-        var discon1 = wifi.disconnect();
+-        console.log("[wifi_test] wifi discon1 result: " + discon1);
+-        expect(discon1).assertTrue();
+-        sleep(3000);
+-
+-        done();
+     })
+ 
+   /**
+@@ -219,17 +194,13 @@ describe('ACTS_WifiTest', function () {
+                 console.info("[wifi_test] test_008 wifi addDeviceconfig promise result: " + JSON.stringify(result));
+                 expect(result).assertLarger(0);
+                 console.info("[wifi_test] test_008 wifi addDeviceconfig promise result: " + result)
+-                sleep(3000);
+                 var conn = wifi.connectToNetwork(result);
+                 expect(conn).assertTrue();
+-                sleep(2000);
+                 var discon2 = wifi.disconnect();
+                 console.log("[wifi_test] wifi discon2 result: " + discon2);
+                 expect(discon2).assertTrue();
+-                sleep(3000);
++                done();
+             });
+-      
+-        done();
+     })
+     
+     /**

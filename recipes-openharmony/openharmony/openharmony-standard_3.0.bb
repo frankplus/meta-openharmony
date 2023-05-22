@@ -108,6 +108,7 @@ SRC_URI += "file://foundation_ace_engine-race-condition-workaround.patch;patchdi
 SRC_URI += "file://test-xts-acts-testRdbStoreUpdate0001-await-updatePromise.patch;patchdir=${S}/test/xts/acts"
 
 SRC_URI += "file://wifi-services-networkmanager-integration.patch;patchdir=${S}/foundation/communication/wifi"
+SRC_URI += "file://test-xts-acts-wifi-test-fix.patch;patchdir=${S}/test/xts/acts"
 
 inherit python3native gn_base ptest
 
