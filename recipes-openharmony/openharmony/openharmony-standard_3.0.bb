@@ -835,6 +835,9 @@ RDEPENDS:${PN} += "${PN}-wifi"
 RDEPENDS:${PN}-wifi += "musl libcxx"
 RDEPENDS:${PN}-wifi += "${PN}-samgr ${PN}-hilog ${PN}-libutils ${PN}-ipc ${PN}-safwk ${PN}-aafwk ${PN}-notification-ces ${PN}-appexecfwk"
 
+RDEPENDS:${PN}-wifi += "networkmanager glib-2.0"
+DEPENDS += "networkmanager glib-2.0"
+
 # //foundation/communication/wifi_native_js
 PACKAGES =+ "${PN}-wifi-native-js"
 FILES:${PN}-wifi-native-js = " \
