@@ -1,0 +1,1005 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+foundation/communication/wifi: implement wifi services with network manager
+
+With the aim of oniro/linux upstream hardware support we replace the wifi hal service
+with libnm calls to network manager. This way we can support wifi without having
+to write new wifi drivers with hdf.
+Currently, the following operations are reimplemented with libnm:
+EnableWifi, DisableWifi, AddDeviceConfig, ConnectToNetwork, ConnectToDevice,
+Disconnect, IsWifiActive, Scan, GetScanInfoList.
+
+Apply to foundation/communication/wifi
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+Signed-off-by: Kareem Zarka <kareem.zarka@huawei.com>
+
+diff --git a/interfaces/innerkits/native_cpp/wifi_standard/interfaces/wifi_msg.h b/interfaces/innerkits/native_cpp/wifi_standard/interfaces/wifi_msg.h
+index e2dbde2e..0e1ba88c 100755
+--- a/interfaces/innerkits/native_cpp/wifi_standard/interfaces/wifi_msg.h
++++ b/interfaces/innerkits/native_cpp/wifi_standard/interfaces/wifi_msg.h
+@@ -168,7 +168,7 @@ public:
+     ~WifiIpAddress()
+     {}
+ 
+-    std::string GetIpv4Address()
++    std::string GetIpv4Address() const
+     {
+         return IpTools::ConvertIpv4Address(addressIpv4);
+     }
+@@ -180,7 +180,7 @@ public:
+         return;
+     }
+ 
+-    std::string GetIpv6Address()
++    std::string GetIpv6Address() const
+     {
+         return IpTools::ConvertIpv6Address(addressIpv6);
+     }
+@@ -424,4 +424,4 @@ struct IpInfo {
+ };
+ }  // namespace Wifi
+ }  // namespace OHOS
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/ohos.build b/ohos.build
+index 3f3e8af2..c534d235 100755
+--- a/ohos.build
++++ b/ohos.build
+@@ -6,7 +6,6 @@
+               "//foundation/communication/wifi/interfaces/innerkits/native_cpp/wifi_standard:wifi_sdk",
+               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_manage",
+               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:dhcp_manage",
+-              "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",
+               "//foundation/communication/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
+               "//foundation/communication/wifi/services/wifi_standard/sa_profile:wifi_standard_sa_profile"
+           ],
+@@ -47,22 +46,7 @@
+                   "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_client:dhcp_client_service",
+                   "//foundation/communication/wifi/services/wifi_standard/wifi_framework/dhcp_manage/dhcp_server:dhcp_server"
+               ]
+-          },
+-          "wifi_hal_service": [
+-              {
+-                  "type": "so",
+-                  "name": "//foundation/communication/wifi/services/wifi_standard/wifi_hal:wifi_hal_service",
+-                  "header": {
+-                      "header_files": [
+-                          "wifi_hal_define.h",
+-                          "wifi_hal_sta_interface.h",
+-                          "wifi_hal_ap_interface.h",
+-                          "wifi_hal_struct.h"
+-                      ],
+-                      "header_base": "//foundation/communication/wifi/services/wifi_standard/wifi_hal/"
+-                  }
+-              }
+-          ]
++          }
+       },
+ 
+       "wifi_native_js": {
+diff --git a/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn b/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
+index 73f14cea..f2264a84 100755
+--- a/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
++++ b/services/wifi_standard/wifi_framework/wifi_manage/BUILD.gn
+@@ -77,10 +77,22 @@ ohos_source_set("wifi_scan_service_impl") {
+     ":wifi_manager_service_config",
+     ":wifi_manager_service_header",
+   ]
++  include_dirs = [
++    "//oniro/sysroots/target/usr/include/libnm",
++    "//oniro/sysroots/target/usr/include/glib-2.0",
++    "//oniro/sysroots/target/usr/lib/glib-2.0/include",
++  ]
++  libs = ["nm", "glib-2.0", "gobject-2.0"]
+ 
+   external_deps = [ "ipc:ipc_core" ]
+ }
+ ohos_source_set("wifi_device_service_impl") {
++  include_dirs = [
++    "//oniro/sysroots/target/usr/include/libnm",
++    "//oniro/sysroots/target/usr/include/glib-2.0",
++    "//oniro/sysroots/target/usr/lib/glib-2.0/include",
++  ]
++  libs = ["nm", "glib-2.0", "gobject-2.0"]
+   sources = [
+     "wifi_device_callback_proxy.cpp",
+     "wifi_device_death_recipient.cpp",
+diff --git a/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.cpp b/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.cpp
+index f6c8b526..64e318fa 100644
+--- a/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.cpp
++++ b/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.cpp
+@@ -24,6 +24,8 @@
+ #include "wifi_service_manager.h"
+ #include "wifi_logger.h"
+ #include "define.h"
++#include <NetworkManager.h> 
++#include <glib.h> 
+ 
+ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
+ namespace OHOS {
+@@ -32,6 +34,181 @@ std::mutex WifiDeviceServiceImpl::g_instanceLock;
+ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance;
+ const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiDeviceServiceImpl::GetInstance().GetRefPtr());
+ 
++void on_deactivate_connection_finished(GObject *source_object, GAsyncResult *res, gpointer user_data) 
++{
++    GError *error = NULL;
++    gboolean success = nm_client_deactivate_connection_finish(NM_CLIENT(source_object), res, &error);
++    if (!success) {
++        WIFI_LOGE("Error deactivating connection: %s\n", error->message);
++        g_error_free(error);
++    }
++
++    GMainLoop *loop = (GMainLoop *)user_data;
++    g_main_loop_quit(loop);
++}
++
++void on_add_connection_finish(GObject *source, GAsyncResult *res, gpointer user_data)
++{
++    GError *error = NULL;
++    NMRemoteConnection *remote = nm_client_add_connection_finish(NM_CLIENT(source), res, &error);
++
++    if (!remote) {
++        WIFI_LOGE("Failed to add connection: %s", error->message);
++        g_error_free(error);
++    }
++    else {
++        WIFI_LOGI("Successfully added WiFi connection");
++    }
++
++    GMainLoop *main_loop = static_cast<GMainLoop *>(user_data);
++    g_main_loop_quit(main_loop);
++}
++
++void on_activate_connection_finished(GObject *source_object, GAsyncResult *res, gpointer user_data)
++{
++    GError *error = NULL;
++    NMActiveConnection *active_conn = nm_client_activate_connection_finish(NM_CLIENT(source_object), res, &error);
++
++    if (!active_conn) {
++        WIFI_LOGE("Failed to activate connection: %s\n", error->message);
++        g_error_free(error);
++    }
++    else {
++        WIFI_LOGD("Connection activated successfully\n");
++    }
++
++    GMainLoop *main_loop = static_cast<GMainLoop *>(user_data);
++    g_main_loop_quit(main_loop);
++}
++
++void on_add_and_activate_connection_finished(GObject *source_object, GAsyncResult *res, gpointer user_data)
++{
++    GError *error = NULL;
++    NMActiveConnection *active_conn = nm_client_add_and_activate_connection_finish(NM_CLIENT(source_object), res, &error);
++
++    if (!active_conn) {
++        WIFI_LOGE("Failed to add and activate connection: %s\n", error->message);
++        g_error_free(error);
++    }
++    else {
++        WIFI_LOGD("Connection added and activated successfully\n");
++    }
++
++    GMainLoop *main_loop = static_cast<GMainLoop *>(user_data);
++    g_main_loop_quit(main_loop);
++}
++
++NMConnection *create_wifi_connection(const WifiDeviceConfig &wifiDeviceConfig)
++{
++    GError *error = NULL;
++    // Create a new NMConnection object
++    NMConnection *connection = nm_simple_connection_new();
++    // Configure the connection settings
++    NMSetting *s_con = NM_SETTING(nm_setting_connection_new());
++    g_object_set(G_OBJECT(s_con),
++                 NM_SETTING_CONNECTION_ID, "My WiFi Connection",
++                 NM_SETTING_CONNECTION_UUID, nm_utils_uuid_generate(),
++                 NM_SETTING_CONNECTION_TYPE, NM_SETTING_WIRELESS_SETTING_NAME,
++                 NM_SETTING_CONNECTION_AUTOCONNECT, FALSE,
++                 NULL);
++    nm_connection_add_setting(connection, s_con);
++    // Add the WiFi settings
++    NMSetting *s_wifi = NM_SETTING(nm_setting_wireless_new());
++    g_object_set(G_OBJECT(s_wifi), NM_SETTING_WIRELESS_MODE, NM_SETTING_WIRELESS_MODE_INFRA, NULL);
++    g_object_set(G_OBJECT(s_wifi), NM_SETTING_WIRELESS_BSSID, wifiDeviceConfig.bssid.c_str(), NULL);
++
++    if (!wifiDeviceConfig.hiddenSSID)
++    {
++        int ssidSize = wifiDeviceConfig.ssid.size();
++        GBytes *ssid = g_bytes_new(wifiDeviceConfig.ssid.c_str(), ssidSize);
++        g_object_set(G_OBJECT(s_wifi), NM_SETTING_WIRELESS_SSID, ssid, NULL);
++        g_bytes_unref(ssid);
++    }
++
++    nm_connection_add_setting(connection, s_wifi);
++
++    // Add the WiFi security settings
++    NMSetting *s_wsec = NM_SETTING(nm_setting_wireless_security_new());
++
++    if (wifiDeviceConfig.keyMgmt == "NONE") {
++        g_object_set(G_OBJECT(s_wsec),
++                     NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "none",
++                     NULL);
++    }
++    else if(wifiDeviceConfig.keyMgmt == "WEP") {
++        g_object_set(G_OBJECT(s_wsec),
++                     NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "ieee8021x",
++                     NM_SETTING_WIRELESS_SECURITY_WEP_KEY_TYPE, NM_SETTING_WIRELESS_SECURITY_WEP_KEY_TYPE,
++                     NM_SETTING_WIRELESS_SECURITY_WEP_KEY0, wifiDeviceConfig.preSharedKey.c_str(),
++                     NULL);
++    }
++    else if(wifiDeviceConfig.keyMgmt == "WPA-PSK") {
++        g_object_set(G_OBJECT(s_wsec),
++                     NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "wpa-psk",
++                     NM_SETTING_WIRELESS_SECURITY_PSK, wifiDeviceConfig.preSharedKey.c_str(),
++                     NULL);
++    }
++    else if(wifiDeviceConfig.keyMgmt == "SAE") {
++        g_object_set(G_OBJECT(s_wsec),
++                     NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "sae",
++                     NM_SETTING_WIRELESS_SECURITY_PSK, wifiDeviceConfig.preSharedKey.c_str(),
++                     NULL);
++    }
++
++    nm_connection_add_setting (connection, NM_SETTING (s_wsec));
++
++
++    // manual ip
++    if (wifiDeviceConfig.wifiIpConfig.assignMethod == AssignIpMethod::STATIC) {
++        if (wifiDeviceConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV4_ADDRESS_TYPE) {
++            NMSetting *s_ip4 = NM_SETTING(nm_setting_ip4_config_new());
++            g_object_set(G_OBJECT(s_ip4),
++                        NM_SETTING_IP_CONFIG_METHOD, NM_SETTING_IP4_CONFIG_METHOD_MANUAL,
++                        NULL);
++            // Add IP4 address
++            std::string ip_string = wifiDeviceConfig.wifiIpConfig.staticIpAddress.ipAddress.address.GetIpv4Address();
++            const char *ip_char_ptr = ip_string.c_str();
++            NMIPAddress *address = nm_ip_address_new(AF_INET, ip_char_ptr, 24, &error);
++            nm_setting_ip_config_add_address(NM_SETTING_IP_CONFIG(s_ip4), address);
++            nm_ip_address_unref(address);
++            nm_connection_add_setting(connection, s_ip4);
++        }
++        else {
++            NMSetting *s_ip6 = NM_SETTING(nm_setting_ip6_config_new());
++
++            g_object_set(G_OBJECT(s_ip6),
++                        NM_SETTING_IP_CONFIG_METHOD, NM_SETTING_IP6_CONFIG_METHOD_MANUAL,
++                        NULL);
++
++            // Add IP6 address
++            std::string ip_string = wifiDeviceConfig.wifiIpConfig.staticIpAddress.ipAddress.address.GetIpv6Address();
++            const char *ip_char_ptr = ip_string.c_str();
++            NMIPAddress *address = nm_ip_address_new(AF_INET6, ip_char_ptr, 64, &error);
++            nm_setting_ip_config_add_address(NM_SETTING_IP_CONFIG(s_ip6), address);
++            nm_ip_address_unref(address);
++            nm_connection_add_setting(connection, s_ip6);
++        }
++    }
++    // dynamic ip
++    else {
++        NMSetting *s_ip4 = NM_SETTING(nm_setting_ip4_config_new());
++
++        g_object_set(G_OBJECT(s_ip4),
++                     NM_SETTING_IP_CONFIG_METHOD, NM_SETTING_IP4_CONFIG_METHOD_AUTO,
++                     NULL);
++
++        nm_connection_add_setting(connection, s_ip4);
++    }
++    
++    if (error) {
++        WIFI_LOGE("Error: %s", error->message);
++        g_error_free(error);
++        return nullptr;
++    }
++
++    return connection;
++}
++
+ sptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::GetInstance()
+ {
+     if (g_instance == nullptr) {
+@@ -94,50 +271,15 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
+         return errCode;
+     }
+ 
+-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+-    if (curState != WifiOprMidState::CLOSED) {
+-        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
+-        if (curState == WifiOprMidState::CLOSING) { /* when current wifi is closing, return */
+-            return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
+-        } else {
+-            return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
+-        }
+-    }
+-
+-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING)) {
+-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+-        return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
+-    }
+-
+-    errCode = WIFI_OPT_FAILED;
+-    do {
+-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
+-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
+-            break;
+-        }
+-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-        if (pService == nullptr) {
+-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
+-            break;
+-        }
+-
+-        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
+-        if (errCode != WIFI_OPT_SUCCESS) {
+-            WIFI_LOGE("Register sta service callback failed!");
+-            break;
+-        }
+-
+-        errCode = pService->EnableWifi();
+-        if (errCode != WIFI_OPT_SUCCESS) {
+-            WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
+-            break;
+-        }
+-    } while (false);
+-    if (errCode != WIFI_OPT_SUCCESS) {
+-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
+-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+-        return errCode;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
+     }
++    nm_client_wireless_set_enabled(client, true);
++    g_object_unref(client);
+ 
+     return WIFI_OPT_SUCCESS;
+ }
+@@ -149,32 +291,18 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState();
+-    if (curState != WifiOprMidState::RUNNING) {
+-        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
+-        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
+-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+-        } else {
+-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+-        }
+-    }
+-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING)) {
+-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
+-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
+-    }
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
+-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+-        return WIFI_OPT_SUCCESS;
+-    }
+-    ErrCode ret = pService->DisableWifi();
+-    if (ret != WIFI_OPT_SUCCESS) {
+-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
+-    } else {
+-        WifiConfigCenter::GetInstance().SetStaLastRunState(false);
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
+     }
+-    return ret;
++    nm_client_wireless_set_enabled(client, false);
++
++    g_object_unref(client);
++    
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result)
+@@ -184,19 +312,32 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
+     }
+ 
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    int retNetworkId = pService->AddDeviceConfig(config);
+-    if (retNetworkId < 0) {
++    NMConnection* connection = create_wifi_connection(config);
++    if (!connection) {
+         return WIFI_OPT_FAILED;
+     }
+-    result = retNetworkId;
++
++    // connection_uuids contains a map between networkId and the connection uuid
++    // uuid of the network = connection_uuids[networkId-1]
++    connection_uuids.push_back(std::string(nm_connection_get_uuid(connection)));
++    result = connection_uuids.size();
++
++    GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
++    nm_client_add_connection_async(
++        client, connection, TRUE, NULL, on_add_connection_finish, main_loop);
++    g_main_loop_run(main_loop);
++    g_main_loop_unref(main_loop);
++
++    g_object_unref(client);
++
+     return WIFI_OPT_SUCCESS;
+ }
+ 
+@@ -207,15 +348,7 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->RemoveDevice(networkId);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
+@@ -225,15 +358,7 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->RemoveAllDevice();
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result)
+@@ -254,15 +379,7 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->EnableDeviceConfig(networkId, attemptEnable);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
+@@ -272,15 +389,7 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->DisableDeviceConfig(networkId);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
+@@ -290,15 +399,65 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
++    }
++    NMDevice *device = nm_client_get_device_by_iface(client, IF_NAME_WLAN);
++    if (!device) {
++        WIFI_LOGE("Error getting interface\n");
++        return WIFI_OPT_FAILED;
+     }
+ 
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    // connection_uuids contains a map between networkId and the connection uuid
++    // uuid of the network = connection_uuids[networkId-1]
++    if (networkId > connection_uuids.size() || networkId < 1) {
++        WIFI_LOGE("Invalid networkId");
++        return WIFI_OPT_FAILED;
+     }
+-    return pService->ConnectToNetwork(networkId);
++    const char *connection_uuid = connection_uuids[networkId-1].c_str();
++
++    const GPtrArray *connections = nm_client_get_connections(client);
++    NMConnection *connection = nullptr;
++    for (guint i = 0; i < connections->len; ++i)
++    {
++        NMConnection *conn = NM_CONNECTION(connections->pdata[i]);
++        const char *conn_uuid = nm_setting_connection_get_uuid(NM_SETTING_CONNECTION(nm_connection_get_setting(conn, NM_TYPE_SETTING_CONNECTION)));
++        if (g_strcmp0(conn_uuid, connection_uuid) == 0)
++        {
++            connection = conn;
++            break;
++        }
++    }
++    if (!connection)
++    {
++        WIFI_LOGE("Connection with the specified UUID not found");
++        g_object_unref(client);
++        return WIFI_OPT_FAILED;
++    }
++
++    GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
++
++    // Activate the connection
++    nm_client_activate_connection_async(
++        client, 
++        connection, 
++        device, 
++        NULL, 
++        NULL,
++        on_activate_connection_finished,
++        main_loop);
++
++    // Run the main loop to start monitoring events
++    g_main_loop_run(main_loop);
++
++    g_main_loop_unref(main_loop);
++    g_object_unref(client);
++
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
+@@ -308,15 +467,43 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
++    }
++    NMDevice *device = nm_client_get_device_by_iface(client, IF_NAME_WLAN);
++    if (!device) {
++        WIFI_LOGE("Error getting interface\n");
++        return WIFI_OPT_FAILED;
+     }
+ 
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    NMConnection* connection = create_wifi_connection(config);
++    if (!connection) {
++        return WIFI_OPT_FAILED;
+     }
+-    return pService->ConnectToDevice(config);
++
++    GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
++
++    // Activate the connection
++    nm_client_add_and_activate_connection_async(
++        client, 
++        connection, 
++        device, 
++        NULL, 
++        NULL,
++        on_add_and_activate_connection_finished,
++        main_loop);
++
++    // Run the main loop to start monitoring events
++    g_main_loop_run(main_loop);
++
++    g_main_loop_unref(main_loop);
++    g_object_unref(client);
++
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::ReConnect()
+@@ -348,15 +535,7 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->ReAssociate();
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::Disconnect(void)
+@@ -366,15 +545,31 @@ ErrCode WifiDeviceServiceImpl::Disconnect(void)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
+     }
++    NMDevice *device = nm_client_get_device_by_iface(client, IF_NAME_WLAN);
++    if (!device) {
++        WIFI_LOGE("Error getting interface");
++        return WIFI_OPT_FAILED;
++    }
++    NMActiveConnection *active_connection = nm_device_get_active_connection(device);
+ 
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
++    if (active_connection == NULL) {
++        WIFI_LOGI("No active WiFi connection found\n");
++        return WIFI_OPT_SUCCESS;
+     }
+-    return pService->Disconnect();
++    GMainLoop *loop = g_main_loop_new(NULL, FALSE);
++    nm_client_deactivate_connection_async(client, active_connection, NULL, on_deactivate_connection_finished, loop);
++    g_main_loop_run(loop);
++    g_main_loop_unref(loop);
++    g_object_unref(client);
++
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
+@@ -384,15 +579,7 @@ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->StartWps(config);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::CancelWps(void)
+@@ -402,20 +589,20 @@ ErrCode WifiDeviceServiceImpl::CancelWps(void)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->CancelWps();
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
+ {
+-    bActive = IsStaServiceRunning();
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
++    }
++    bActive = nm_client_wireless_get_enabled(client);
++    g_object_unref(client);
+     return WIFI_OPT_SUCCESS;
+ }
+ 
+@@ -472,15 +659,7 @@ ErrCode WifiDeviceServiceImpl::SetCountryCode(const std::string &countryCode)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsStaServiceRunning()) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-
+-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_STA_NOT_OPENED;
+-    }
+-    return pService->SetCountryCode(countryCode);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
+@@ -610,4 +789,4 @@ bool WifiDeviceServiceImpl::IsScanServiceRunning()
+     return true;
+ }
+ }  // namespace Wifi
+-}  // namespace OHOS
+\ No newline at end of file
++}  // namespace OHOS
+diff --git a/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.h b/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.h
+index 1d519c9f..edcf483e 100644
+--- a/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.h
++++ b/services/wifi_standard/wifi_framework/wifi_manage/wifi_device_service_impl.h
+@@ -23,6 +23,8 @@
+ #include "wifi_device_stub.h"
+ #include "iremote_object.h"
+ 
++#include <vector>
++
+ namespace OHOS {
+ namespace Wifi {
+ enum ServiceRunningState {
+@@ -101,7 +103,8 @@ private:
+     static std::mutex g_instanceLock;
+     bool mPublishFlag;
+     ServiceRunningState mState;
++    std::vector<std::string> connection_uuids;
+ };
+ }  // namespace Wifi
+ }  // namespace OHOS
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.h b/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.h
+index 8b7ce576..77d856e7 100644
+--- a/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.h
++++ b/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.h
+@@ -29,6 +29,8 @@
+ #include "i_ap_service_callbacks.h"
+ #include "ip2p_service_callbacks.h"
+ 
++#define IF_NAME_WLAN "wlan0"
++
+ namespace OHOS {
+ namespace Wifi {
+ /* init state */
+@@ -171,4 +173,4 @@ private:
+ };
+ } // namespace Wifi
+ } // namespace OHOS
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_service_impl.cpp b/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_service_impl.cpp
+index a18cebaa..63e9b13e 100644
+--- a/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_service_impl.cpp
++++ b/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_service_impl.cpp
+@@ -26,6 +26,8 @@
+ #include "wifi_logger.h"
+ #include "define.h"
+ #include "wifi_scan_callback_proxy.h"
++#include <NetworkManager.h> 
++#include <glib.h> 
+ 
+ DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
+ namespace OHOS {
+@@ -33,6 +35,47 @@ namespace Wifi {
+ std::mutex WifiScanServiceImpl::g_instanceLock;
+ sptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance;
+ const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiScanServiceImpl::GetInstance().GetRefPtr());
++
++/* ap band: 1 - 2.4GHZ, 2 - 5GHZ */
++int get_band(guint32 frequency)
++{
++    if (frequency >= 2400 && frequency <= 2495)
++    {
++        return 1;
++    }
++    else if (frequency >= 5150 && frequency <= 5925)
++    {
++        return 2;
++    }
++    else
++    {
++        return -1;
++    }
++}
++
++WifiSecurity get_wifi_security_type(NMAccessPoint *ap)
++{
++    NM80211ApSecurityFlags wpa_flags = nm_access_point_get_wpa_flags(ap);
++    NM80211ApSecurityFlags rsn_flags = nm_access_point_get_rsn_flags(ap);
++
++    if (wpa_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK || rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK)
++    {
++        return WifiSecurity::PSK;
++    }
++    else if (wpa_flags & NM_802_11_AP_SEC_KEY_MGMT_802_1X || rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_802_1X)
++    {
++        return WifiSecurity::SAE;
++    }
++    else if (wpa_flags == 0 && rsn_flags == 0)
++    {
++        return WifiSecurity::OPEN;
++    }
++    else
++    {
++        return WifiSecurity::INVALID;
++    }
++}
++
+ sptr<WifiScanServiceImpl> WifiScanServiceImpl::GetInstance()
+ {
+     if (g_instance == nullptr) {
+@@ -96,15 +139,6 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    WifiConfigCenter::GetInstance().SetScanControlInfo(info);
+-    if (IsScanServiceRunning()) {
+-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+-        if (pService == nullptr) {
+-            return WIFI_OPT_SCAN_NOT_OPENED;
+-        }
+-        return pService->OnControlStrategyChanged();
+-    }
+-
+     return WIFI_OPT_SUCCESS;
+ }
+ 
+@@ -116,15 +150,28 @@ ErrCode WifiScanServiceImpl::Scan()
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsScanServiceRunning()) {
+-        return WIFI_OPT_SCAN_NOT_OPENED;
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
++    }
++    NMDevice *device = nm_client_get_device_by_iface(client, IF_NAME_WLAN);
++    if (!device) {
++        WIFI_LOGE("Error getting interface");
++        return WIFI_OPT_FAILED;
+     }
+ 
+-    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_SCAN_NOT_OPENED;
++    if (!nm_device_wifi_request_scan(NM_DEVICE_WIFI(device), NULL, &error)) {
++        WIFI_LOGE("Error requesting scan: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
+     }
+-    return pService->Scan(true);
++    WIFI_LOGD("Wifi scan requested");
++    
++    g_object_unref(client);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
+@@ -135,15 +182,7 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+ 
+-    if (!IsScanServiceRunning()) {
+-        return WIFI_OPT_SCAN_NOT_OPENED;
+-    }
+-
+-    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst();
+-    if (pService == nullptr) {
+-        return WIFI_OPT_SCAN_NOT_OPENED;
+-    }
+-    return pService->ScanWithParam(params);
++    return WIFI_OPT_SUCCESS;
+ }
+ 
+ ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
+@@ -171,7 +210,54 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
+         WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+         return WIFI_OPT_PERMISSION_DENIED;
+     }
+-    WifiConfigCenter::GetInstance().GetScanInfoList(result);
++
++    GError *error = NULL;
++    NMClient *client = nm_client_new(NULL, &error);
++    if (!client) {
++        WIFI_LOGE("Could not connect to NetworkManager: %s\n", error->message);
++        g_error_free(error);
++        return WIFI_OPT_FAILED;
++    }
++    NMDevice *device = nm_client_get_device_by_iface(client, IF_NAME_WLAN);
++    if (!device) {
++        WIFI_LOGE("Error getting interface");
++        return WIFI_OPT_FAILED;
++    }
++
++    const GPtrArray *aps = nm_device_wifi_get_access_points(NM_DEVICE_WIFI(device));
++    if (!aps) {
++        WIFI_LOGE("Error getting access points");
++        return WIFI_OPT_FAILED;
++    }
++    
++    WIFI_LOGD("Discovered %d access points", aps->len);
++    for (guint i = 0; i < aps->len; i++)
++    {
++        NMAccessPoint *ap = (NMAccessPoint *)g_ptr_array_index(aps, i);
++        GBytes *ssid_bytes = nm_access_point_get_ssid(ap);
++        if (ssid_bytes != NULL)
++        {
++            WifiScanInfo scan_info;
++
++            gsize ssid_len;
++            const gchar *ssid_str = (const gchar *)g_bytes_get_data(ssid_bytes, &ssid_len);
++            scan_info.ssid = std::string(ssid_str, ssid_len);
++
++            scan_info.bssid = nm_access_point_get_bssid(ap);
++            scan_info.rssi = nm_access_point_get_strength(ap);
++            scan_info.frequency = nm_access_point_get_frequency(ap);
++            scan_info.band = get_band(nm_access_point_get_frequency(ap));
++            scan_info.securityType = get_wifi_security_type(ap);
++
++            result.push_back(scan_info);
++
++            WIFI_LOGD("Discovered wifi access point: %s", scan_info.ssid.c_str());
++        }
++    }
++    
++
++    g_object_unref(client);
++
+     return WIFI_OPT_SUCCESS;
+ }
+ 
+@@ -206,4 +292,4 @@ bool WifiScanServiceImpl::IsScanServiceRunning()
+     return true;
+ }
+ }  // namespace Wifi
+-}  // namespace OHOS
+\ No newline at end of file
++}  // namespace OHOS
