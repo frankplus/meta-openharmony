@@ -170,6 +170,24 @@ GN_ARGS += 'node_path="${RECIPE_SYSROOT_NATIVE}/usr/bin"'
 GN_ARGS += 'host_toolchain="//oniro:host_toolchain"'
 GN_ARGS += 'install_oniro_third_party=false'
 
+# Configure HAL system parameters
+OHOS_MANUFACTURE = "Oniro Project"
+OHOS_SOFTWARE_MODEL = "Oniro OH"
+OHOS_HARDWARE_MODEL = "${MACHINE}"
+OHOS_HARDWARE_MODEL:qemuarma7 = "QEMU Arm Cortex-A7"
+OHOS_HARDWARE_MODEL:raspberrypi4-64 = "Raspberry Pi 4"
+OHOS_HARDWARE_PROFILE = "aout:true,display:true"
+OHOS_HARDWARE_PROFILE:qemuarma7 = "aout:false,display:true,camera:false,radio:false,bluetooth:false,WIFI:false,usbhost:false"
+OHOS_HARDWARE_PROFILE:raspberrypi4-64 = "aout:false,display:false,camera:false,radio:false,bluetooth:false,WIFI:true,usbhost:false"
+do_configure[prefuncs] += "do_configure_sysparam_hal"
+do_configure_sysparam_hal() {
+    sed -i ${S}/base/startup/syspara_lite/hals/parameter/src/parameter_hal.cpp \
+        -e 's/\(static const char OHOS_MANUFACTURE\[\]\) =.*/\1 = {"${OHOS_MANUFACTURE}"};/' \
+        -e 's/\(static const char OHOS_SOFTWARE_MODEL\[\]\) =.*/\1 = {"${OHOS_SOFTWARE_MODEL}"};/' \
+        -e 's/\(static const char OHOS_HARDWARE_MODEL\[\]\) =.*/\1 = {"${OHOS_HARDWARE_MODEL}"};/' \
+        -e 's/\(static const char OHOS_HARDWARE_PROFILE\[\]\) =.*/\1 = {"${OHOS_HARDWARE_PROFILE}"};/'
+}
+
 # OpenHarmony build system needs a bit of help to be able to find the right
 # ld-musl-*.so path
 inherit linuxloader
