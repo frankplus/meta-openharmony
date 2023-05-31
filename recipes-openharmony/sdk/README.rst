@@ -17,10 +17,10 @@ OpenHarmony SDK
     builds that can be used directly in OpenHarmony builds. The current known
     limitation is that at the current stage, this support was only validated
     with the distro configuration, machine and layers setup provided by the
-    `meta-openharmony repository/layer <https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony>`_.
+    `meta-openharmony repository/layer <https://gitlab.eclipse.org/eclipse/oniro-oh/meta-openharmony>`_.
 
     For more information checkout the
-    `meta-openharmony README file <https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony/-/blob/kirkstone/README.md>`_.
+    `meta-openharmony README file <https://gitlab.eclipse.org/eclipse/oniro-oh/meta-openharmony/-/blob/kirkstone/README.md>`_.
 
 Oniro Project provides support for building an alternative open-source toolchain
 for use with the OpenHarmony reference implementation. This allows using an

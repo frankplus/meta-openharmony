@@ -12,7 +12,7 @@ https://gitee.com/openharmony/startup_appspawn/pulls/308
 TODO: revisit this patch once we have more information
 
 Signed-off-by: Robert Drab <robert.drab@huawei.com>
-Relates to https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony/-/issues/42
+Relates to https://gitlab.eclipse.org/eclipse/oniro-oh/meta-openharmony/-/issues/42
 Upstream-Status: Pending
 
 diff --git a/src/appspawn_server.cpp b/src/appspawn_server.cpp

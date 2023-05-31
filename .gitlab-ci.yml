@@ -263,7 +263,7 @@ fetch:
       fi
     - echo "Syncing mirror files to $SOURCE_MIRROR_PATH"
     - if [ "$CI_SERVER_HOST" = "gitlab.eclipse.org" -a
-           "$CI_PROJECT_PATH" = "eclipse/oniro-core/meta-openharmony" -a
+           "$CI_PROJECT_PATH" = "eclipse/oniro-oh/meta-openharmony" -a
            "$CI_COMMIT_BRANCH" = "kirkstone" ] ; then
         DO_MIRROR_UPDATES_CH=1 ;
       fi
@@ -299,7 +299,7 @@ mirror_ch:
     - job: fetch
       artifacts: true
   rules:
-    - if: $CI_SERVER_HOST == "gitlab.eclipse.org" && $CI_PROJECT_PATH == "eclipse/oniro-core/meta-openharmony" && $CI_COMMIT_BRANCH == "kirkstone"
+    - if: $CI_SERVER_HOST == "gitlab.eclipse.org" && $CI_PROJECT_PATH == "eclipse/oniro-oh/meta-openharmony" && $CI_COMMIT_BRANCH == "kirkstone"
   # No need to mark builds broken due to infrastructure problems
   allow_failure: true
   tags:

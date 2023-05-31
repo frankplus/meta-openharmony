@@ -120,7 +120,7 @@ By making a contribution to this project, I certify that:
 # `meta-openharmony`-specific contributions process and guidelines
 
 The project handles contributions as merge request in the project's
-[GitLab instance](https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony).
+[GitLab instance](https://gitlab.eclipse.org/eclipse/oniro-oh/meta-openharmony).
 See above for more details.
 
 Each contributions must adhere to the [OpenEmbedded Commit Patch Message Guidelines](http://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines).

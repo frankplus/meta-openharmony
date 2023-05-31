@@ -88,7 +88,7 @@ meta-openharmony layer.
 You can run these commands to do this:
 
 	mkdir ohoe && cd ohoe
-	repo init -u https://gitlab.eclipse.org/eclipse/oniro-core/meta-openharmony.git -b kirkstone
+	repo init -u https://gitlab.eclipse.org/eclipse/oniro-oh/meta-openharmony.git -b kirkstone
 	repo sync --no-clone-bundle
 
 After this is done, you need to initialize the build environment. This modifies
