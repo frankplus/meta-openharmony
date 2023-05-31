@@ -4,13 +4,14 @@ SPDX-License-Identifier: Apache-2.0
 SPDX-FileCopyrightText: Huawei Inc.
 -->
 <manifest>
+  <remote name="oniro-oh" fetch="https://gitlab.eclipse.org/eclipse/oniro-oh" />
   <remote name="oniro-core" fetch="https://gitlab.eclipse.org/eclipse/oniro-core" />
   <remote name="openembedded" fetch="https://git.openembedded.org" />
   <remote name="yocto" fetch="https://git.yoctoproject.org/git" />
   <remote name="kraj" fetch="https://github.com/kraj" />
   <default revision="kirkstone" sync-j="4" />
 
-  <project name="meta-openharmony" remote="oniro-core" />
+  <project name="meta-openharmony" remote="oniro-oh" />
   <project name="oniro" remote="oniro-core" />
 
   <project name="bitbake" remote="openembedded" revision="2.0" />
