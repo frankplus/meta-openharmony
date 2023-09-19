@@ -54,7 +54,7 @@ workflow:
 
 include:
   - local: '.gitlab-ci/container.yml'
-  - project: 'eclipsefdn/it/releng/gitlab-ci-templates'
+  - project: 'eclipsefdn/it/releng/gitlab-runner-service/gitlab-ci-templates'
     file: '/jobs/eca.gitlab-ci.yml'
 
 variables:
