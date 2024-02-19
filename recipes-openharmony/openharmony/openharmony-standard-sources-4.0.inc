@@ -1285,7 +1285,24 @@ SRC_URI += "${ORIGIN_URL}/device_soc_hisilicon.git;protocol=https;branch=OpenHar
 SRCREV_device_soc_hisilicon = "46f6a838bb8bc32c29a9d528a3ef9f278b5b8a49"
 SRCREV_FORMAT .= "+device_soc_hisilicon"
 
-#prebuilts download
+
+# NPM package shrinkwrap files. These files describe all dependencies
+# needed by a npm package usually downloaded and installed by the
+# command 'npm install'. These shrinkwrap files are generated with 
+# `devtool add <path to npm package e.g. ${OH_SRCDIR}/developtools/ace_ets2bundle/compiler>`
+# if you encounter dependency conflict then add --legacy-peer-deps to 
+# `npm install` command in `oe-core/scripts/lib/recipetool/create_npm.py`
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-ets2bundle-compiler.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace_ets2bundle/compiler"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ace-js2bundle-ace-loader.json;dev=1;destsuffix=${OH_SRCDIR}/developtools/ace_js2bundle/ace-loader"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_jsframework.json;dev=1;destsuffix=${OH_SRCDIR}/third_party/jsframework"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_weex-loader.json;dev=1;destsuffix=${OH_SRCDIR}/third_party/weex-loader"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_ets-frontend-legacy-bin-api8.json;dev=1;destsuffix=${OH_SRCDIR}/arkcompiler/ets_frontend/legacy_bin/api8"
+SRC_URI += "npmsw://${THISDIR}/openharmony-${OPENHARMONY_VERSION}/npm-shrinkwrap_sdk-js-build-tools.json;dev=1;destsuffix=${OH_SRCDIR}/interface/sdk-js/build-tools"
+SRC_URI += "npm://repo.huaweicloud.com/repository/npm;package=entities;version=4.5.0;destsuffix=${OH_SRCDIR}/third_party/parse5/packages/parse5/node_modules/entities"
+SRC_URI += "npm://repo.huaweicloud.com/repository/npm;package=typescript;version=4.9.5;destsuffix=${OH_SRCDIR}/third_party/parse5/packages/parse5/node_modules/typescript"
+
+# prebuilts download that are listed in prebuilts_download_config.json 
+# in the install configs
 SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/cmake/3.16.5/linux/cmake-linux-x86-3.16.5.tar.gz;name=linux;subdir=${OH_SRCDIR}/prebuilts/cmake"
 SRC_URI[linux.sha256sum] = "d1f27dbffbc52a15ca2fe79f99210f7c16c94fa2ba40524c63123d7baca9bf07"
 SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/gn/2024/linux/gn-linux-x86-20230426.tar.gz;name=gn;subdir=${OH_SRCDIR}/prebuilts/build-tools/linux-x86/bin"
@@ -1326,6 +1343,9 @@ SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/rust/rust-std-1.68
 SRC_URI[rustc-aarch64-std.sha256sum] = "cdd931941cdcc470311df3ac111768f9834e9c735aff31f871a24c4adfb0578d"
 SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/rust/rust-std-1.68.0-dev-armv7-linux-ohos-norpath.tar.gz;name=rustc-arm-std;subdir=${OH_SRCDIR}/prebuilts/rustc"
 SRC_URI[rustc-arm-std.sha256sum] = "faef3066cebecde810eef78e7749c47505e6a982d78896804cd403ca53617e74"
+SRC_URI += "https://repo.huaweicloud.com/nodejs/v14.21.1/node-v14.21.1-linux-x64.tar.gz;name=node-v14.21.1-linux-x64;subdir=${OH_SRCDIR}/prebuilts/build-tools/common/nodejs"
+SRC_URI[node-v14.21.1-linux-x64.sha256sum] = "8ae854dac7fa5e7dfd5dae8fe8e001c0599821705f650b32c4819149cfda1d0e"
+
 
 # Allow network connectivity from do_unpack() task. This is needed for
 # git lfs operations that are executed within do_unpack()
