@@ -1,0 +1,332 @@
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+Patch generated from OpenHarmony-v3.1-Release version, with the following commands:
+
+    git diff --no-renames v1.2.0..OpenHarmony-v3.1-Release | \
+    filterdiff -x '*/porting/*' -x '?/.gitee/*' -x '*/BUILD.gn' -x '*/*.gni' \
+               -x '*/OAT.xml' -x '*/README.OpenSource' -x '*/scripts/*' \
+               -x '*/ndk_script/*' -x '*/bundle.json' -x '*/libc-test/*' \
+      > openharmony-common.patch
+
+Upstream-status: Pending
+Signed-off-by: Esben Haabendal <esben.haabendal@huawei.com>
+
+diff --git a/arch/aarch64/bits/signal.h b/arch/aarch64/bits/signal.h
+old mode 100644
+new mode 100755
+index b71261f56816..760a9f323bcb
+--- a/arch/aarch64/bits/signal.h
++++ b/arch/aarch64/bits/signal.h
+@@ -149,5 +149,7 @@ typedef struct __ucontext {
+ #define SIGPWR    30
+ #define SIGSYS    31
+ #define SIGUNUSED SIGSYS
++#define SIGHOOK   36
++#define SIGUNHOOK 37
+ 
+ #define _NSIG 65
+diff --git a/arch/arm/bits/signal.h b/arch/arm/bits/signal.h
+index 3c78985672df..213e5fc23b9d 100644
+--- a/arch/arm/bits/signal.h
++++ b/arch/arm/bits/signal.h
+@@ -82,5 +82,7 @@ typedef struct __ucontext {
+ #define SIGPWR    30
+ #define SIGSYS    31
+ #define SIGUNUSED SIGSYS
++#define SIGHOOK   36
++#define SIGUNHOOK 37
+ 
+ #define _NSIG 65
+diff --git a/arch/arm/syscall_arch.h b/arch/arm/syscall_arch.h
+index 4b08762d7b35..a877b2cff196 100644
+--- a/arch/arm/syscall_arch.h
++++ b/arch/arm/syscall_arch.h
+@@ -98,12 +98,6 @@ static inline long __syscall6(long n, long a, long b, long c, long d, long e, lo
+ 	__asm_syscall(R7_OPERAND, "0"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5));
+ }
+ 
+-#define VDSO_USEFUL
+-#define VDSO_CGT32_SYM "__vdso_clock_gettime"
+-#define VDSO_CGT32_VER "LINUX_2.6"
+-#define VDSO_CGT_SYM "__vdso_clock_gettime64"
+-#define VDSO_CGT_VER "LINUX_2.6"
+-
+ #define SYSCALL_FADVISE_6_ARG
+ 
+ #define SYSCALL_IPC_BROKEN_MODE
+diff --git a/dynamic.list b/dynamic.list
+index ee0d363b648d..d427f5ace030 100644
+--- a/dynamic.list
++++ b/dynamic.list
+@@ -14,6 +14,8 @@ memalign;
+ posix_memalign;
+ aligned_alloc;
+ malloc_usable_size;
++mallinfo;
++mallinfo2;
+ 
+ timezone;
+ daylight;
+diff --git a/include/malloc.h b/include/malloc.h
+index 35f8b19c2c34..98ba01000134 100644
+--- a/include/malloc.h
++++ b/include/malloc.h
+@@ -18,6 +18,36 @@ void *memalign(size_t, size_t);
+ 
+ size_t malloc_usable_size(void *);
+ 
++struct mallinfo {
++  int arena;
++  int ordblks;
++  int smblks;
++  int hblks;
++  int hblkhd;
++  int usmblks;
++  int fsmblks;
++  int uordblks;
++  int fordblks;
++  int keepcost;
++};
++
++struct mallinfo mallinfo(void);
++
++struct mallinfo2 {
++  size_t arena;
++  size_t ordblks;
++  size_t smblks;
++  size_t hblks;
++  size_t hblkhd;
++  size_t usmblks;
++  size_t fsmblks;
++  size_t uordblks;
++  size_t fordblks;
++  size_t keepcost;
++};
++
++struct mallinfo2 mallinfo2(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/include/sys/prctl.h b/include/sys/prctl.h
+index d9c846e9c2ea..769229f56bc7 100644
+--- a/include/sys/prctl.h
++++ b/include/sys/prctl.h
+@@ -158,6 +158,9 @@ struct prctl_mm_map {
+ #define PR_GET_TAGGED_ADDR_CTRL 56
+ #define PR_TAGGED_ADDR_ENABLE (1UL << 0)
+ 
++#define PR_SET_VMA 0x53564d41
++#define PR_SET_VMA_ANON_NAME 0
++
+ int prctl (int, ...);
+ 
+ #ifdef __cplusplus
+diff --git a/src/malloc/expand_heap.c b/src/malloc/expand_heap.c
+index e6a3d7a000eb..ab4eb5a3593e 100644
+--- a/src/malloc/expand_heap.c
++++ b/src/malloc/expand_heap.c
+@@ -6,6 +6,8 @@
+ #include "syscall.h"
+ #include "malloc_impl.h"
+ 
++#include <sys/prctl.h>
++
+ /* This function returns true if the interval [old,new]
+  * intersects the 'len'-sized interval below &libc.auxv
+  * (interpreted as the main-thread stack) or below &b
+@@ -65,6 +67,8 @@ void *__expand_heap(size_t *pn)
+ 	void *area = __mmap(0, n, PROT_READ|PROT_WRITE,
+ 		MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+ 	if (area == MAP_FAILED) return 0;
++	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, area, n, "native_heap:musl");
++
+ 	*pn = n;
+ 	mmap_step++;
+ 	return area;
+diff --git a/src/malloc/malloc.c b/src/malloc/malloc.c
+index 96982596b94d..51fa4a3ac399 100644
+--- a/src/malloc/malloc.c
++++ b/src/malloc/malloc.c
+@@ -293,6 +293,9 @@ void *malloc(size_t n)
+ 		char *base = __mmap(0, len, PROT_READ|PROT_WRITE,
+ 			MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+ 		if (base == (void *)-1) return 0;
++
++		prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, base, len, "native_heap:musl");
++
+ 		c = (void *)(base + SIZE_ALIGN - OVERHEAD);
+ 		c->csize = len - (SIZE_ALIGN - OVERHEAD);
+ 		c->psize = SIZE_ALIGN - OVERHEAD;
+diff --git a/src/malloc/mallocng/mallinfo.c b/src/malloc/mallocng/mallinfo.c
+new file mode 100644
+index 000000000000..6e0856ae3d6f
+--- /dev/null
++++ b/src/malloc/mallocng/mallinfo.c
+@@ -0,0 +1,93 @@
++/*
++ * Copyright (c) 2021 Huawei Device Co., Ltd.
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *    http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include <limits.h>
++#include <malloc.h>
++#include <stddef.h>
++
++#if 0
++#include "glue.h"
++#include "meta.h"
++
++static void accumulate_meta(struct mallinfo2 *mi, struct meta *g) {
++  int sc = g->sizeclass;
++  if (sc >= 48) {
++    // Large mmap allocation
++    mi->hblks++;
++    mi->uordblks += g->maplen*4096;
++    mi->hblkhd += g->maplen*4096;
++  } else {
++    if (g->freeable && !g->maplen) {
++      // Small size slots are embedded in a larger slot, avoid double counting
++      // by subtracing the size of the larger slot from the total used memory.
++      struct meta* outer_g = get_meta((void*)g->mem);
++      int outer_sc  = outer_g->sizeclass;
++      int outer_sz = size_classes[outer_sc]*UNIT;
++      mi->uordblks -= outer_sz;
++    }
++    int sz = size_classes[sc]*UNIT;
++    int mask = g->avail_mask | g->freed_mask;
++    int nr_unused = __builtin_popcount(mask);
++    mi->ordblks += nr_unused;
++    mi->uordblks += sz*(g->last_idx+1-nr_unused);
++    mi->fordblks += sz*nr_unused;
++  }
++}
++
++static void accumulate_meta_area(struct mallinfo2 *mi, struct meta_area *ma) {
++  for (int i=0; i<ma->nslots; i++) {
++    if (ma->slots[i].mem) {
++      accumulate_meta(mi, &ma->slots[i]);
++    }
++  }
++}
++#endif
++
++struct mallinfo2 mallinfo2() {
++  
++  struct mallinfo2 mi = {0};
++
++#if 0 
++  rdlock();
++  struct meta_area *ma = ctx.meta_area_head;
++  while (ma) {
++    accumulate_meta_area(&mi, ma);
++    ma = ma->next;
++  }
++  unlock();
++#endif
++
++  return mi;
++}
++
++#define cap(x) ((x > INT_MAX) ? INT_MAX : x)
++
++struct mallinfo mallinfo() {
++  struct mallinfo mi = {0};
++  struct mallinfo2 mi2 = mallinfo2();
++
++  mi.arena = cap(mi2.arena);
++  mi.ordblks = cap(mi2.ordblks);
++  mi.smblks = cap(mi2.smblks);
++  mi.hblks = cap(mi2.hblks);
++  mi.hblkhd = cap(mi2.hblkhd);
++  mi.usmblks = cap(mi2.usmblks);
++  mi.fsmblks = cap(mi2.fsmblks);
++  mi.uordblks = cap(mi2.uordblks);
++  mi.fordblks = cap(mi2.fordblks);
++  mi.keepcost = cap(mi2.keepcost);
++
++  return mi;
++}
+diff --git a/src/mman/mmap.c b/src/mman/mmap.c
+index eff88d82a8fc..763c248cdba9 100644
+--- a/src/mman/mmap.c
++++ b/src/mman/mmap.c
+@@ -22,6 +22,10 @@ void *__mmap(void *start, size_t len, int prot, int flags, int fd, off_t off)
+ 		errno = ENOMEM;
+ 		return MAP_FAILED;
+ 	}
++	if (len == 0) {
++                errno = EINVAL;
++                return MAP_FAILED;
++	}
+ 	if (flags & MAP_FIXED) {
+ 		__vm_wait();
+ 	}
+diff --git a/src/thread/pthread_create.c b/src/thread/pthread_create.c
+index 5f491092597e..62407c45dd1f 100644
+--- a/src/thread/pthread_create.c
++++ b/src/thread/pthread_create.c
+@@ -6,6 +6,15 @@
+ #include <sys/mman.h>
+ #include <string.h>
+ #include <stddef.h>
++#include <stdarg.h>
++
++void log_print(const char* info,...)
++{
++    va_list ap;
++    va_start(ap, info);
++    vfprintf(stdout,info, ap);
++    va_end(ap);
++}
+ 
+ static void dummy_0()
+ {
+@@ -380,3 +389,34 @@ fail:
+ 
+ weak_alias(__pthread_exit, pthread_exit);
+ weak_alias(__pthread_create, pthread_create);
++
++struct pthread* __pthread_list_find(pthread_t thread_id, const char* info)
++{
++    struct pthread *thread = (struct pthread *)thread_id; 
++    if (NULL == thread) {
++        log_print("invalid pthread_t (0) passed to %s\n", info);
++        return NULL;
++    }
++
++    struct pthread *self = __pthread_self();
++    if (thread == self) {
++        return thread;
++    }
++    struct pthread *t = self;
++    t = t->next ;
++    while (t != self) {
++        if (t == thread) return thread;
++        t = t->next ;
++    }
++    log_print("invalid pthread_t %p passed to %s\n", thread, info); 
++    return NULL;
++}
++
++pid_t __pthread_gettid_np(pthread_t t)
++{
++    __tl_lock();
++    struct pthread* thread = __pthread_list_find(t, "pthread_gettid_np");
++    __tl_unlock();
++    return thread ? thread->tid : -1;
++}
++weak_alias(__pthread_gettid_np, pthread_gettid_np);
+\ No newline at end of file
