@@ -19,6 +19,7 @@ DEPENDS += "ruby-native"
 DEPENDS += "ncurses-native"
 DEPENDS += "ccache-native"
 DEPENDS += "clang-native"
+DEPENDS += "hc-gen-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"
@@ -30,7 +31,8 @@ require java-tools.inc
 inherit ccache
 inherit logging
 
-B = "${S}/out/rk3568"
+OHOS_PRODUCT_NAME="rk3568"
+B = "${S}/out/${OHOS_PRODUCT_NAME}"
 
 SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
@@ -72,57 +74,49 @@ do_compile:append() {
         ln -s "$GPP_PATH" "$GPP_DIR/c++"
         bbnote "Symbolic link for c++ created."
     fi
-    
-    CCACHE_LOGFILE="${CCACHE_DIR}/logfile.log"
 
     cd ${S}
-    python3 ${S}/build/hb/main.py build --product-name rpi4 --ccache
+    python3 ${S}/build/hb/main.py build --product-name ${OHOS_PRODUCT_NAME} --ccache
 }
 
 do_install () {
-    OHOS_PACKAGE_OUT_DIR="${B}/packages/${OHOS_PRODUCT_PLATFORM_TYPE}"
+    OHOS_PACKAGE_OUT_DIR="${B}/packages/phone"
+    bbnote "installing contents from ${OHOS_PACKAGE_OUT_DIR} to ${D}"
 
-    # We install library files to ${libdir} and executables into ${bindir}, and
+    # We install library files to /lib and executables into /bin, and
     # then setup /system/lib and /system/bin symlinks to avoid breaking use of
     # hard-coded paths.
-    mkdir -p ${D}/system ${D}${libdir} ${D}${bindir}
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib/* ${D}${libdir}/
-    install -m 755 -t ${D}${bindir}/ ${OHOS_PACKAGE_OUT_DIR}/system/bin/*
-    ln -sfT ..${libdir} ${D}/system/lib
-    ln -sfT ..${bindir} ${D}/system/bin
-    # same for /vendor/lib and /vendor/bin
-    mkdir -p ${D}/vendor
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/vendor/lib/* ${D}${libdir}/
-    install -m 755 -t ${D}${bindir}/ ${OHOS_PACKAGE_OUT_DIR}/vendor/bin/*
-    ln -sfT ..${libdir} ${D}/vendor/lib
-    ln -sfT ..${bindir} ${D}/vendor/bin
-
-    # system ability configurations
-    mkdir -p ${D}${libdir}/openharmony/profile
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/profile/* ${D}${libdir}/openharmony/profile
-    ln -sfT ..${libdir}/openharmony/profile ${D}/system/profile
-
-    # odd files in /system/usr
-    mkdir -p ${D}${libdir}/openharmony/usr
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/usr/* ${D}${libdir}/openharmony/usr
-    ln -sfT ..${libdir}/openharmony/usr ${D}/system/usr
+    mkdir -p ${D}/system ${D}/lib ${D}/bin
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib/* ${D}/lib/
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/bin/* ${D}/bin/
+    find ${D}/bin/ -type f -exec chmod 755 {} \;
+    ln -sfT ../lib ${D}/system/lib
+    ln -sfT ../bin ${D}/system/bin
 
     # OpenHarmony etc (configuration) files
-    mkdir -p ${D}${sysconfdir}/openharmony
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
-    ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
-    # same for /vendor/etc
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/etc/* ${D}${sysconfdir}/openharmony
-    ln -sfT ..${sysconfdir}/openharmony ${D}/vendor/etc
+    mkdir -p ${D}/etc
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}/etc
+    ln -sfT ../etc ${D}/system/etc
+
+    # system ability configurations
+    mkdir -p ${D}/system/profile
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/profile/* ${D}/system/profile
+
+    # copy /system/usr
+    mkdir -p ${D}/system/usr
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/usr/* ${D}/system/usr
 
     # OpenHarmony font files
-    mkdir -p ${D}${datadir}/fonts/openharmony
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/fonts/* ${D}${datadir}/fonts/openharmony
-    ln -sfT ..${datadir}/fonts/openharmony ${D}/system/fonts
+    mkdir -p ${D}/system/fonts
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/fonts/* ${D}/system/fonts
 
     # OpenHarmony app files
     mkdir -p ${D}/system/app
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/app/* ${D}/system/app
+
+    # copy /vendor
+    mkdir -p ${D}/vendor
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
 }
 
 inherit native
