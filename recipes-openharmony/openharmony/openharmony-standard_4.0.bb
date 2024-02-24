@@ -37,6 +37,9 @@ B = "${S}/out/${OHOS_PRODUCT_NAME}"
 SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
 
+SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/hdf_core/framework"
+
+
 # The task is usually done by //build/prebuilts_download.sh but we are 
 # skipping the download part which is done by do_fetch,
 # we are extracting here only the main installation part of the prebuilts
@@ -74,6 +77,19 @@ do_compile:append() {
         ln -s "$GPP_PATH" "$GPP_DIR/c++"
         bbnote "Symbolic link for c++ created."
     fi
+
+    # set the compiler to Yocto native toolchain.
+    CC="${BUILD_CC}"
+    CXX="${BUILD_CXX}"
+    FC="${BUILD_FC}"
+    CPP="${BUILD_CPP}"
+    LD="${BUILD_LD}"
+    CCLD="${BUILD_CCLD}"
+    AR="${BUILD_AR}"
+    AS="${BUILD_AS}"
+    RANLIB="${BUILD_RANLIB}"
+    STRIP="${BUILD_STRIP}"
+    NM="${BUILD_NM}"
 
     cd ${S}
     python3 ${S}/build/hb/main.py build --product-name ${OHOS_PRODUCT_NAME} --ccache
@@ -119,4 +135,22 @@ do_install () {
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
 }
 
-inherit native
+# OpenHarmony libraries are not versioned properly.
+# Move the unversioned .so files to the primary package.
+SOLIBS = ".so"
+FILES_SOLIBSDEV = ""
+
+FILES:${PN} += "\
+    /system/* \
+    /vendor/* \
+    /lib/* \
+"
+
+
+EXCLUDE_FROM_SHLIBS = "1"
+
+# To avoid excessive diskspace blowup, we are stripping our executables
+INSANE_SKIP:${PN} += "already-stripped"
+
+# Need this to allow libnative_window.so and libnative_drawing.so symlinks
+INSANE_SKIP:${PN} += "dev-so"
