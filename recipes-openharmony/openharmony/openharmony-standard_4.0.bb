@@ -31,14 +31,14 @@ require java-tools.inc
 inherit ccache
 inherit logging
 
-OHOS_PRODUCT_NAME="rk3568"
+OHOS_PRODUCT_NAME="rpi4"
 B = "${S}/out/${OHOS_PRODUCT_NAME}"
 
 SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
 
+SRC_URI += "file://build.patch;patchdir=${S}/build"
 SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/hdf_core/framework"
-
 
 # The task is usually done by //build/prebuilts_download.sh but we are 
 # skipping the download part which is done by do_fetch,
@@ -104,15 +104,17 @@ do_install () {
     # hard-coded paths.
     mkdir -p ${D}/system ${D}/lib ${D}/bin
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib/* ${D}/lib/
+    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib64/* ${D}/lib/
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/bin/* ${D}/bin/
     find ${D}/bin/ -type f -exec chmod 755 {} \;
     ln -sfT ../lib ${D}/system/lib
+    ln -sfT ../lib ${D}/system/lib64
     ln -sfT ../bin ${D}/system/bin
 
     # OpenHarmony etc (configuration) files
-    mkdir -p ${D}/etc
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}/etc
-    ln -sfT ../etc ${D}/system/etc
+    mkdir -p ${D}${sysconfdir}/openharmony
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
+    ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
 
     # system ability configurations
     mkdir -p ${D}/system/profile
@@ -133,6 +135,10 @@ do_install () {
     # copy /vendor
     mkdir -p ${D}/vendor
     cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
+
+    # exclude some libs and bins because conflicting with other yocto packages
+    rm ${D}/lib/ld-musl-aarch64.so.1
+    rm ${D}/bin/sh
 }
 
 # OpenHarmony libraries are not versioned properly.
@@ -154,3 +160,8 @@ INSANE_SKIP:${PN} += "already-stripped"
 
 # Need this to allow libnative_window.so and libnative_drawing.so symlinks
 INSANE_SKIP:${PN} += "dev-so"
+
+# TEMPORARY fix to: `do_package_qa: QA Issue: /lib/init/reboot/librebootmodule.z.so 
+# contained in package openharmony-standard requires libinit_module_engine.so()(64bit), 
+# but no providers found in RDEPENDS:openharmony-standard? [file-rdeps]`
+INSANE_SKIP:${PN} += "file-rdeps"
