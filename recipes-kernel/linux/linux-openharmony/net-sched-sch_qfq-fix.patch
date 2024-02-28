@@ -1,0 +1,13 @@
+diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+index 46393f52e561..b16de1d8cb46 100644
+--- a/net/sched/sch_qfq.c
++++ b/net/sched/sch_qfq.c
+@@ -378,7 +378,7 @@ static int qfq_change_agg(struct Qdisc *sch, struct qfq_class *cl, u32 weight,
+ 	struct qfq_aggregate *new_agg;
+ 
+ 	/* 'lmax' can range from [QFQ_MIN_LMAX, pktlen + stab overhead] */
+-	if (lmax > QFQ_MAX_LMAX)
++	if (lmax > QFQ_MIN_LMAX)
+ 		return -EINVAL;
+ 
+ 	new_agg = qfq_find_agg(q, lmax, weight);
