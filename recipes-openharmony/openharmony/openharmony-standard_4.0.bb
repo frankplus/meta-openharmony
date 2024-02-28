@@ -40,6 +40,13 @@ SRC_URI += "file://prebuilts_download.py"
 SRC_URI += "file://build.patch;patchdir=${S}/build"
 SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/hdf_core/framework"
 
+# clean build directory if already exists
+clean_out_dir() {
+    if [ -d ${S}/out ]; then
+        rm -r ${S}/out
+    fi
+}
+
 # The task is usually done by //build/prebuilts_download.sh but we are 
 # skipping the download part which is done by do_fetch,
 # we are extracting here only the main installation part of the prebuilts
@@ -58,7 +65,7 @@ python_is_python3() {
     fi
 }
 
-do_configure[prefuncs] += "prebuilts_download python_is_python3"
+do_configure[prefuncs] += "clean_out_dir prebuilts_download python_is_python3"
 
 do_compile:append() {
     # Find the path of the g++ compiler
