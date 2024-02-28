@@ -25,7 +25,7 @@ LDFLAGS:append:toolchain-clang = " ${@bb.utils.contains('COMPILER_RT', '-rtlib=c
 #CFLAGS:append:df-openharmony = "-DHOOK_ENABLE"
 
 do_install:append:df-openharmony () {
-    for folder in ${MUSL_LDSO_PATHS}; do
-        echo "${libdir}/${folder}" >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path
+    for directory in ${MUSL_LDSO_PATHS}; do
+        echo "${directory}" >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path
     done
 }
