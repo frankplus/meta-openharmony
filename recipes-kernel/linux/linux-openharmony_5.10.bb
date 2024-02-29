@@ -38,8 +38,8 @@ SRCREV_drivers_hdf_core = "0217b83f3f07ba7b3b5a9a7524a20f363cb330db"
 
 SRC_URI += "file://defconfig"
 SRC_URI += "file://hdf.patch"
+SRC_URI += "file://qemu-arm-linux.patch"
 SRC_URI += "file://hdf_patch.sh"
-SRC_URI += "file://0001-rpi4.patch"
 SRC_URI += "file://remove-vendor-kconfig.patch"
 SRC_URI += "file://net-sched-sch_qfq-fix.patch"
 
@@ -47,10 +47,10 @@ SRC_URI += "file://net-sched-sch_qfq-fix.patch"
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-openharmony:"
 
 # Define the compatibility of the kernel
-COMPATIBLE_MACHINE = "raspberrypi4-64"
+COMPATIBLE_MACHINE = "qemuarma7"
 
 # use file://defconfig
-KBUILD_DEFCONFIG:raspberrypi4-64 = ""
+KBUILD_DEFCONFIG:qemuarma7 = ""
 
 do_patch:append(){
     KERNEL_BUILD_ROOT=${S}
