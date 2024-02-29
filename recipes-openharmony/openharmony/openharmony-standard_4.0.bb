@@ -31,8 +31,8 @@ require java-tools.inc
 inherit ccache
 inherit logging
 
-OHOS_PRODUCT_NAME="rpi4"
-B = "${S}/out/${OHOS_PRODUCT_NAME}"
+OHOS_PRODUCT_NAME="qemu-arm-linux-min"
+B = "${S}/out/qemu-arm-linux"
 
 SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
@@ -111,7 +111,7 @@ do_install () {
     # hard-coded paths.
     mkdir -p ${D}/system ${D}/lib ${D}/bin
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib/* ${D}/lib/
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib64/* ${D}/lib/
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/system/lib64" ] && cp -r ${OHOS_PACKAGE_OUT_DIR}/system/lib64/* ${D}/lib/
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/bin/* ${D}/bin/
     find ${D}/bin/ -type f -exec chmod 755 {} \;
     ln -sfT ../lib ${D}/system/lib
@@ -129,22 +129,22 @@ do_install () {
 
     # copy /system/usr
     mkdir -p ${D}/system/usr
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/usr/* ${D}/system/usr
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/system/usr" ] && cp -r ${OHOS_PACKAGE_OUT_DIR}/system/usr/* ${D}/system/usr
 
     # OpenHarmony font files
     mkdir -p ${D}/system/fonts
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/fonts/* ${D}/system/fonts
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/system/fonts" ] && cp -r ${OHOS_PACKAGE_OUT_DIR}/system/fonts/* ${D}/system/fonts
 
     # OpenHarmony app files
     mkdir -p ${D}/system/app
-    cp -r ${OHOS_PACKAGE_OUT_DIR}/system/app/* ${D}/system/app
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/system/app" ] && cp -r ${OHOS_PACKAGE_OUT_DIR}/system/app/* ${D}/system/app
 
     # copy /vendor
-    mkdir -p ${D}/vendor
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/vendor" ] && mkdir -p ${D}/vendor
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/vendor" ] && cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
 
     # exclude some libs and bins because conflicting with other yocto packages
-    rm ${D}/lib/ld-musl-aarch64.so.1
+    [ -e ${D}/lib/ld-musl-aarch64.so.1 ] && rm ${D}/lib/ld-musl-aarch64.so.1
     rm ${D}/bin/sh
 }
 
