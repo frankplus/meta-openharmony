@@ -1,0 +1,126 @@
+From 8f39525272e9a10d86e613481af20b3d1331ef84 Mon Sep 17 00:00:00 2001
+From: Francesco Pham <francesco.pham@huawei.com>
+Date: Sat, 2 Mar 2024 13:09:55 +0100
+Subject: [PATCH] fix pointer-integer conversion errors
+
+Signed-off-by: Francesco Pham <francesco.pham@huawei.com>
+---
+ ldso/cfi.c                | 14 +++++++-------
+ ldso/dynlink.c            |  2 +-
+ src/network/getnameinfo.c |  4 ++--
+ src/network/lookup_name.c |  4 ++--
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/ldso/cfi.c b/ldso/cfi.c
+index 314e740a..dd8ce2ef 100644
+--- a/ldso/cfi.c
++++ b/ldso/cfi.c
+@@ -195,7 +195,7 @@ static inline void cfi_slowpath_common(uint64_t call_site_type_id, void *func_pt
+     uintptr_t addr = (uintptr_t)func_ptr & ((1ULL << 56) - 1);
+ #else
+     LD_LOGD("[CFI] [%{public}s] __aarch64__ not defined!\n", __FUNCTION__);
+-    uintptr_t addr = func_ptr;
++    uintptr_t addr = (uintptr_t) func_ptr;
+ #endif
+ 
+     /* Get shadow value */
+@@ -326,7 +326,7 @@ void unmap_dso_from_cfi_shadow(struct dso *dso)
+         return;
+ 
+     /* Set the dso's shadow value as invalid. */
+-    fill_shadow_value_to_shadow(dso->map, dso->map + dso->map_len, 0, sv_invalid);
++    fill_shadow_value_to_shadow((uintptr_t)dso->map, (uintptr_t)dso->map + dso->map_len, 0, sv_invalid);
+     dso->is_mapped_to_shadow = false;
+     prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, cfi_shadow_start, shadow_size, "cfi_shadow:musl");
+ 
+@@ -374,21 +374,21 @@ static int add_dso_to_cfi_shadow(struct dso *dso)
+         /* If the dso doesn't have __cfi_check(), set it's shadow value unchecked. */
+         if (!cfi_check_sym.sym) {
+             LD_LOGD("[CFI] [%{public}s] %{public}s has no __cfi_check()!\n", __FUNCTION__, p->name);
+-            if (fill_shadow_value_to_shadow(p->map, p->map + p->map_len, 0, sv_uncheck) == CFI_FAILED) {
++            if (fill_shadow_value_to_shadow((uintptr_t)p->map, (uintptr_t)p->map + p->map_len, 0, sv_uncheck) == CFI_FAILED) {
+                 LD_LOGE("[CFI] [%{public}s] add dso to cfi shadow failed!\n", __FUNCTION__);
+                 return CFI_FAILED;
+             }
+         /* If the dso has __cfi_check(), set it's shadow value valid. */
+         } else {
+             LD_LOGD("[CFI] [%{public}s] %{public}s has __cfi_check()!\n", __FUNCTION__, p->name);
+-            uintptr_t end = p->map + p->map_len;
+-            uintptr_t cfi_check = LADDR(cfi_check_sym.dso, cfi_check_sym.sym->st_value);
++            uintptr_t end = (uintptr_t)p->map + p->map_len;
++            uintptr_t cfi_check = (uintptr_t)LADDR(cfi_check_sym.dso, cfi_check_sym.sym->st_value);
+ 
+             if (cfi_check == 0) {
+                 LD_LOGE("[CFI] [%{public}s] %{public}s has null cfi_check func!\n", __FUNCTION__, p->name);
+                 return CFI_FAILED;
+             }
+-            if (fill_shadow_value_to_shadow(p->map, end, cfi_check, sv_valid_min) == CFI_FAILED) {
++            if (fill_shadow_value_to_shadow((uintptr_t)p->map, end, cfi_check, sv_valid_min) == CFI_FAILED) {
+                 LD_LOGE("[CFI] [%{public}s] add %{public}s to cfi shadow failed!\n", __FUNCTION__, p->name);
+                 return CFI_FAILED;
+             }
+@@ -506,4 +506,4 @@ void __cfi_slowpath_diag(uint64_t call_site_type_id, void *func_ptr, void *diag_
+ 
+     cfi_slowpath_common(call_site_type_id, func_ptr, diag_data);
+     return;
+-}
+\ No newline at end of file
++}
+diff --git a/ldso/dynlink.c b/ldso/dynlink.c
+index c8832f63..fe8dc431 100644
+--- a/ldso/dynlink.c
++++ b/ldso/dynlink.c
+@@ -5477,7 +5477,7 @@ static void find_and_set_bss_name(struct dso *p)
+ 	Phdr *ph = p->phdr;
+ 	for (cnt = p->phnum; cnt--; ph = (void *)((char *)ph + p->phentsize)) {
+ 		if (ph->p_type != PT_LOAD) continue;
+-		size_t seg_start = p->base + ph->p_vaddr;
++		size_t seg_start = (size_t) (p->base + ph->p_vaddr);
+ 		size_t seg_file_end = seg_start + ph->p_filesz + PAGE_SIZE - 1 & -PAGE_SIZE;
+ 		size_t seg_max_addr = seg_start + ph->p_memsz + PAGE_SIZE - 1 & -PAGE_SIZE;
+ 		size_t zeromap_size = seg_max_addr - seg_file_end;
+diff --git a/src/network/getnameinfo.c b/src/network/getnameinfo.c
+index fe32156b..4447a52c 100644
+--- a/src/network/getnameinfo.c
++++ b/src/network/getnameinfo.c
+@@ -51,14 +51,14 @@ static void mkptr6(char *s, const unsigned char *ip)
+ static inline int get_hosts_str(char *line, int length, FILE *f, int *i)
+ {
+ 	if (f) {
+-		return fgets(line, sizeof line, f);
++		return fgets(line, sizeof line, f) != NULL;
+ 	}
+ 	if (*i < FIXED_HOSTS_MAX_LENGTH) {
+ 		memcpy(line, fixed_hosts[*i], strlen(fixed_hosts[*i]));
+ 		(*i)++;
+ 		return 1;
+ 	}
+-	return NULL;
++	return 0;
+ }
+ 
+ static void reverse_hosts(char *buf, const unsigned char *a, unsigned scopeid, int family)
+diff --git a/src/network/lookup_name.c b/src/network/lookup_name.c
+index 2a8cd5d0..1c32c835 100644
+--- a/src/network/lookup_name.c
++++ b/src/network/lookup_name.c
+@@ -61,14 +61,14 @@ static int name_from_numeric(struct address buf[static 1], const char *name, int
+ static inline int get_hosts_str(char *line, int length, FILE *f, int *i)
+ {
+ 	if (f) {
+-		return fgets(line, sizeof line, f);
++		return fgets(line, sizeof line, f) != NULL;
+ 	}
+ 	if (*i < FIXED_HOSTS_MAX_LENGTH) {
+ 		memcpy(line, fixed_hosts[*i], strlen(fixed_hosts[*i]));
+ 		(*i)++;
+ 		return 1;
+ 	}
+-	return NULL;
++	return 0;
+ }
+ 
+ static int name_from_hosts(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family)
+-- 
+2.25.1
+

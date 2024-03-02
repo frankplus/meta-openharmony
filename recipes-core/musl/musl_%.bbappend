@@ -2,14 +2,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-BASEVER:df-openharmony = "1.2.0"
-SRCREV:df-openharmony = "040c1d16b468c50c04fc94edff521f1637708328"
-LIC_FILES_CHKSUM:df-openharmony = "file://COPYRIGHT;md5=f95ee848a08ad253c04723da00cedb01"
-FILESEXTRAPATHS:prepend:df-openharmony := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:${THISDIR}/musl-${BASEVER}:"
+FILESEXTRAPATHS:prepend:df-openharmony := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
+
 SRC_URI:append:df-openharmony = " file://openharmony-common.patch"
 SRC_URI:append:df-openharmony = " file://openharmony-linux-user.patch"
-# This conflicts with libcap, so we have to go with libcap instead
-#SRC_URI:append:df-openharmony = " file://openharmony-linux-user-capability_h.patch"
+SRC_URI:append:df-openharmony = " file://fix-pointer-integer-conversion-errors.patch"
 
 # As musl links with -nostdlib, we need to add linking with
 # libclang_rt.builtins.a manually as needed
