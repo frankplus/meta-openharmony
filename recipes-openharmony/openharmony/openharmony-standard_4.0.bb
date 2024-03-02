@@ -115,7 +115,7 @@ do_install () {
     cp -r ${OHOS_PACKAGE_OUT_DIR}/system/bin/* ${D}/bin/
     find ${D}/bin/ -type f -exec chmod 755 {} \;
     ln -sfT ../lib ${D}/system/lib
-    ln -sfT ../lib ${D}/system/lib64
+    [ -d "${OHOS_PACKAGE_OUT_DIR}/system/lib64" ] && ln -sfT ../lib ${D}/system/lib64
     ln -sfT ../bin ${D}/system/bin
 
     # OpenHarmony etc (configuration) files
@@ -145,6 +145,7 @@ do_install () {
 
     # exclude some libs and bins because conflicting with other yocto packages
     [ -e ${D}/lib/ld-musl-aarch64.so.1 ] && rm ${D}/lib/ld-musl-aarch64.so.1
+    [ -e ${D}/lib/ld-musl-arm.so.1 ] && rm ${D}/lib/ld-musl-arm.so.1
     rm ${D}/bin/sh
 }
 
