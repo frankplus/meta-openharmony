@@ -144,8 +144,6 @@ do_install () {
     [ -d "${OHOS_PACKAGE_OUT_DIR}/vendor" ] && cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
 
     # exclude some libs and bins because conflicting with other yocto packages
-    [ -e ${D}/lib/ld-musl-aarch64.so.1 ] && rm ${D}/lib/ld-musl-aarch64.so.1
-    [ -e ${D}/lib/ld-musl-arm.so.1 ] && rm ${D}/lib/ld-musl-arm.so.1
     rm ${D}/bin/sh
 }
 
