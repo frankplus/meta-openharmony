@@ -119,9 +119,9 @@ do_install () {
     ln -sfT ../bin ${D}/system/bin
 
     # OpenHarmony etc (configuration) files
-    mkdir -p ${D}${sysconfdir}/openharmony
-    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}/openharmony
-    ln -sfT ..${sysconfdir}/openharmony ${D}/system/etc
+    mkdir -p ${D}${sysconfdir}
+    cp -r  ${OHOS_PACKAGE_OUT_DIR}/system/etc/* ${D}${sysconfdir}
+    ln -sfT ..${sysconfdir} ${D}/system/etc
 
     # system ability configurations
     mkdir -p ${D}/system/profile
