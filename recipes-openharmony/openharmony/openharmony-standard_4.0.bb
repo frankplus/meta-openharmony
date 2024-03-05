@@ -39,6 +39,8 @@ SRC_URI += "file://prebuilts_download.py"
 
 SRC_URI += "file://build.patch;patchdir=${S}/build"
 SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/hdf_core/framework"
+SRC_URI += "file://qemu_arm_linux_min.patch;patchdir=${S}/vendor/ohemu"
+SRC_URI += "file://remove-kernel-dep.patch;patchdir=${S}/device/qemu"
 
 # clean build directory if already exists
 clean_out_dir() {
