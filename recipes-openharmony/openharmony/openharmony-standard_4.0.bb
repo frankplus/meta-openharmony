@@ -145,6 +145,13 @@ do_install () {
     [ -d "${OHOS_PACKAGE_OUT_DIR}/vendor" ] && mkdir -p ${D}/vendor
     [ -d "${OHOS_PACKAGE_OUT_DIR}/vendor" ] && cp -r  ${OHOS_PACKAGE_OUT_DIR}/vendor/* ${D}/vendor
 
+    # initialize root file system 
+    cd ${D}
+    mkdir  chip_prod  config  data  dev  eng_chipset  eng_system  \
+        mnt  module_update  proc  storage  sys  sys_prod  tmp  updater 
+    ln -sf /vendor ${D}/chipset
+    ln -sf /system/bin/init ${D}/init
+
     # exclude some libs and bins because conflicting with other yocto packages
     rm ${D}/bin/sh
 }
@@ -158,6 +165,8 @@ FILES:${PN} += "\
     /system/* \
     /vendor/* \
     /lib/* \
+    chip_prod  chipset  config  data  dev  eng_chipset  eng_system  \
+    init  mnt  module_update  proc  storage  sys  sys_prod  tmp  updater \
 "
 
 
