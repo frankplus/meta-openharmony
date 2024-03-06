@@ -31,8 +31,8 @@ require java-tools.inc
 inherit ccache
 inherit logging
 
-OHOS_PRODUCT_NAME="qemu-arm-linux-min"
-B = "${S}/out/qemu-arm-linux"
+OHOS_PRODUCT_NAME="rpi4"
+B = "${S}/out/rpi4"
 
 SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
@@ -154,6 +154,8 @@ do_install () {
 
     # exclude some libs and bins because conflicting with other yocto packages
     rm ${D}/bin/sh
+    [ -d "${D}/etc/profile" ] && rm -r ${D}/etc/profile
+    rm -r ${D}/etc/udev
 }
 
 # OpenHarmony libraries are not versioned properly.
