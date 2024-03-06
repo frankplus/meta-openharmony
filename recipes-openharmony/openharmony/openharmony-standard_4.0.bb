@@ -155,7 +155,9 @@ do_install () {
     # exclude some libs and bins because conflicting with other yocto packages
     rm ${D}/bin/sh
     [ -d "${D}/etc/profile" ] && rm -r ${D}/etc/profile
-    rm -r ${D}/etc/udev
+    [ -d "${D}/etc/udev" ] && rm -r ${D}/etc/udev
+
+    return 0
 }
 
 # OpenHarmony libraries are not versioned properly.
