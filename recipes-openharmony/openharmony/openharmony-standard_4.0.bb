@@ -157,6 +157,10 @@ do_install () {
     [ -d "${D}/etc/profile" ] && rm -r ${D}/etc/profile
     [ -d "${D}/etc/udev" ] && rm -r ${D}/etc/udev
 
+    # when building for rk3568 target there is a binary in this directory that 
+    # is built for aarch64 architecture when we are targeting arm
+    [ -d "${D}/lib/module/arkcompiler" ] && rm -r ${D}/lib/module/arkcompiler
+
     return 0
 }
 
