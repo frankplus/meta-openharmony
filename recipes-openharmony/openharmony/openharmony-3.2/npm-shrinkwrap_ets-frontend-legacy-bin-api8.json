@@ -1002,7 +1002,7 @@
     },
     "node_modules/@discoveryjs/json-ext": {
       "version": "0.5.6",
-      "resolved": "https://registry.npmmirror.com/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz",
       "integrity": "sha512-ws57AidsDvREKrZKYffXddNkyaF14iHNHm8VQnZH6t99E8gczjNN0GpvcGny0imC80yQ0tHz1xVUKk/KFQSUyA==",
       "dev": true
     },
@@ -1146,7 +1146,7 @@
     },
     "node_modules/@types/node": {
       "version": "10.5.5",
-      "resolved": "https://registry.npmmirror.com/@types/node/-/node-10.5.5.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-10.5.5.tgz",
       "integrity": "sha512-6Qnb1gXbp3g1JX9QVJj3A6ORzc9XCyhokxUKaoonHgNXcQhmk8adhotxfkeK8El9TnFeUuH72yI6jQ5nDJKS6w==",
       "dev": true
     },
@@ -1329,13 +1329,13 @@
     },
     "node_modules/@webpack-cli/configtest": {
       "version": "1.1.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/configtest/-/configtest-1.1.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/configtest/-/configtest-1.1.1.tgz",
       "integrity": "sha512-1FBc1f9G4P/AxMqIgfZgeOTuRnwZMten8E7zap5zgpPInnCrP8D4Q81+4CWIch8i/Nf7nXjP0v6CjjbHOrXhKg==",
       "dev": true
     },
     "node_modules/@webpack-cli/info": {
       "version": "1.4.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/info/-/info-1.4.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/info/-/info-1.4.1.tgz",
       "integrity": "sha512-PKVGmazEq3oAo46Q63tpMr4HipI3OPfP7LiNOEJg963RMgT0rqheag28NCML0o3GIzA3DmxP1ZIAv9oTX1CUIA==",
       "dev": true,
       "dependencies": {
@@ -1344,7 +1344,7 @@
     },
     "node_modules/@webpack-cli/serve": {
       "version": "1.6.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/serve/-/serve-1.6.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/serve/-/serve-1.6.1.tgz",
       "integrity": "sha512-gNGTiTrjEVQ0OcVnzsRSqTxaBSr+dmTfm+qJsCDluky8uhdLWep7Gcr62QsAKHTMxjCS/8nEITsmFAhfIx+QSw==",
       "dev": true
     },
@@ -5796,7 +5796,7 @@
     },
     "@discoveryjs/json-ext": {
       "version": "0.5.6",
-      "resolved": "https://registry.npmmirror.com/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz",
       "integrity": "sha512-ws57AidsDvREKrZKYffXddNkyaF14iHNHm8VQnZH6t99E8gczjNN0GpvcGny0imC80yQ0tHz1xVUKk/KFQSUyA==",
       "dev": true
     },
@@ -5940,7 +5940,7 @@
     },
     "@types/node": {
       "version": "10.5.5",
-      "resolved": "https://registry.npmmirror.com/@types/node/-/node-10.5.5.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-10.5.5.tgz",
       "integrity": "sha512-6Qnb1gXbp3g1JX9QVJj3A6ORzc9XCyhokxUKaoonHgNXcQhmk8adhotxfkeK8El9TnFeUuH72yI6jQ5nDJKS6w==",
       "dev": true
     },
@@ -6123,13 +6123,13 @@
     },
     "@webpack-cli/configtest": {
       "version": "1.1.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/configtest/-/configtest-1.1.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/configtest/-/configtest-1.1.1.tgz",
       "integrity": "sha512-1FBc1f9G4P/AxMqIgfZgeOTuRnwZMten8E7zap5zgpPInnCrP8D4Q81+4CWIch8i/Nf7nXjP0v6CjjbHOrXhKg==",
       "dev": true
     },
     "@webpack-cli/info": {
       "version": "1.4.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/info/-/info-1.4.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/info/-/info-1.4.1.tgz",
       "integrity": "sha512-PKVGmazEq3oAo46Q63tpMr4HipI3OPfP7LiNOEJg963RMgT0rqheag28NCML0o3GIzA3DmxP1ZIAv9oTX1CUIA==",
       "dev": true,
       "requires": {
@@ -6138,7 +6138,7 @@
     },
     "@webpack-cli/serve": {
       "version": "1.6.1",
-      "resolved": "https://registry.npmmirror.com/@webpack-cli/serve/-/serve-1.6.1.tgz",
+      "resolved": "https://repo.huaweicloud.com/repository/npm/@webpack-cli/serve/-/serve-1.6.1.tgz",
       "integrity": "sha512-gNGTiTrjEVQ0OcVnzsRSqTxaBSr+dmTfm+qJsCDluky8uhdLWep7Gcr62QsAKHTMxjCS/8nEITsmFAhfIx+QSw==",
       "dev": true
     },
