@@ -21,7 +21,6 @@ KERNEL_BUILD_ROOT=$2
 ln_list=(
     drivers/hdf_core/adapter/khdf/linux    drivers/hdf/khdf
     drivers/hdf_core/framework             drivers/hdf/framework
-    drivers/hdf_core/interfaces/inner_api  drivers/hdf/inner_api
     drivers/hdf_core/framework/include     include/hdf
 )
 
