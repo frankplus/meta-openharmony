@@ -894,7 +894,7 @@ SRC_URI += "${ORIGIN_URL}/arkcompiler_runtime_core.git;protocol=https;branch=Ope
 SRCREV_arkcompiler_runtime_core = "5ea6a82e839525ed8967997463936854820ef611"
 SRCREV_FORMAT .= "+arkcompiler_runtime_core"
 SRC_URI += "${ORIGIN_URL}/arkcompiler_ets_runtime.git;protocol=https;branch=OpenHarmony-3.2-Release;name=arkcompiler_ets_runtime;destsuffix=${OH_SRCDIR}/arkcompiler/ets_runtime"
-SRCREV_arkcompiler_ets_runtime = "ca9c0bdba95b54d445596de4efe8425095cdba2d"
+SRCREV_arkcompiler_ets_runtime = "d5a900a9a9bff0a5526e0c968fa290b5bb87b310"
 SRCREV_FORMAT .= "+arkcompiler_ets_runtime"
 SRC_URI += "${ORIGIN_URL}/arkcompiler_ets_frontend.git;protocol=https;branch=OpenHarmony-3.2-Release;name=arkcompiler_ets_frontend;destsuffix=${OH_SRCDIR}/arkcompiler/ets_frontend"
 SRCREV_arkcompiler_ets_frontend = "f552ace0881d41cb3bb81ec814055868eb2e59fc"
