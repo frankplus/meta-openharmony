@@ -33,13 +33,14 @@ SRCREV_third_party_FreeBSD = "ca57c902d175ebcdda33707764e9cbc82fc3024c"
 SRC_URI += "${ORIGIN_URL}/drivers_hdf_core.git;protocol=https;branch=OpenHarmony-3.2-Release;name=drivers_hdf_core;destsuffix=drivers/hdf_core"
 SRCREV_drivers_hdf_core = "213c680542b0f9916c317f4d77507529b166c582"
 
+SRC_URI += "git://gitee.com/openharmony-sig/vendor_iscas.git;protocol=https;branch=OpenHarmony-3.2-Release;name=vendor_iscas;destsuffix=vendor/iscas"
+SRCREV_vendor_iscas = "16a4d8efba39c03e46342dc75f1b400ee8258136"
+
 SRC_URI += "file://defconfig"
 SRC_URI += "file://hdf.patch"
 SRC_URI += "file://hdf_patch.sh"
-# SRC_URI += "file://remove-vendor-kconfig.patch"
-# SRC_URI += "file://net-sched-sch_qfq-fix.patch"
-# SRC_URI += "file://qemu-arm-linux.patch"
 SRC_URI += "file://rpi4.patch"
+SRC_URI += "file://kbuild-flags.patch"
 
 # Specify the paths for patches and additional files
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-openharmony:"
@@ -54,6 +55,14 @@ KBUILD_DEFCONFIG:raspberrypi4-64 = ""
 do_patch:append(){
     KERNEL_BUILD_ROOT=${S}
     bash ${WORKDIR}/hdf_patch.sh ${WORKDIR} ${KERNEL_BUILD_ROOT}
+}
+
+do_compile:prepend(){
+    export PRODUCT_PATH=vendor/iscas/rpi4
+}
+
+do_compile_kernelmodules:prepend(){
+    export PRODUCT_PATH=vendor/iscas/rpi4
 }
 
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
