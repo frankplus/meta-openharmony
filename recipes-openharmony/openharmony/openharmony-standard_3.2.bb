@@ -159,9 +159,12 @@ do_install () {
     [ -d "${D}/etc/profile" ] && rm -r ${D}/etc/profile
     [ -d "${D}/etc/udev" ] && rm -r ${D}/etc/udev
 
-    # when building for rk3568 target there is a binary in this directory that 
-    # is built for aarch64 architecture when we are targeting arm
-    [ -d "${D}/lib/module/arkcompiler" ] && rm -r ${D}/lib/module/arkcompiler
+    rm ${D}/lib/libshared_libz.so
+    rm ${D}/lib/libf2fs.so
+    rm ${D}/lib/platformsdk/libhmicuuc.so
+    rm ${D}/lib/platformsdk/libhmicui18n.so
+    rm ${D}/lib/libext2_uuid.so
+    rm -r ${D}/lib/firmware
 
     return 0
 }
