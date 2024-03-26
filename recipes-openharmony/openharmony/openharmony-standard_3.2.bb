@@ -66,6 +66,11 @@ python_is_python3() {
 
 do_configure[prefuncs] += "clean_out_dir prebuilts_download python_is_python3"
 
+do_compile:prepend() {
+    # Remove unused Makefile to avoid bitbake running oe_runmake
+    rm -f ${S}/out/rpi4/Makefile
+}
+
 do_compile:append() {
     # Find the path of the g++ compiler
     GPP_PATH=$(which g++)
