@@ -166,6 +166,10 @@ do_install () {
     rm ${D}/lib/libext2_uuid.so
     rm -r ${D}/lib/firmware
 
+    # rename musl to avoid conflict with yocto provided libc
+    mv ${D}/lib/ld-musl-aarch64.so.1 ${D}/lib/ohos-ld-musl-aarch64.so.1
+    mv ${D}/etc/ld-musl-aarch64.path ${D}/etc/ohos-ld-musl-aarch64.path
+
     return 0
 }
 
