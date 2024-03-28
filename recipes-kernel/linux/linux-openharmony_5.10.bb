@@ -39,8 +39,8 @@ SRCREV_kernel_linux_patches = "824896c9ef0d04b70bd9d7644afec03db8cda927"
 SRC_URI += "git://gitee.com/openharmony-sig/vendor_iscas.git;protocol=https;branch=OpenHarmony-3.2-Release;name=vendor_iscas;destsuffix=vendor/iscas"
 SRCREV_vendor_iscas = "16a4d8efba39c03e46342dc75f1b400ee8258136"
 
-SRC_URI += "file://defconfig"
-SRC_URI += "file://hdf.patch"
+SRC_URI += "file://bcm2711_oh_defconfig"
+SRC_URI += "file://qemu_defconfig"
 SRC_URI += "file://rpi4.patch"
 SRC_URI += "file://kbuild-flags.patch"
 
@@ -51,8 +51,12 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/linux-openharmony:"
 COMPATIBLE_MACHINE = "qemuarma7|raspberrypi4-64"
 
 # use file://defconfig
-KBUILD_DEFCONFIG:qemuarma7 = ""
-KBUILD_DEFCONFIG:raspberrypi4-64 = ""
+KBUILD_DEFCONFIG:qemuarma7 = "qemu_defconfig"
+KBUILD_DEFCONFIG:raspberrypi4-64 = "bcm2711_oh_defconfig"
+
+do_kernel_metadata:prepend(){
+    cp -rf ${WORKDIR}/${KBUILD_DEFCONFIG} ${S}/arch/${ARCH}/configs
+}
 
 do_patch:prepend(){
     PROJECT_ROOT=${WORKDIR}
