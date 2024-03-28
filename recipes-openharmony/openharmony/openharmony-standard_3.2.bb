@@ -20,6 +20,7 @@ DEPENDS += "ncurses-native"
 DEPENDS += "ccache-native"
 DEPENDS += "clang-native"
 DEPENDS += "hc-gen-native"
+DEPENDS += "nodejs-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-${OPENHARMONY_VERSION}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony-standard-${OPENHARMONY_VERSION}:"

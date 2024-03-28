@@ -1107,6 +1107,28 @@ SRC_URI[node-v12.18.4-linux-x64.sha256sum] = "b1745bf45aab8d92ebb78d6c4f07c66ad7
 # git lfs operations that are executed within do_unpack()
 do_unpack[network] = "1"
 
+npm_rebuild() {
+    cd ${S}/third_party/jsframework/
+    npm rebuild
+
+    cd ${S}/developtools/ace_ets2bundle/compiler
+    npm rebuild
+
+    cd ${S}/developtools/ace_js2bundle/ace-loader
+    npm rebuild
+
+    cd ${S}/arkcompiler/ets_frontend/ts2panda
+    npm rebuild
+
+    cd ${S}/arkcompiler/ets_frontend/legacy_bin/api8
+    npm rebuild
+
+    cd ${S}/interface/sdk-js/build-tools
+    npm rebuild
+}
+
+do_configure[prefuncs] += "npm_rebuild"
+
 # Create symlinks as done by the OpenHarmony repo manifest
 create_symlinks() {
     if [ -f "${S}/build/build_scripts/build.sh" ]; then
