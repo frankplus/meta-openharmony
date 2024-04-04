@@ -39,6 +39,12 @@ SRCREV_kernel_linux_patches = "824896c9ef0d04b70bd9d7644afec03db8cda927"
 SRC_URI += "git://gitee.com/openharmony-sig/vendor_iscas.git;protocol=https;branch=OpenHarmony-3.2-Release;name=vendor_iscas;destsuffix=vendor/iscas"
 SRCREV_vendor_iscas = "16a4d8efba39c03e46342dc75f1b400ee8258136"
 
+SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/prebuilts_gcc_linux-x86_arm_gcc-linaro-7.5.0-arm-linux-gnueabi/1.0/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz;name=gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu;subdir=prebuilts/gcc/linux-x86/aarch64"
+SRC_URI[gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.sha256sum] = "3b6465fb91564b54bbdf9578b4cc3aa198dd363f7a43820eab06ea2932c8e0bf"
+
+SRC_URI += "https://repo.huaweicloud.com/openharmony/compiler/clang/12.0.1-1971c8/linux/clang_linux-x86_64-1971c8-20230313.tar.bz2;name=llvm-2;subdir=prebuilts/clang/ohos/linux-x86_64"
+SRC_URI[llvm-2.sha256sum] = "9b664ebd3834af110b63c7f0e8c45cc84f9cfc8ba486004822adf1c8d3e20a84"
+
 SRC_URI += "file://bcm2711_oh_defconfig"
 SRC_URI += "file://qemu_defconfig"
 SRC_URI += "file://rpi4.patch"
@@ -54,6 +60,12 @@ COMPATIBLE_MACHINE = "qemuarma7|raspberrypi4-64"
 KBUILD_DEFCONFIG:qemuarma7 = "qemu_defconfig"
 KBUILD_DEFCONFIG:raspberrypi4-64 = "bcm2711_oh_defconfig"
 
+TOOLCHAIN = "clang"
+CROSS_COMPILE_TOOLCHAIN = "${WORKDIR}/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu"
+
+export CROSS_COMPILE = "${CROSS_COMPILE_TOOLCHAIN}/bin/aarch64-linux-gnu-"
+export PRODUCT_PATH = "vendor/iscas/rpi4"
+
 do_kernel_metadata:prepend(){
     cp -rf ${WORKDIR}/${KBUILD_DEFCONFIG} ${S}/arch/${ARCH}/configs
 }
@@ -67,12 +79,24 @@ do_patch:prepend(){
     bash ${PROJECT_ROOT}/drivers/hdf_core/adapter/khdf/linux/patch_hdf.sh ${PROJECT_ROOT} ${KERNEL_BUILD_ROOT} ${KERNEL_PATCH_PATH} ${DEVICE_NAME}
 }
 
-do_compile:prepend(){
-    export PRODUCT_PATH=vendor/iscas/rpi4
-}
+do_compile:prepend() {
+    # Find the path of the g++ compiler
+    GPP_PATH=$(which g++)
+    if [ -z "$GPP_PATH" ]; then
+        bberr "g++ not found."
+        exit 1
+    fi
 
-do_compile_kernelmodules:prepend(){
-    export PRODUCT_PATH=vendor/iscas/rpi4
+    # Get the directory where g++ is located
+    GPP_DIR=$(dirname "$GPP_PATH")
+
+    # Check if c++ exists in the same directory
+    if [ ! -f "$GPP_DIR/c++" ]; then
+        # If c++ does not exist, create a symlink to g++
+        ln -s "$GPP_PATH" "$GPP_DIR/c++"
+        bbnote "Symbolic link for c++ created."
+    fi
 }
 
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+INHIBIT_PACKAGE_STRIP = "1"
