@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-SUMMARY = "OpenHarmony 4.0"
+SUMMARY = "OpenHarmony 3.2"
 
 
 LICENSE = "0BSD & Apache-2.0 & BSD-2-Clause & BSD-3-Clause & BSL-1.0 & \
@@ -39,6 +39,7 @@ SRC_URI += "file://prebuilts_download.sh"
 SRC_URI += "file://prebuilts_download.py"
 
 SRC_URI += "file://hdi-gen-compiler.patch;patchdir=${S}/drivers/hdf_core/framework"
+SRC_URI += "file://rpi4-config-json.patch;patchdir=${S}/vendor/iscas"
 
 # clean build directory if already exists
 clean_out_dir() {
@@ -159,17 +160,22 @@ do_install () {
     rm ${D}/bin/sh
     [ -d "${D}/etc/profile" ] && rm -r ${D}/etc/profile
     [ -d "${D}/etc/udev" ] && rm -r ${D}/etc/udev
-
-    rm ${D}/lib/libshared_libz.so
-    rm ${D}/lib/libf2fs.so
-    rm ${D}/lib/platformsdk/libhmicuuc.so
-    rm ${D}/lib/platformsdk/libhmicui18n.so
-    rm ${D}/lib/libext2_uuid.so
     rm -r ${D}/lib/firmware
 
     # rename musl to avoid conflict with yocto provided libc
-    mv ${D}/lib/ld-musl-aarch64.so.1 ${D}/lib/ohos-ld-musl-aarch64.so.1
-    mv ${D}/etc/ld-musl-aarch64.path ${D}/etc/ohos-ld-musl-aarch64.path
+    if [ "${TARGET_ARCH}" = "aarch64" ]; then
+        mv ${D}/lib/ld-musl-aarch64.so.1 ${D}/lib/ohos-ld-musl-aarch64.so.1
+        mv ${D}/etc/ld-musl-aarch64.path ${D}/etc/ohos-ld-musl-aarch64.path
+    fi
+
+    if [ "${TARGET_ARCH}" = "arm" ]; then
+        mv ${D}/lib/ld-musl-arm.so.1 ${D}/lib/ohos-ld-musl-arm.so.1
+        mv ${D}/etc/ld-musl-arm.path ${D}/etc/ohos-ld-musl-arm.path
+    fi
+
+    # removing artifact which architecture does not match the target
+    rm ${D}/lib/libext2_uuid.so
+    rm ${D}/lib/libf2fs.so
 
     return 0
 }

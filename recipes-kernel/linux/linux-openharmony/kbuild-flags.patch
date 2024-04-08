@@ -1,8 +1,13 @@
 diff --git a/Makefile b/Makefile
-index aa4a7d2096a6..cc3b16c7ad03 100644
+index 204953861072..6139a439606f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -498,7 +498,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+@@ -493,11 +493,11 @@ LINUXINCLUDE    := \
+ 		$(USERINCLUDE)
+ 
+ KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
+-KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
++KBUILD_CFLAGS   := -Wall -Wundef -Wno-trigraphs \
  		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
  		   -Werror=implicit-function-declaration -Werror=implicit-int \
  		   -Werror=return-type -Wno-format-security \
@@ -11,17 +16,3 @@ index aa4a7d2096a6..cc3b16c7ad03 100644
  KBUILD_CPPFLAGS := -D__KERNEL__
  KBUILD_AFLAGS_KERNEL :=
  KBUILD_CFLAGS_KERNEL :=
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 485b7dbd4f9e..ff0326c8ca2c 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -44,8 +44,7 @@ ifeq ($(CONFIG_BROKEN_GAS_INST),y)
- $(warning Detected assembler with broken .inst; disassembly will be unreliable)
- endif
- 
--KBUILD_CFLAGS	+= -mgeneral-regs-only	\
--		   $(compat_vdso) $(cc_has_k_constraint)
-+KBUILD_CFLAGS	+= $(compat_vdso) $(cc_has_k_constraint)
- KBUILD_CFLAGS	+= $(call cc-disable-warning, psabi)
- KBUILD_AFLAGS	+= $(compat_vdso)
- 

@@ -18,11 +18,21 @@ IMAGE_INSTALL += "bash"
 IMAGE_INSTALL += "avahi-daemon"
 
 use_ohos_musl() {
-    rm ${IMAGE_ROOTFS}/lib/ld-musl-aarch64.so.1
-    rm ${IMAGE_ROOTFS}/etc/ld-musl-aarch64.path
+    if [ "${TARGET_ARCH}" = "aarch64" ]; then
+        rm ${IMAGE_ROOTFS}/lib/ld-musl-aarch64.so.1
+        rm ${IMAGE_ROOTFS}/etc/ld-musl-aarch64.path
 
-    mv ${IMAGE_ROOTFS}/lib/ohos-ld-musl-aarch64.so.1 ${IMAGE_ROOTFS}/lib/ld-musl-aarch64.so.1 
-    mv ${IMAGE_ROOTFS}/etc/ohos-ld-musl-aarch64.path ${IMAGE_ROOTFS}/etc/ld-musl-aarch64.path 
+        mv ${IMAGE_ROOTFS}/lib/ohos-ld-musl-aarch64.so.1 ${IMAGE_ROOTFS}/lib/ld-musl-aarch64.so.1 
+        mv ${IMAGE_ROOTFS}/etc/ohos-ld-musl-aarch64.path ${IMAGE_ROOTFS}/etc/ld-musl-aarch64.path 
+    fi
+
+    if [ "${TARGET_ARCH}" = "arm" ]; then
+        rm ${IMAGE_ROOTFS}/lib/ld-musl-armhf.so.1
+        rm ${IMAGE_ROOTFS}/etc/ld-musl-armhf.path
+
+        mv ${IMAGE_ROOTFS}/lib/ohos-ld-musl-arm.so.1 ${IMAGE_ROOTFS}/lib/ld-musl-arm.so.1 
+        mv ${IMAGE_ROOTFS}/etc/ohos-ld-musl-arm.path ${IMAGE_ROOTFS}/etc/ld-musl-arm.path 
+    fi
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "use_ohos_musl; "
