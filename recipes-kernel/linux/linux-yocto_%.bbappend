@@ -4,7 +4,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/openharmony:"
 SRC_URI += "file://0001-OpenHarmony-4.1-Release-adaptation.patch"
 SRC_URI += "file://0001-fix-access_tokenid-resolve-strict-prototypes-warning.patch"
 SRC_URI += "file://0001-fixing-get_fs-set_fs-functions-undeclared.patch"
-SRC_URI += "file://kbuild_cflags.patch"
 
 SRC_URI += " file://openharmony.cfg"
 
@@ -25,24 +24,24 @@ SRCREV_drivers_hdf_core = "4a9f9088e087e2999f81118f34792d3cbe8c87dd"
 SRC_URI += "git://github.com/eclipse-oniro4openharmony/vendor_oniro.git;protocol=https;branch=OpenHarmony-4.1-Release;name=vendor_oniro;destsuffix=vendor/oniro"
 SRCREV_vendor_oniro = "ffd56f100d5a2cd6e449dfa9ef74b4ba9067bcef"
 
-SRC_URI += "file://hdf.patch"
-SRC_URI += "file://hdf_patch.sh"
+# SRC_URI += "file://hdf.patch"
+# SRC_URI += "file://hdf_patch.sh"
 
-do_patch:append(){
-    KERNEL_BUILD_ROOT=${S}
-    bash ${WORKDIR}/hdf_patch.sh ${WORKDIR} ${KERNEL_BUILD_ROOT}
-}
+# do_patch:append(){
+#     KERNEL_BUILD_ROOT=${S}
+#     bash ${WORKDIR}/hdf_patch.sh ${WORKDIR} ${KERNEL_BUILD_ROOT}
+# }
 
-do_configure:prepend() {
-    KERNEL_BUILD_ROOT=${S}
-    ROOT_DIR=${WORKDIR}
+# do_configure:prepend() {
+#     KERNEL_BUILD_ROOT=${S}
+#     ROOT_DIR=${WORKDIR}
     
-    bash ${ROOT_DIR}/kernel/linux/common_modules/newip/apply_newip.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
-    bash ${ROOT_DIR}/kernel/linux/common_modules/qos_auth/apply_qos_auth.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
-    if [ ! -d "$KERNEL_BUILD_ROOT/security/xpm" ]; then
-        bash ${ROOT_DIR}/kernel/linux/common_modules/xpm/apply_xpm.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
-    fi
-}
+#     bash ${ROOT_DIR}/kernel/linux/common_modules/newip/apply_newip.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
+#     bash ${ROOT_DIR}/kernel/linux/common_modules/qos_auth/apply_qos_auth.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
+#     if [ ! -d "$KERNEL_BUILD_ROOT/security/xpm" ]; then
+#         bash ${ROOT_DIR}/kernel/linux/common_modules/xpm/apply_xpm.sh ${ROOT_DIR} ${KERNEL_BUILD_ROOT} ${MACHINE} ${LINUX_VERSION}
+#     fi
+# }
 
 do_compile:prepend() { 
     export PRODUCT_PATH=vendor/oniro/x23
