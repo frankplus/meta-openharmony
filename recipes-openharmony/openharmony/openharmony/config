@@ -17,7 +17,7 @@ lxc.tty.max = 4
 lxc.pty.max = 1024
 lxc.cap.drop = mac_admin mac_override
 
-lxc.apparmor.profile = unconfined
+#lxc.apparmor.profile = unconfined
 lxc.autodev = 0
 
 lxc.mount.entry = tmpfs dev tmpfs nosuid,mode=0755 0 0
