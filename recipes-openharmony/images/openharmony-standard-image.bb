@@ -23,4 +23,4 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = " + 8192"
 
 QB_MEM = "-m 1024"
 
-QB_KERNEL_CMDLINE_APPEND += "bootopt=64S3,32N2,64N2 systempart=/dev/mapper/system hardware=qemu ohos.boot.sn=0a20230726rpi"
+QB_KERNEL_CMDLINE_APPEND += "hardware=virt ohos.boot.sn=20250405oniro"

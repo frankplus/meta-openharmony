@@ -9,31 +9,31 @@ This layer depends on the following Yocto meta-layers:
 
 ```
 URI: poky/meta
-branch: kirkstone
+branch: scarthgap
 
 URI: poky/meta-poky
-branch: kirkstone
+branch: scarthgap
 
 URI: poky/meta-yocto-bsp
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-openembedded/meta-oe
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-openembedded/meta-filesystems
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-openembedded/meta-python
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-openembedded/meta-networking
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-openharmony
-branch: kirkstone
+branch: scarthgap
 
 URI: meta-virtualization
-branch: kirkstone
+branch: scarthgap
 ```
 
 # Adding the meta-openharmony layer to your build
