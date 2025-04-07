@@ -26,10 +26,8 @@ do_patch:append(){
     KERNEL_BUILD_ROOT=${S}
     bash ${WORKDIR}/hdf_patch.sh ${WORKDIR} ${KERNEL_BUILD_ROOT}
     
-    # symlink include/linux/stdarg.h to include/stdarg.h if the symlink doesn't already exist
-    if [ ! -L "${KERNEL_BUILD_ROOT}/include/stdarg.h" ]; then
-        ln -s ${KERNEL_BUILD_ROOT}/include/linux/stdarg.h ${KERNEL_BUILD_ROOT}/include/stdarg.h
-    fi
+    sed -i 's/<stdarg.h>/<linux\/stdarg.h>/' ${KERNEL_BUILD_ROOT}/bounds_checking_function/include/securec.h
+    sed -i 's/"stdarg.h"/"linux\/stdarg.h"/' ${WORKDIR}/drivers/hdf_core/framework/support/platform/src/fwk/platform_device.c
 }
 
 do_compile:prepend() { 
